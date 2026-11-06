@@ -120,13 +120,26 @@ select{font-family:var(--font-ui);font-size:13px;font-weight:600;color:var(--ink
 .nota{font-size:12px;color:var(--muted);max-width:90ch;line-height:1.6;margin:0 4px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
+/* painel de juntas soldadas: vermelho, como no Sigma Campo */
+:root{--acc:#C62828;--acc-rgb:198,40,40;--acc-soft:#FEF2F2;--acc-tx:#7F1D1D}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--acc:#EF5350;--acc-rgb:239,83,80;--acc-soft:#3D1A1A;--acc-tx:#FCA5A5}}
+:root[data-theme="dark"]{--acc:#EF5350;--acc-rgb:239,83,80;--acc-soft:#3D1A1A;--acc-tx:#FCA5A5}
+.es-header .logo{background:var(--acc)}
+.kpi{border-top:3px solid var(--acc)}
+.kpi .n{color:var(--acc)}
+.abas{display:flex;gap:8px;flex-wrap:wrap}
+.abas .uchip[aria-pressed="true"],.fil .uchip[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#fff}
+.abas .cnt{display:inline-block;min-width:18px;margin-left:4px;padding:0 5px;border-radius:9px;background:var(--field);color:var(--muted);font-size:11px}
+.abas .uchip[aria-pressed="true"] .cnt{background:rgba(255,255,255,.25);color:#fff}
+.vz-box{background:var(--panel);border:1px dashed var(--field-line);border-radius:var(--r-lg);padding:28px 22px;color:var(--muted);font-size:13px;line-height:1.6}
+.vz-box b{display:block;color:var(--ink);font-family:var(--font-d);font-size:15px;margin-bottom:4px}
 .duas2{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.45fr);gap:16px;align-items:start}
 @media(max-width:980px){.duas2{grid-template-columns:minmax(0,1fr)}}
 .pad{padding:12px 14px}
 .sv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start;width:100%;text-align:left;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--panel);cursor:pointer;margin-bottom:8px;font-family:var(--font-ui);color:var(--ink)}
 .sv:hover{background:var(--field)}
-.sv.on{border-color:var(--blue);box-shadow:inset 3px 0 0 var(--blue)}
-.sv .cod{font:800 12px var(--font-d);color:var(--blue);background:var(--field);border:1px solid var(--field-line);border-radius:6px;padding:3px 7px;white-space:nowrap}
+.sv.on{border-color:var(--acc);box-shadow:inset 3px 0 0 var(--acc)}
+.sv .cod{font:800 12px var(--font-d);color:var(--acc);background:var(--acc-soft);border:1px solid rgba(var(--acc-rgb),.3);border-radius:6px;padding:3px 7px;white-space:nowrap}
 .sv b{display:block;font-size:13px;line-height:1.3}
 .sv small{font-size:11.5px;color:var(--muted)}
 .sv em{color:#DC2626;font-style:normal;font-weight:700}
@@ -139,7 +152,8 @@ select{font-family:var(--font-ui);font-size:13px;font-weight:600;color:var(--ink
 .mx td{text-align:center;padding:0}
 .mx td b{font-family:var(--font-d);white-space:nowrap}
 .mx .na{color:var(--muted)}
-.mx .cel{display:block;border-radius:6px;padding:6px 2px;font:800 10.5px var(--font-d);white-space:nowrap}
+.mx .cel.rp{outline:2px solid var(--ink);outline-offset:-2px}
+.mx .cel{background:rgba(var(--acc-rgb),var(--a));display:block;border-radius:6px;padding:6px 2px;font:800 10.5px var(--font-d);white-space:nowrap}
 .mwrap{display:grid;grid-template-columns:minmax(0,1fr) 320px}
 @media(max-width:980px){.mwrap{grid-template-columns:minmax(0,1fr)}}
 .mcol{min-width:0;padding:14px 16px}
@@ -152,14 +166,14 @@ select{font-family:var(--font-ui);font-size:13px;font-weight:600;color:var(--ink
 .jc{border:0;border-radius:6px;padding:6px 0;font:800 11px var(--font-d);cursor:pointer}
 .jc:hover{filter:brightness(1.08)}
 .jc.sel{outline:3px solid var(--ink);outline-offset:1px}
-.jc:focus-visible{outline:3px solid var(--blue);outline-offset:1px}
+.jc:focus-visible{outline:3px solid var(--acc);outline-offset:1px}
 .leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;font-weight:600;color:var(--ink-soft);margin-top:12px}
 .leg i,.dt{display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:6px;vertical-align:-1px}
 .hm-side{border-left:1px solid var(--line);padding:14px 16px;min-width:0}
 @media(max-width:980px){.hm-side{border-left:0;border-top:1px solid var(--line)}}
 .hs-t{font-family:var(--font-d);font-weight:800;font-size:15px;line-height:1.3}
 .hs-q{font-size:11.5px;color:var(--muted);margin:3px 0 10px}
-.hs-fechar{background:none;border:0;color:var(--blue);font:700 12px var(--font-ui);cursor:pointer;padding:0}
+.hs-fechar{background:none;border:0;color:var(--acc);font:700 12px var(--font-ui);cursor:pointer;padding:0}
 .hm-side h3{font-family:var(--font-d);font-weight:800;font-size:11.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px}
 .chip{font-size:11px;font-weight:800;border-radius:20px;padding:3px 9px;border:1px solid;display:inline-block}
 .kv{display:grid;grid-template-columns:auto auto;gap:6px 14px;font-size:12.5px;justify-content:start}
@@ -179,20 +193,24 @@ select{font-family:var(--font-ui);font-size:13px;font-weight:600;color:var(--ink
 
 <header class="es-header">
   <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 17h4l3-10 4 14 3-8h4"/></svg></div>
-  <div class="tit"><div class="tt">Mapa de juntas dos fornos</div><div class="st">REPLAN · F-424102 · Contrato 5900.0135110.26.2 · OS 035 · Parada março 2027</div></div>
-  <nav class="nav-f" aria-label="Navegação"><a class="hbtn" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21H3z"/></svg>Início</a><a class="hbtn" href="consulta.html">Consultar</a><a class="hbtn" id="lk-outro" href="painel-zonas.html">Painel de zonas</a><a class="hbtn" href="mapa-tubos.html">Mapa de tubos</a><button type="button" class="hbtn" id="b-tema" title="Claro ou escuro (tecla T)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><span id="b-tema-t">Escuro</span></button></nav>
+  <div class="tit"><div class="tt">Mapa de juntas dos fornos</div><div class="st">REPLAN · fornos · Contrato 5900.0135110.26.2 · OS 035 · Parada março 2027</div></div>
+  <nav class="nav-f" aria-label="Navegação"><a class="hbtn" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21H3z"/></svg>Início</a><a class="hbtn" href="consulta.html">Consultar</a><a class="hbtn" id="lk-outro" href="painel-zonas.html">Painel de zonas</a><a class="hbtn" href="mapa-tubos.html">Mapa de tubos</a><a class="hbtn" href="juntas-gerencial.html">Painel gerencial</a><button type="button" class="hbtn" id="b-tema" title="Claro ou escuro (tecla T)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><span id="b-tema-t">Escuro</span></button></nav>
   <span class="tag-prot">Protótipo · juntas de exemplo</span>
 </header>
 <main class="wrap">
+  <nav class="abas" id="abas" aria-label="Forno"></nav>
+  <div id="vazio" hidden></div>
+  <div id="cheio" style="display:grid;gap:16px">
   <section class="kpis" id="kpis" aria-label="Resumo das juntas"></section>
   <div class="duas2">
     <section class="panel"><div class="panel-h"><div><div class="tt">Serviços de soldagem</div><div class="q">Plaquetas da declaração que têm junta soldada · toque para abrir o mapa</div></div></div><div class="pad" id="porSv"></div></section>
-    <section class="panel"><div class="panel-h"><div><div class="tt">Etapas e ensaios concluídos</div><div class="q">Juntas feitas sobre as juntas que exigem cada etapa ou ensaio · borda vermelha: há reprovado</div></div></div><div class="pad mxw" id="mx"></div></section>
+    <section class="panel"><div class="panel-h"><div><div class="tt">Etapas e ensaios concluídos</div><div class="q">Juntas feitas sobre as juntas que exigem cada etapa ou ensaio · marcado com ! quando há junta reprovada</div></div></div><div class="pad mxw" id="mx"></div></section>
   </div>
   <section class="panel">
     <div class="panel-h"><div><div class="tt" id="m-tit"></div><div class="q" id="m-sub"></div></div></div>
     <div class="mwrap"><div class="mcol"><div class="fil" id="fil"></div><div id="mapa"></div><div class="leg" id="leg"></div></div><aside class="hm-side" id="side" aria-live="polite"></aside></div>
   </section>
+  </div>
   <p class="nota">Protótipo. As etapas e os ensaios usam o mesmo cadastro do painel de juntas do Sigma Campo (junta_etapa e ensaio_tipo). Quantidade de juntas da LT e da serpentina, requisitos de ensaio sem pedido explícito na declaração, soldadores e laudos são exemplos.</p>
 </main>
 <script>
@@ -373,43 +391,48 @@ function estZona(fo,zc){const ps=ITENS.filter(p=>p.forno===fo&&p.zonas.includes(
 const JETAPAS=[['visual_ajuste','Ajuste'],['dimensional','Dimensional'],['raiz','Raiz'],['enchimento','Enchimento'],['acabamento','Acabamento']];
 const ENS={EVS:'EVS',LP:'LP',RX:'RX',DUR:'Dureza',TTAT:'TTAT',PMI:'PMI'};
 const SERV=[
- {cod:'1.5',nome:'Colunas de tubos catalisadores e pigtails inferiores',mat:'A-608 HP mod. × Incoloy 800 HT',
+ {fo:'02',cod:'1.5',nome:'Colunas de tubos catalisadores e pigtails inferiores',mat:'A-608 HP mod. × Incoloy 800 HT',
   nota:'4 juntas por coluna: J1 e J2 entre os 3 tubos da coluna (verificar se vêm soldadas do fabricante), J3 pigtail × tubo e J4 pigtail × coletor. Requisitos de ensaio de exemplo, a definir no plano de inspeção.'},
- {cod:'1.3',nome:'Tês do sistema de saída',mat:'conforme posição 2 do DE-REPLAN-4241-42-00016',req:['EVS','LP','DUR'],
+ {fo:'02',cod:'1.3',nome:'Tês do sistema de saída',mat:'conforme posição 2 do DE-REPLAN-4241-42-00016',req:['EVS','LP','DUR'],
   nota:'3 Tês × 3 extremidades. Dureza conforme API 942, pedido no próprio item.'},
- {cod:'1.20',nome:'Linha de transferência nova',mat:'conforme projeto da LT',req:['EVS','RX'],qt:12,
+ {fo:'02',cod:'1.20',nome:'Linha de transferência nova',mat:'conforme projeto da LT',req:['EVS','RX'],qt:12,
   nota:'Quantidade de juntas de exemplo: levantar no desenho da LT nova.'},
- {cod:'1.22',nome:'Serpentina de carga mista (P9)',mat:'P9',req:['EVS','RX','TTAT','DUR'],qt:24,
+ {fo:'02',cod:'1.22',nome:'Serpentina de carga mista (P9)',mat:'P9',req:['EVS','RX','TTAT','DUR'],qt:24,
   nota:'Protrusão interna máxima de 1,6 mm e gamagrafia recomendada (item 1.22). P9 com TTAT e dureza. Quantidade de juntas de exemplo.'},
- {cod:'1.33',nome:'Dreno do coletor de carga mista',mat:'conforme linha',req:['LP'],qt:2,
+ {fo:'02',cod:'1.33',nome:'Dreno do coletor de carga mista',mat:'conforme linha',req:['LP'],qt:2,
   nota:'Solda do dreno com a luva e da luva com o coletor, com LP (item 1.33).'},
- {cod:'HI-23-02',nome:'2 bocais no costado',mat:'chaparia do costado',req:['EVS','LP'],qt:2,nota:'Uma junta por bocal. Ensaios de exemplo.'},
- {cod:'HI-25-11',nome:'7 bocais de 3" leste e oeste',mat:'chaparia do costado',req:['EVS','LP'],qt:7,nota:'Uma junta por bocal. Ensaios de exemplo.'}];
+ {fo:'02',cod:'HI-23-02',nome:'2 bocais no costado',mat:'chaparia do costado',req:['EVS','LP'],qt:2,nota:'Uma junta por bocal. Ensaios de exemplo.'},
+ {fo:'02',cod:'HI-25-11',nome:'7 bocais de 3" leste e oeste',mat:'chaparia do costado',req:['EVS','LP'],qt:7,nota:'Uma junta por bocal. Ensaios de exemplo.'},
+ {fo:'01',cod:'1.6',nome:'Grampos do reparo de refratário',mat:'grampos conforme DE-REPLAN_4241-42-407',req:['EVS'],qt:16,
+  nota:'Grampos (ancoragens) soldados na chaparia na área de 1 m² indicada pela inspeção. Quantidade de exemplo: definir pela malha do desenho.'},
+ {fo:'P3',cod:'1.5',nome:'2 bocais de 4" no carretel de entrada',mat:'conforme o carretel',req:['EVS','LP'],qt:2,
+  nota:'Bocais na geratriz superior para aplicar o concreto isolante por fluência livre (item 1.5, retificação). Ensaios de exemplo.'}];
+SERV.forEach(s=>s.k=s.fo+'|'+s.cod);
 const SOLD=EFETIVO.filter(e=>e.grupo==='Caldeiraria e Soldagem / Produção');
 const INSP_S=EFETIVO.find(e=>e.funcao.startsWith('Inspetora de soldagem')),INSP_E=EFETIVO.find(e=>e.funcao.startsWith('Inspetor de END'));
 const JUNTAS=[];
 function dia(n){const d=new Date(Date.UTC(2027,2,3+n));return d.toISOString().slice(0,10)}
 function montaJunta(sv,id,ref,tipo,req,nivel,r){
   /* nivel: 0 nada, 1 ajustada, 2 soldada sem END, 3 END em curso, 4 concluída */
-  const sold=SOLD[Math.floor(r*SOLD.length)%SOLD.length],j={sv:sv.cod,id,ref,tipo,req,et:{},en:{},sold};
+  const sold=SOLD[Math.floor(r*SOLD.length)%SOLD.length],j={sv:sv.k,fo:sv.fo,id,ref,tipo,req,et:{},en:{},sold};
   const nEt=nivel>=2?5:nivel===1?2:0;
   JETAPAS.slice(0,nEt).forEach(([c],i)=>{j.et[c]={quando:dia(i+Math.floor(r*4)),quem:i<2?INSP_S.nome:sold.nome,sinete:i<2?null:sold.funcao.split('· ')[1]}});
   req.forEach((e,i)=>{if(nivel>=4||(nivel===3&&i<Math.ceil(req.length/2))){
       const rep=e==='RX'&&r>.9;j.en[e]={res:rep?'reprovado':'aprovado',quando:dia(6+i),quem:e==='EVS'?INSP_S.nome:INSP_E.nome,rel:`${e}-${String(Math.floor(r*900)+100)}/27`}}});
   return j}
 (function(){
-  const pl=c=>ITENS.find(p=>p.forno==='02'&&p.cod===c);
+  const pl=sv=>ITENS.find(p=>p.forno===sv.fo&&p.cod===sv.cod);
   colunas().forEach(c=>{const r=hash(c.id);
     const nv=c.rem||!c.sub?0:c.med?4:(r<.5?3:2);
     [['J1','tubo 1 × tubo 2','JP'],['J2','tubo 2 × tubo 3','JP'],['J3','pigtail × tubo 3','JC'],['J4','pigtail × coletor','JC']].forEach(([s,ref,tp],k)=>{
       const req=tp==='JP'?['EVS','RX']:['EVS','LP','PMI'];
       JUNTAS.push(montaJunta(SERV[0],`${c.id}-${s}`,`Coluna ${c.id} · ${ref}`,tp,req,nv===3&&k<2?4:nv,hash(c.id+s)))})});
-  SERV.slice(1).forEach(sv=>{const p=pl(sv.cod),frac=p?(p.estado==='lib'?1:p.feitas/TIPOS[p.tipo].e.length):0;
+  SERV.slice(1).forEach(sv=>{const p=pl(sv),frac=p?(p.estado==='lib'?1:p.feitas/TIPOS[p.tipo].e.length):0;
     const qt=sv.cod==='1.3'?9:sv.qt;
     for(let i=0;i<qt;i++){const r=hash(sv.cod+i),pos=i/qt;
       const nv=pos<frac*.7?4:pos<frac?3:pos<frac+.15?1:0;
-      const ref=sv.cod==='1.3'?`Tê ${Math.floor(i/3)+1} · extremidade ${i%3+1}`:sv.cod==='1.33'?(i?'luva × coletor':'dreno × luva'):sv.cod.startsWith('HI')?`bocal ${i+1} × costado`:`junta ${i+1}`;
-      JUNTAS.push(montaJunta(sv,`${sv.cod}-J${String(i+1).padStart(2,'0')}`,ref,'JC',sv.req,nv,r))}});
+      const ref=sv.fo==='P3'?`bocal ${i+1} × carretel`:sv.fo==='01'?`grampo ${i+1}`:sv.cod==='1.3'?`Tê ${Math.floor(i/3)+1} · extremidade ${i%3+1}`:sv.cod==='1.33'?(i?'luva × coletor':'dreno × luva'):sv.cod.startsWith('HI')?`bocal ${i+1} × costado`:`junta ${i+1}`;
+      JUNTAS.push(montaJunta(sv,`${sv.fo==='02'?'':sv.fo+' '}${sv.cod}-J${String(i+1).padStart(2,'0')}`,ref,'JC',sv.req,nv,r))}});
 })();
 function estJ(j){const sol=!!j.et.acabamento,aj=Object.keys(j.et).length>0;
   if(Object.values(j.en).some(e=>e.res==='reprovado'))return'rep';
@@ -418,42 +441,52 @@ function estJ(j){const sol=!!j.et.acabamento,aj=Object.keys(j.et).length>0;
 const JEST={nao:['Não iniciada','#CBD2DC','#4B5563'],sol:['Em soldagem','#0F4CBA','#fff'],end:['Soldada, aguardando END','#F59E0B','#3F2207'],rep:['Reparo (END reprovado)','#EF4444','#fff'],ok:['Concluída','#16A34A','#fff']};
 
 const $=id=>document.getElementById(id);
-let svAtivo='1.5',jSel=null,filtro='';
-{const h=decodeURIComponent(location.hash.slice(1));if(SERV.some(s=>s.cod===h))svAtivo=h}
-function kpis(){const t=JUNTAS.length,s=JUNTAS.filter(j=>j.et.acabamento).length,req=JUNTAS.reduce((a,j)=>a+j.req.length,0),
-  lau=JUNTAS.reduce((a,j)=>a+Object.keys(j.en).length,0),rep=JUNTAS.filter(j=>estJ(j)==='rep').length;
+const FO_ORD=['02','01','8A','8B','P3'];
+let foAtivo='02',svAtivo='02|1.5',jSel=null,filtro='';
+{const h=decodeURIComponent(location.hash.slice(1)).split('/'),fo=GULS[h[0]];
+  if(fo){foAtivo=fo;const k=fo+'|'+(h[1]||'');svAtivo=SERV.some(s=>s.k===k)?k:((SERV.find(s=>s.fo===fo)||{}).k||null)}}
+const svDo=()=>SERV.filter(s=>s.fo===foAtivo),jDo=()=>JUNTAS.filter(j=>j.fo===foAtivo);
+function marcaHash(){history.replaceState(null,'','#'+SLUG[foAtivo]+(svAtivo?'/'+encodeURIComponent(svAtivo.split('|')[1]):''))}
+function abas(){
+  $('abas').innerHTML=FO_ORD.map(k=>{const n=SERV.filter(s=>s.fo===k).length;
+    return `<button type="button" class="uchip" data-fo="${k}" aria-pressed="${k===foAtivo}">${esc(FORNOS[k].tag)} <span class="cnt">${n}</span></button>`}).join('');
+  document.querySelectorAll('[data-fo]').forEach(b=>b.onclick=()=>{foAtivo=b.dataset.fo;svAtivo=(svDo()[0]||{}).k||null;jSel=null;filtro='';marcaHash();tudo()});
+  const st=document.querySelector('.es-header .st');if(st)st.textContent=`REPLAN · ${FORNOS[foAtivo].tag} · Contrato 5900.0135110.26.2 · OS 035 · Parada março 2027`}
+function kpis(){const js=jDo(),t=js.length,s=js.filter(j=>j.et.acabamento).length,req=js.reduce((a,j)=>a+j.req.length,0),
+  lau=js.reduce((a,j)=>a+Object.keys(j.en).length,0),rep=js.filter(j=>estJ(j)==='rep').length;
   $('kpis').innerHTML=[[t,'','Juntas nos serviços de soldagem'],[s,` de ${t}`,'Soldadas (acabamento feito)'],[lau,` de ${req}`,'Ensaios com laudo'],[rep,'','Em reparo por END reprovado']]
     .map(([n,sm,l])=>`<div class="kpi"><div class="n">${n}<small>${sm}</small></div><div class="l">${l}</div></div>`).join('')}
 function porServico(){
-  $('porSv').innerHTML=SERV.map(sv=>{const js=JUNTAS.filter(j=>j.sv===sv.cod),s=js.filter(j=>j.et.acabamento).length,ok=js.filter(j=>estJ(j)==='ok').length,rep=js.filter(j=>estJ(j)==='rep').length;
-    return `<button type="button" class="sv ${sv.cod===svAtivo?'on':''}" data-sv="${sv.cod}"><span class="cod">${esc(sv.cod)}</span><span class="t"><b>${esc(sv.nome)}</b>
+  $('porSv').innerHTML=svDo().map(sv=>{const js=JUNTAS.filter(j=>j.sv===sv.k),s=js.filter(j=>j.et.acabamento).length,ok=js.filter(j=>estJ(j)==='ok').length,rep=js.filter(j=>estJ(j)==='rep').length;
+    return `<button type="button" class="sv ${sv.k===svAtivo?'on':''}" data-sv="${sv.k}"><span class="cod">${esc(sv.cod)}</span><span class="t"><b>${esc(sv.nome)}</b>
       <small>${js.length} juntas · ${s} soldadas · ${ok} concluídas${rep?` · <em>${rep} em reparo</em>`:''}</small>
       <span class="bar2"><i style="width:${Math.round(ok/js.length*100)}%;background:#16A34A"></i><i style="width:${Math.round((s-ok)/js.length*100)}%;background:#F59E0B"></i></span></span></button>`}).join('');
-  document.querySelectorAll('[data-sv]').forEach(b=>b.onclick=()=>{svAtivo=b.dataset.sv;jSel=null;history.replaceState(null,'','#'+encodeURIComponent(svAtivo));tudo();document.getElementById('m-tit').scrollIntoView({behavior:'smooth',block:'start'})})}
-function matriz(){const cols=[...JETAPAS.map(([c,n])=>({c,n,et:1})),...Object.entries(ENS).map(([c,n])=>({c,n}))];
-  $('mx').innerHTML=`<table class="mx"><thead><tr><th>Serviço</th>${cols.map(c=>`<th>${c.n}</th>`).join('')}</tr></thead><tbody>${SERV.map(sv=>{const js=JUNTAS.filter(j=>j.sv===sv.cod);
+  document.querySelectorAll('[data-sv]').forEach(b=>b.onclick=()=>{svAtivo=b.dataset.sv;jSel=null;marcaHash();tudo();$('m-tit').scrollIntoView({behavior:'smooth',block:'start'})})}
+function matriz(){const lst=svDo(),usados=new Set(lst.flatMap(s=>JUNTAS.filter(j=>j.sv===s.k).flatMap(j=>j.req)));
+  const cols=[...JETAPAS.map(([c,n])=>({c,n,et:1})),...Object.entries(ENS).filter(([c])=>usados.has(c)).map(([c,n])=>({c,n}))];
+  $('mx').innerHTML=`<table class="mx"><thead><tr><th>Serviço</th>${cols.map(c=>`<th>${c.n}</th>`).join('')}</tr></thead><tbody>${lst.map(sv=>{const js=JUNTAS.filter(j=>j.sv===sv.k);
     return `<tr><td><b>${esc(sv.cod)}</b></td>${cols.map(c=>{const alvo=c.et?js:js.filter(j=>j.req.includes(c.c));if(!alvo.length)return '<td class="na">·</td>';
       const f=alvo.filter(j=>c.et?j.et[c.c]:j.en[c.c]).length,pc=f/alvo.length,rp=!c.et&&alvo.some(j=>j.en[c.c]&&j.en[c.c].res==='reprovado');
-      return `<td><span class="cel" style="background:rgba(15,76,186,${(.08+pc*.82).toFixed(2)});color:${pc>.5?'#fff':'#0B3A91'}${rp?';box-shadow:inset 0 0 0 2px #EF4444':''}">${f}/${alvo.length}</span></td>`}).join('')}</tr>`}).join('')}</tbody></table>`}
-function mapa(){const sv=SERV.find(s=>s.cod===svAtivo);let js=JUNTAS.filter(j=>j.sv===svAtivo);
+      return `<td><span class="cel${rp?' rp':''}" style="--a:${(.1+pc*.85).toFixed(2)};color:${pc>.5?'#fff':'var(--acc-tx)'}" title="${rp?'Há junta reprovada neste ensaio':''}">${rp?'! ':''}${f}/${alvo.length}</span></td>`}).join('')}</tr>`}).join('')}</tbody></table>`}
+function mapa(){const sv=SERV.find(s=>s.k===svAtivo);let js=JUNTAS.filter(j=>j.sv===svAtivo);
   if(filtro)js=js.filter(j=>estJ(j)===filtro);
   $('m-tit').textContent=`${sv.cod} · ${sv.nome}`;$('m-sub').textContent=`${sv.mat} · ${sv.nota}`;
   $('fil').innerHTML=[['','Todas'],...Object.entries(JEST).map(([k,v])=>[k,v[0]])].map(([k,n])=>`<button type="button" class="uchip" data-f="${k}" aria-pressed="${filtro===k}">${n}</button>`).join('');
   document.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{filtro=b.dataset.f;jSel=null;tudo()});
   let h='';
-  if(svAtivo==='1.5'){const grupos={};js.forEach(j=>{const c=j.id.split('-')[0];(grupos[c]=grupos[c]||[]).push(j)});
+  if(svAtivo==='02|1.5'){const grupos={};js.forEach(j=>{const c=j.id.split('-')[0];(grupos[c]=grupos[c]||[]).push(j)});
     h=`<div class="cols">${Object.entries(grupos).map(([c,l])=>`<div class="colj"><span class="cn">${c}</span><div class="jj">${l.map(j=>chipJ(j,j.id.split('-')[1])).join('')}</div></div>`).join('')}</div>`}
   else h=`<div class="jl">${js.map(j=>chipJ(j,j.id.split('-').pop())).join('')}</div>`;
   $('mapa').innerHTML=js.length?h:'<p class="vz">Nenhuma junta neste filtro.</p>';
   $('mapa').querySelectorAll('[data-j]').forEach(b=>b.onclick=()=>{jSel=b.dataset.j;lado();marca()});
   $('leg').innerHTML=Object.values(JEST).map(v=>`<span><i style="background:${v[1]}"></i>${v[0]}</span>`).join('')}
-function chipJ(j,rot){const e=JEST[estJ(j)];return `<button type="button" class="jc${jSel===j.id?' sel':''}" data-j="${j.id}" style="background:${e[1]};color:${e[2]}" title="${esc(j.ref)} · ${e[0]}">${esc(rot)}</button>`}
+function chipJ(j,rot){const e=JEST[estJ(j)];return `<button type="button" class="jc${jSel===j.id?' sel':''}" data-j="${esc(j.id)}" style="background:${e[1]};color:${e[2]}" title="${esc(j.ref)} · ${e[0]}">${esc(rot)}</button>`}
 function marca(){document.querySelectorAll('[data-j]').forEach(b=>b.classList.toggle('sel',b.dataset.j===jSel))}
 function lado(){const j=JUNTAS.find(x=>x.id===jSel);
-  if(!j){const sv=SERV.find(s=>s.cod===svAtivo),js=JUNTAS.filter(x=>x.sv===svAtivo),c={};js.forEach(x=>{const k=estJ(x);c[k]=(c[k]||0)+1});
+  if(!j){const sv=SERV.find(s=>s.k===svAtivo),js=JUNTAS.filter(x=>x.sv===svAtivo),c={};js.forEach(x=>{const k=estJ(x);c[k]=(c[k]||0)+1});
     $('side').innerHTML=`<div class="hs-t">${esc(sv.cod)} · ${esc(sv.nome)}</div><div class="hs-q">Toque numa junta para ver as etapas, o soldador e os laudos.</div>
       <dl class="kv">${Object.entries(JEST).map(([k,v])=>`<dt><i class="dt" style="background:${v[1]}"></i>${v[0]}</dt><dd>${c[k]||0}</dd>`).join('')}</dl>
-      <a class="hbtn" style="margin-top:14px;text-decoration:none" href="consulta.html#f-424102/p/${encodeURIComponent(sv.cod)}">Abrir a plaqueta ${esc(sv.cod)} na consulta</a>`;return}
+      <a class="hbtn" style="margin-top:14px;text-decoration:none" href="consulta.html#${SLUG[sv.fo]}/p/${encodeURIComponent(sv.cod)}">Abrir a plaqueta ${esc(sv.cod)} na consulta</a>`;return}
   const e=estJ(j),E=JEST[e];
   $('side').innerHTML=`<button type="button" class="hs-fechar" id="b-f">← Resumo do serviço</button>
     <div class="hs-t" style="margin-top:4px">Junta ${esc(j.id)}</div><div class="hs-q" style="margin:2px 0 8px">${esc(j.ref)} · ${j.tipo==='JP'?'junta de pré-fabricação':'junta de campo'}</div>
@@ -462,7 +495,11 @@ function lado(){const j=JUNTAS.find(x=>x.id===jSel);
     <h3>Ensaios exigidos</h3><ol class="ets">${j.req.map(c=>{const r=j.en[c];return `<li class="${r?(r.res==='aprovado'?'ok':'rp'):''}"><span>${r?(r.res==='aprovado'?'✓':'✕'):'·'}</span><div><b>${ENS[c]}</b><small>${r?`${r.res==='aprovado'?'Aprovado':'Reprovado, reparo aberto'} · ${esc(r.rel)} · ${esc(r.quem)}`:'sem laudo'}</small></div></li>`}).join('')}</ol>
     <h3>Soldador</h3><p class="zm">${esc(j.sold.nome)} · ${esc(j.sold.funcao)}</p>`;
   $('b-f').onclick=()=>{jSel=null;lado();marca()}}
-function tudo(){kpis();porServico();matriz();mapa();lado()}
+function tudo(){abas();const tem=svDo().length;$('cheio').hidden=!tem;$('vazio').hidden=!!tem;
+  if(!tem){$('vazio').innerHTML=`<div class="vz-box"><b>${esc(FORNOS[foAtivo].tag)} não tem serviço de soldagem na Declaração de Escopo rev. 1</b>
+    Os itens deste forno são acesso, refratário, medição de espessura, queimadores e damper. Se uma possível abertura de ZR virar escopo com solda, a plaqueta nova entra aqui com as juntas dela.
+    <a class="hbtn" style="margin-top:12px;text-decoration:none;display:inline-flex" href="consulta.html#${SLUG[foAtivo]}">Ver as plaquetas do forno na consulta</a></div>`;return}
+  kpis();porServico();matriz();mapa();lado()}
 tudo();
 
 </script>
