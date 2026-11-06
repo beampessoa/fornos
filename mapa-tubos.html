@@ -178,6 +178,7 @@ select{font-family:var(--font-ui);font-size:13px;font-weight:600;color:var(--ink
 .prox .c .st{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin-top:8px}
 </style>
 <style>[hidden]{display:none!important} body{margin:0} img{max-width:100%} .nav-f{display:flex;gap:8px;flex-wrap:wrap} .nav-f a{text-decoration:none}</style>
+<script>(function(){var t="light";try{if(localStorage.getItem("sigma-tema")==="escuro")t="dark"}catch(e){}document.documentElement.setAttribute("data-theme",t)})();</script>
 </head>
 <body>
 
@@ -188,7 +189,7 @@ select{font-family:var(--font-ui);font-size:13px;font-weight:600;color:var(--ink
     <div class="tt">Mapa de tubos dos fornos</div>
     <div class="st">REPLAN · U-4241 Geração de hidrogênio · Contrato 5900.0135110.26.2 · OS 035 · Parada março 2027</div>
   </div>
-  <nav class="nav-f" aria-label="Navegação"><a class="hbtn" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21H3z"/></svg>Início</a><a class="hbtn" id="lk-outro" href="painel-zonas.html">Painel de zonas</a></nav>
+  <nav class="nav-f" aria-label="Navegação"><a class="hbtn" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21H3z"/></svg>Início</a><a class="hbtn" id="lk-outro" href="painel-zonas.html">Painel de zonas</a><button type="button" class="hbtn" id="b-tema" title="Claro ou escuro (tecla T)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><span id="b-tema-t">Escuro</span></button></nav>
   <span class="tag-prot">Protótipo · medições de exemplo</span>
 </header>
 
@@ -607,5 +608,17 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',tudo);
 tudo();
 </script>
 
+<script>
+(function(){
+  function aplicar(t){document.documentElement.setAttribute("data-theme",t);
+    try{localStorage.setItem("sigma-tema",t==="dark"?"escuro":"claro")}catch(e){}
+    var s=document.getElementById("b-tema-t");if(s)s.textContent=t==="dark"?"Claro":"Escuro";
+    if(typeof tudo==="function")tudo();}
+  function trocar(){aplicar(document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark")}
+  var b=document.getElementById("b-tema");if(b)b.onclick=trocar;
+  document.addEventListener("keydown",function(e){if((e.key==="t"||e.key==="T")&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))trocar()});
+  aplicar(document.documentElement.getAttribute("data-theme")||"light");
+})();
+</script>
 </body>
 </html>

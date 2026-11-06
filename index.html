@@ -84,6 +84,15 @@ body{font-family:var(--font-ui);color:var(--ink);background:var(--canvas);-webki
 .forno.f01{--c:var(--teal);--c-soft:#E6F4F7}
 .forno.f8a{--c:var(--roxo);--c-soft:#F3EEFE}
 .forno.f8b{--c:#9333EA;--c-soft:#F5EEFF}
+.ctas.um{grid-template-columns:1fr}
+.tabela{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh);overflow-x:auto}
+.tabela table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:620px}
+.tabela th{text-align:left;font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:12px 14px;border-bottom:1px solid var(--line)}
+.tabela td{padding:11px 14px;border-bottom:1px solid var(--line);color:var(--ink-soft);vertical-align:top}
+.tabela tr:last-child td{border-bottom:0}
+.tabela td:nth-child(-n+3){white-space:nowrap}
+.tabela td b{font-family:var(--font-d);color:var(--ink)}
+.tabela .n{text-align:right;font-family:var(--font-d);font-weight:700;color:var(--ink)}
 .foot{text-align:center;font-size:11px;color:#9CA3AF;margin-top:36px;line-height:1.6}
 .foot .legal{max-width:620px;margin:11px auto 0;padding-top:11px;border-top:1px solid var(--line);font-size:10.5px;color:#A8AFBB}
 @media (max-width:640px){.hero h1{font-size:22px}.top .tag{display:none}}
@@ -120,7 +129,7 @@ body{font-family:var(--font-ui);color:var(--ink);background:var(--canvas);-webki
     <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
   </a>
 
-  <div class="ctas">
+  <div class="ctas um">
     <a class="cta roxo slim" href="mapa-tubos.html">
       <div class="ico">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="14" r="2"/><circle cx="12" cy="14" r="2"/><circle cx="18" cy="14" r="2"/><path d="M3 20h18"/></svg>
@@ -131,49 +140,20 @@ body{font-family:var(--font-ui);color:var(--ink);background:var(--canvas);-webki
       </div>
       <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
     </a>
-    <a class="cta teal slim" href="painel-zonas.html#f-424102">
-      <div class="ico">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-      </div>
-      <div class="txt">
-        <h2>Liberação para fechamento</h2>
-        <p>O que ainda segura cada forno: laudos de ensaio, recomendações abertas e reparos</p>
-      </div>
-      <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-    </a>
+
   </div>
 
-  <div class="sec-label">Fornos do escopo</div>
-  <div class="fornos">
-
-    <div class="forno f02"><div class="faixa"></div><div class="corpo">
-      <div class="cab"><div><h3>F-424102</h3><div class="un">U-4241 · ZR-14658907</div></div><span class="tipo">Reformador</span></div>
-      <p>312 tubos catalisadores em 6 fileiras (A a F) e 98 queimadores no teto. Substituição de 84 colunas, LT nova e convecção com 249 pontos de ME.</p>
-      <div class="nums"><div><b>14</b>zonas</div><div><b>41</b>itens</div><div><b>84</b>colunas novas</div></div>
-      <div class="acoes"><a class="pri" href="painel-zonas.html#f-424102">Zonas</a><a href="mapa-tubos.html#f-424102">Tubos</a></div>
-    </div></div>
-
-    <div class="forno f01"><div class="faixa"></div><div class="corpo">
-      <div class="cab"><div><h3>F-424101</h3><div class="un">U-4241 · ZR-14990740</div></div><span class="tipo">Serpentina helicoidal</span></div>
-      <p>Radiação cilíndrica com 2 serpentinas de 13 voltas e convecção de 10 fileiras. ME nos pontos de controle e limpeza das duas primeiras espiras.</p>
-      <div class="nums"><div><b>7</b>zonas</div><div><b>10</b>itens</div><div><b>26</b>voltas</div></div>
-      <div class="acoes"><a class="pri" href="painel-zonas.html#f-424101">Zonas</a><a href="mapa-tubos.html#f-424101">Tubos</a></div>
-    </div></div>
-
-    <div class="forno f8a"><div class="faixa"></div><div class="corpo">
-      <div class="cab"><div><h3>F-428301A</h3><div class="un">U-4283 · ZR-14990638</div></div><span class="tipo">Tubos verticais</span></div>
-      <p>Radiação com 4 passes de 10 tubos verticais e convecção de 12 fileiras. ME em 56 pontos conforme croqui e silplate da convecção e da chaminé.</p>
-      <div class="nums"><div><b>6</b>zonas</div><div><b>6</b>itens</div><div><b>56</b>pontos de ME</div></div>
-      <div class="acoes"><a class="pri" href="painel-zonas.html#f-428301a">Zonas</a><a href="mapa-tubos.html#f-428301a">Tubos</a></div>
-    </div></div>
-
-    <div class="forno f8b"><div class="faixa"></div><div class="corpo">
-      <div class="cab"><div><h3>F-428301B</h3><div class="un">U-4283 · ZR-14990639</div></div><span class="tipo">Tubos verticais</span></div>
-      <p>Mesmo projeto do F-428301A, com medições e estados próprios. Escopo idêntico ao do A, mais a manutenção do queimador 1.</p>
-      <div class="nums"><div><b>6</b>zonas</div><div><b>6</b>itens</div><div><b>56</b>pontos de ME</div></div>
-      <div class="acoes"><a class="pri" href="painel-zonas.html#f-428301b">Zonas</a><a href="mapa-tubos.html#f-428301b">Tubos</a></div>
-    </div></div>
-
+  <div class="sec-label">Escopo da declaração rev. 1</div>
+  <div class="tabela">
+    <table>
+      <thead><tr><th>Forno</th><th>Unidade · nota</th><th>Tipo</th><th class="n">Zonas</th><th class="n">Itens</th><th>Destaque do escopo</th></tr></thead>
+      <tbody>
+        <tr><td><b>F-424102</b></td><td>U-4241 · ZR-14658907</td><td>Reformador</td><td class="n">14</td><td class="n">41</td><td>84 colunas novas, LT nova, 249 pontos de ME na convecção</td></tr>
+        <tr><td><b>F-424101</b></td><td>U-4241 · ZR-14990740</td><td>Serpentina helicoidal</td><td class="n">7</td><td class="n">10</td><td>ME nos pontos de controle, limpeza das duas primeiras espiras</td></tr>
+        <tr><td><b>F-428301A</b></td><td>U-4283 · ZR-14990638</td><td>Tubos verticais</td><td class="n">6</td><td class="n">6</td><td>ME em 56 pontos, silplate da convecção e da chaminé</td></tr>
+        <tr><td><b>F-428301B</b></td><td>U-4283 · ZR-14990639</td><td>Tubos verticais</td><td class="n">6</td><td class="n">6</td><td>Mesmo escopo do A, mais a manutenção do queimador 1</td></tr>
+      </tbody>
+    </table>
   </div>
 
   <div class="foot">
