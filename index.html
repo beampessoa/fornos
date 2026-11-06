@@ -93,7 +93,8 @@ body{font-family:var(--font-ui);color:var(--ink);background:var(--canvas);-webki
 .tabela td:nth-child(-n+3){white-space:nowrap}
 .tabela td b{font-family:var(--font-d);color:var(--ink)}
 .tabela .n{text-align:right;font-family:var(--font-d);font-weight:700;color:var(--ink)}
-.paineis{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.paineis{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:900px){.paineis{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:640px){.paineis{grid-template-columns:1fr}}
 .painel{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;text-decoration:none;color:var(--ink);box-shadow:var(--sh);transition:transform .12s,box-shadow .15s}
 .painel:hover{transform:translateY(-2px);box-shadow:var(--sh-md)}
@@ -105,7 +106,7 @@ body{font-family:var(--font-ui);color:var(--ink);background:var(--canvas);-webki
 .painel p{font-size:12.5px;color:var(--muted);line-height:1.55;flex:1}
 .painel .go{margin-top:14px;font-size:12.5px;font-weight:700;color:var(--c);display:inline-flex;align-items:center;gap:5px}
 .painel .go svg{width:13px;height:13px}
-.painel.azul{--c:var(--blue);--c-soft:#EFF4FF}.painel.roxo{--c:#7C3AED;--c-soft:#F3EEFE}
+.painel.azul{--c:var(--blue);--c-soft:#EFF4FF}.painel.vermelho{--c:#C62828;--c-soft:#FEF2F2}.painel.roxo{--c:#7C3AED;--c-soft:#F3EEFE}
 .foot{text-align:center;font-size:11px;color:#9CA3AF;margin-top:36px;line-height:1.6}
 .foot .legal{max-width:620px;margin:11px auto 0;padding-top:11px;border-top:1px solid var(--line);font-size:10.5px;color:#A8AFBB}
 @media (max-width:640px){.hero h1{font-size:22px}.top .tag{display:none}}
@@ -146,6 +147,10 @@ body{font-family:var(--font-ui);color:var(--ink);background:var(--canvas);-webki
     <a class="painel roxo" href="mapa-tubos.html"><div class="faixa"></div><div class="corpo">
       <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="14" r="2"/><circle cx="12" cy="14" r="2"/><circle cx="18" cy="14" r="2"/><path d="M3 20h18"/></svg></div>
       <h3>Mapa de tubos</h3><p>Os 312 tubos catalisadores e as serpentinas, com crescimento diametral, espessura e histórico por campanha.</p>
+      <span class="go">Abrir <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>
+    <a class="painel vermelho" href="mapa-juntas.html"><div class="faixa"></div><div class="corpo">
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 17h4l3-10 4 14 3-8h4"/></svg></div>
+      <h3>Mapa de juntas</h3><p>Juntas dos serviços de soldagem: colunas novas, Tês, LT, serpentina de carga mista e bocais, com etapas, soldador e laudos.</p>
       <span class="go">Abrir <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>
   </div>
 

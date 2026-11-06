@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>Mapa de juntas dos fornos</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+
+/* Layout: o mesmo do Painel Gerencial de Campo (campo-graf.html): cabeçalho branco com logo azul, KPIs, painéis brancos com cabeçalho e corpo */
+:root{
+  --blue:#0F4CBA; --blue-700:#0B3A91; --blue-300:#5B8AE6;
+  --green:#22C55E; --green-600:#16A34A;
+  --canvas:#F1F4F9; --panel:#FFFFFF; --ink:#1F2937; --ink-soft:#4B5563; --muted:#6B7280;
+  --line:#E5E7EB; --field:#F4F6FA; --field-line:#D7DEEA; --stage:#F6F8FB;
+  --s-nao:#9CA3AF; --s-and:#0F4CBA; --s-esp:#F59E0B; --s-pen:#EF4444; --s-lib:#16A34A;
+  --s-nao-bg:#F1F3F6; --s-and-bg:#E8EFFC; --s-esp-bg:#FFF7E6; --s-pen-bg:#FDECEC; --s-lib-bg:#E7F6EE;
+  --s-nao-tx:#4B5563; --s-and-tx:#0B3A91; --s-esp-tx:#92400E; --s-pen-tx:#991B1B; --s-lib-tx:#166534;
+  --font-d:'Exo 2',system-ui,sans-serif; --font-ui:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --r:8px; --r-md:12px; --r-lg:16px;
+  --sh:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.10);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --blue:#5B8AE6; --blue-700:#8FB0F0; --blue-300:#3B67C4;
+  --canvas:#0F141B; --panel:#171E28; --ink:#E5EAF1; --ink-soft:#B8C2CF; --muted:#8B97A6;
+  --line:#263140; --field:#1D2632; --field-line:#2E3A4A; --stage:#E9EDF2;
+  --s-nao:#9CA3AF; --s-and:#4F7FE0; --s-esp:#F59E0B; --s-pen:#F05252; --s-lib:#22C55E;
+  --s-nao-bg:#232C38; --s-and-bg:#18294A; --s-esp-bg:#3A2A0E; --s-pen-bg:#3D1A1A; --s-lib-bg:#123A22;
+  --s-nao-tx:#C3CAD4; --s-and-tx:#A9C2F5; --s-esp-tx:#F8C567; --s-pen-tx:#F8A5A5; --s-lib-tx:#86E0A8;
+  --sh:0 1px 2px rgba(0,0,0,.3); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --blue:#5B8AE6; --blue-700:#8FB0F0; --blue-300:#3B67C4;
+  --canvas:#0F141B; --panel:#171E28; --ink:#E5EAF1; --ink-soft:#B8C2CF; --muted:#8B97A6;
+  --line:#263140; --field:#1D2632; --field-line:#2E3A4A; --stage:#E9EDF2;
+  --s-nao:#9CA3AF; --s-and:#4F7FE0; --s-esp:#F59E0B; --s-pen:#F05252; --s-lib:#22C55E;
+  --s-nao-bg:#232C38; --s-and-bg:#18294A; --s-esp-bg:#3A2A0E; --s-pen-bg:#3D1A1A; --s-lib-bg:#123A22;
+  --s-nao-tx:#C3CAD4; --s-and-tx:#A9C2F5; --s-esp-tx:#F8C567; --s-pen-tx:#F8A5A5; --s-lib-tx:#86E0A8;
+  --sh:0 1px 2px rgba(0,0,0,.3); color-scheme:dark }
+*{box-sizing:border-box}
+body{font-family:var(--font-ui);color:var(--ink);background:var(--canvas);-webkit-font-smoothing:antialiased;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:20;background:var(--panel)}
+.es-header{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--panel);border-bottom:1px solid var(--line);
+  padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.es-header .logo{width:38px;height:38px;border-radius:10px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+.es-header .logo svg{width:20px;height:20px}
+.es-header .tit{min-width:190px;flex:1 1 auto}
+.es-header .tt{font-family:var(--font-d);font-weight:800;font-size:16px;line-height:1.1}
+.es-header .st{font-size:11.5px;color:var(--muted)}
+.tag-prot{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--s-esp-tx);background:var(--s-esp-bg);border:1px solid var(--s-esp);border-radius:20px;padding:5px 11px;white-space:nowrap}
+.wrap{max-width:1280px;margin:0 auto;padding-block:20px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:16px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-md);padding:16px;box-shadow:var(--sh);min-width:0}
+.kpi .n{font-family:var(--font-d);font-size:30px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.kpi .n small{font-size:14px;color:var(--muted);font-weight:700}
+.kpi .l{font-size:12px;color:var(--muted);margin-top:6px;font-weight:600}
+.kpi.forno{border-top:3px solid var(--s-pen)}
+.kpi.forno.ok{border-top-color:var(--s-lib)}
+.trava{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pil{font-family:var(--font-d);font-weight:800;font-size:22px;line-height:1}
+.duas{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:920px){.duas{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh);overflow:hidden;min-width:0}
+.panel-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.panel-h .tt{font-weight:800;font-size:14px}
+.panel-h .q{font-size:11.5px;color:var(--muted);margin-top:3px}
+.acoes{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.uchip{font-family:var(--font-ui);font-size:12.5px;font-weight:700;padding:7px 13px;border-radius:20px;border:1px solid var(--line);background:var(--panel);color:var(--ink-soft);cursor:pointer;white-space:nowrap}
+.uchip:hover{background:var(--field)}
+.uchip[aria-pressed="true"]{background:var(--blue);color:#fff;border-color:var(--blue)}
+.hbtn{display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border-radius:var(--r);font-family:var(--font-ui);font-size:12.5px;font-weight:700;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink);white-space:nowrap}
+.hbtn:hover{background:var(--field)}
+.hbtn svg{width:15px;height:15px}
+.hbtn.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+button:focus-visible,select:focus-visible,.zrow:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.palco{background:var(--stage)}
+.palco svg{display:block;width:100%;height:auto}
+.zona{cursor:pointer;mix-blend-mode:multiply;transition:fill-opacity .15s}
+.zona:hover,.zona.ativa{fill-opacity:.62!important}
+.zona.ativa{stroke-width:3.5!important}
+.sem-area .zona{display:none}
+.ed .zona{pointer-events:none}
+.legenda{display:flex;flex-wrap:wrap;gap:6px 16px;padding:12px 18px;border-top:1px solid var(--line);font-size:12px;font-weight:600;color:var(--ink-soft)}
+.legenda i{display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:6px;vertical-align:-1px}
+.lista{list-style:none;margin:0;padding:6px 8px}
+.zrow{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding:9px 10px;border-radius:var(--r);cursor:pointer;border-bottom:1px solid var(--line)}
+.zrow:last-child{border-bottom:0}
+.zrow:hover{background:var(--field)}
+.zrow.ativa{background:var(--field);box-shadow:inset 3px 0 0 var(--blue)}
+.num{font-family:var(--font-d);font-size:12px;font-weight:800;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff}
+.zn{font-family:var(--font-d);font-weight:700;font-size:13px;line-height:1.25}
+.zm{font-size:11.5px;color:var(--muted)}
+.barra{grid-column:2/4;height:4px;background:var(--field);border-radius:3px;overflow:hidden}
+.barra span{display:block;height:100%;border-radius:3px}
+.chip{font-size:11px;font-weight:800;letter-spacing:.02em;border-radius:20px;padding:3px 9px;white-space:nowrap;border:1px solid transparent}
+.fora{font-size:12px;color:var(--muted);padding:10px 18px 14px;border-top:1px solid var(--line);line-height:1.55}
+.fora b{font-family:var(--font-d);color:var(--ink)}
+.det{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:20px;padding:16px 18px}
+.det h3{font-family:var(--font-d);font-weight:800;font-size:12px;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.trilho{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px}
+.trilho div{height:30px;border-radius:6px;font:800 11px var(--font-d);display:grid;place-items:center}
+.trilho-rot{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;font-size:10px;color:var(--muted);margin-top:5px;line-height:1.2;font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+td,th{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:10.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+td.n{font-family:var(--font-d);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.med{margin:0;padding:0;list-style:none;font-size:12.5px}
+.med li{padding:6px 0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px}
+.med li:last-child{border-bottom:0}
+.med code{font-family:var(--font-d);font-weight:700;font-size:11.5px;color:var(--blue);background:var(--field);border:1px solid var(--field-line);border-radius:6px;padding:1px 6px;white-space:nowrap;align-self:start}
+.aviso{border-radius:var(--r-md);padding:11px 13px;font-size:12.5px;line-height:1.55;margin-top:12px;border:1px solid}
+.aviso b{font-weight:800}
+.edbar{display:none;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 18px;border-bottom:1px solid #FDE68A;background:#FFFBEB;font-size:12.5px;color:#92400E}
+.ed .edbar{display:flex}
+.edbar label{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+select{font-family:var(--font-ui);font-size:13px;font-weight:600;color:var(--ink);background:var(--field);border:1px solid var(--field-line);border-radius:var(--r);padding:7px 10px;cursor:pointer}
+.nota{font-size:12px;color:var(--muted);max-width:90ch;line-height:1.6;margin:0 4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.duas2{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.45fr);gap:16px;align-items:start}
+@media(max-width:980px){.duas2{grid-template-columns:minmax(0,1fr)}}
+.pad{padding:12px 14px}
+.sv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start;width:100%;text-align:left;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--panel);cursor:pointer;margin-bottom:8px;font-family:var(--font-ui);color:var(--ink)}
+.sv:hover{background:var(--field)}
+.sv.on{border-color:var(--blue);box-shadow:inset 3px 0 0 var(--blue)}
+.sv .cod{font:800 12px var(--font-d);color:var(--blue);background:var(--field);border:1px solid var(--field-line);border-radius:6px;padding:3px 7px;white-space:nowrap}
+.sv b{display:block;font-size:13px;line-height:1.3}
+.sv small{font-size:11.5px;color:var(--muted)}
+.sv em{color:#DC2626;font-style:normal;font-weight:700}
+.bar2{display:flex;height:5px;background:var(--field);border-radius:3px;overflow:hidden;margin-top:6px}
+.bar2 i{display:block;height:100%}
+.mxw{overflow-x:auto}
+.mx{border-collapse:separate;border-spacing:3px;font-size:11.5px;width:100%}
+.mx th{font-size:9.5px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);padding:4px;text-align:center;white-space:nowrap}
+.mx th:first-child,.mx td:first-child{text-align:left}
+.mx td{text-align:center;padding:0}
+.mx td b{font-family:var(--font-d);white-space:nowrap}
+.mx .na{color:var(--muted)}
+.mx .cel{display:block;border-radius:6px;padding:6px 2px;font:800 10.5px var(--font-d);white-space:nowrap}
+.mwrap{display:grid;grid-template-columns:minmax(0,1fr) 320px}
+@media(max-width:980px){.mwrap{grid-template-columns:minmax(0,1fr)}}
+.mcol{min-width:0;padding:14px 16px}
+.fil{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.cols{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.colj{border:1px solid var(--line);border-radius:8px;padding:6px}
+.colj .cn{font:800 12px var(--font-d);display:block;margin-bottom:4px}
+.jj{display:grid;grid-template-columns:repeat(4,1fr);gap:3px}
+.jl{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px}
+.jc{border:0;border-radius:6px;padding:6px 0;font:800 11px var(--font-d);cursor:pointer}
+.jc:hover{filter:brightness(1.08)}
+.jc.sel{outline:3px solid var(--ink);outline-offset:1px}
+.jc:focus-visible{outline:3px solid var(--blue);outline-offset:1px}
+.leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;font-weight:600;color:var(--ink-soft);margin-top:12px}
+.leg i,.dt{display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:6px;vertical-align:-1px}
+.hm-side{border-left:1px solid var(--line);padding:14px 16px;min-width:0}
+@media(max-width:980px){.hm-side{border-left:0;border-top:1px solid var(--line)}}
+.hs-t{font-family:var(--font-d);font-weight:800;font-size:15px;line-height:1.3}
+.hs-q{font-size:11.5px;color:var(--muted);margin:3px 0 10px}
+.hs-fechar{background:none;border:0;color:var(--blue);font:700 12px var(--font-ui);cursor:pointer;padding:0}
+.hm-side h3{font-family:var(--font-d);font-weight:800;font-size:11.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px}
+.chip{font-size:11px;font-weight:800;border-radius:20px;padding:3px 9px;border:1px solid;display:inline-block}
+.kv{display:grid;grid-template-columns:auto auto;gap:6px 14px;font-size:12.5px;justify-content:start}
+.kv dt{color:var(--ink-soft);font-weight:600}.kv dd{margin:0;font-family:var(--font-d);font-weight:800}
+.ets{list-style:none;padding:0;margin:0;display:grid;gap:5px}
+.ets li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;align-items:start;font-size:12.5px}
+.ets li>span{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:800;background:var(--field);color:var(--muted)}
+.ets li.ok>span{background:#16A34A;color:#fff}.ets li.rp>span{background:#EF4444;color:#fff}
+.ets b{display:block}.ets small{font-size:11.5px;color:var(--muted)}
+.vz{font-size:13px;color:var(--muted)}
+</style>
+<style>[hidden]{display:none!important} body{margin:0} img{max-width:100%} .nav-f{display:flex;gap:8px;flex-wrap:wrap} .nav-f a{text-decoration:none}</style>
+<script>(function(){var t="light";try{if(localStorage.getItem("sigma-tema")==="escuro")t="dark"}catch(e){}document.documentElement.setAttribute("data-theme",t)})();</script>
+</head>
+<body>
+
+
+<header class="es-header">
+  <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 17h4l3-10 4 14 3-8h4"/></svg></div>
+  <div class="tit"><div class="tt">Mapa de juntas dos fornos</div><div class="st">REPLAN · F-424102 · Contrato 5900.0135110.26.2 · OS 035 · Parada março 2027</div></div>
+  <nav class="nav-f" aria-label="Navegação"><a class="hbtn" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21H3z"/></svg>Início</a><a class="hbtn" href="consulta.html">Consultar</a><a class="hbtn" id="lk-outro" href="painel-zonas.html">Painel de zonas</a><a class="hbtn" href="mapa-tubos.html">Mapa de tubos</a><button type="button" class="hbtn" id="b-tema" title="Claro ou escuro (tecla T)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><span id="b-tema-t">Escuro</span></button></nav>
+  <span class="tag-prot">Protótipo · juntas de exemplo</span>
+</header>
+<main class="wrap">
+  <section class="kpis" id="kpis" aria-label="Resumo das juntas"></section>
+  <div class="duas2">
+    <section class="panel"><div class="panel-h"><div><div class="tt">Serviços de soldagem</div><div class="q">Plaquetas da declaração que têm junta soldada · toque para abrir o mapa</div></div></div><div class="pad" id="porSv"></div></section>
+    <section class="panel"><div class="panel-h"><div><div class="tt">Etapas e ensaios concluídos</div><div class="q">Juntas feitas sobre as juntas que exigem cada etapa ou ensaio · borda vermelha: há reprovado</div></div></div><div class="pad mxw" id="mx"></div></section>
+  </div>
+  <section class="panel">
+    <div class="panel-h"><div><div class="tt" id="m-tit"></div><div class="q" id="m-sub"></div></div></div>
+    <div class="mwrap"><div class="mcol"><div class="fil" id="fil"></div><div id="mapa"></div><div class="leg" id="leg"></div></div><aside class="hm-side" id="side" aria-live="polite"></aside></div>
+  </section>
+  <p class="nota">Protótipo. As etapas e os ensaios usam o mesmo cadastro do painel de juntas do Sigma Campo (junta_etapa e ensaio_tipo). Quantidade de juntas da LT e da serpentina, requisitos de ensaio sem pedido explícito na declaração, soldadores e laudos são exemplos.</p>
+</main>
+<script>
+/* ---------- zonas por forno, ligadas aos itens da Declaração de Escopo rev. 1 ---------- */
+const FORNOS={
+'02':{tag:'F-424102',nome:'Forno reformador F-424102',sub:'U-4241 Geração de hidrogênio · ZR-14658907',tipo:'img',vb:[24,168,1064,622],
+ cap:'Vista axonométrica em corte do coordenador · base DE-5270.00-42311-422-FAB-006/007/008/011',
+ fora:[{tag:'V-424103',nome:'Tambor de vapor'},{tag:'P-424103',nome:'Caldeira de recuperação (itens 1.5 a 1.7, SADE_061, SADE_082)'}],
+ zonas:[
+ {cod:'CHAM',nome:'Chaminé',num:'01',estado:'lib',etapa:8,badge:[70,305],pts:[[163,228],[204,228],[204,668],[163,668]],
+  ens:[{m:'Visual interna',ext:'pelas BVs da chaminé',f:2,t:2,r:0}],
+  med:[['1.15','Abrir BVs da chaminé e montar acesso interno']]},
+ {cod:'VTF',nome:'Ventilador de tiragem forçada',tag:'VE-F-424102-01',num:'02',estado:'nao',etapa:1,badge:[175,496],pts:[[250,506],[300,503],[310,510],[310,548],[252,551]],ens:[],med:[]},
+ {cod:'VTI',nome:'Ventilador de tiragem induzida',tag:'VE-F-424102-02',num:'03',estado:'nao',etapa:1,badge:[297,713],pts:[[288,642],[335,640],[336,679],[290,681]],ens:[],
+  med:[['1.16','Neutralizar e limpar rotor e câmara de sucção do VE-F-424102-02']]},
+ {cod:'APH',nome:'Pré-aquecedor de ar (PAF)',tag:'P-F-424102-01',num:'04',estado:'and',etapa:1,badge:[378,568],pts:[[356,512],[380,500],[458,506],[458,612],[436,622],[356,616]],ens:[],
+  med:[['1.15','Acesso ao PAF, chapas nas extremidades corroídas, neutralização e hidrojato do permutador de placas']]},
+ {cod:'DUTO',nome:'Dutos de gases e de ar',num:'05',estado:'nao',etapa:1,badge:[457,345],pts:[[383,378],[400,360],[565,360],[580,378],[580,462],[563,462],[563,384],[401,384],[401,476],[383,476]],ens:[],
+  med:[['1.15','BVs dos dutos de ar frio, ar quente e juntas de expansão'],['1.16','Trocar a lona da junta de expansão JE-05'],['1.32','Furo para escoamento de água no duto de saída do VT para a chaminé']]},
+ {cod:'CONV',nome:'Seção de convecção',num:'06',estado:'esp',etapa:6,badge:[476,481],pts:[[505,490],[585,440],[640,426],[640,615],[585,665],[505,665]],
+  ens:[{m:'ME',ext:'GV I 36, carga mista 27, superaquecedor 126, GV II 60',f:249,t:249,r:0},{m:'Ultrassom',ext:'curvas do GV I (24 norte, 12 sul)',f:36,t:36,r:0},{m:'LP',ext:'soldas da carga combinada (13 + 6)',f:19,t:19,r:0},{m:'Gamagrafia',ext:'soldas da nova serpentina de carga mista',f:20,t:24,r:0}],
+  rep:{txt:'Serpentina de carga mista substituída (P9)',f:1,t:1,u:'serpentina'},
+  med:[['1.15','Portas, BVs, 6 tampas de curvas e ME em 14 regiões do costado'],['1.16','ME em 249 pontos, manta cerâmica, refratário e pintura'],['1.19','LP nas soldas da carga combinada'],['1.22','Substituir a serpentina de carga mista (P9)'],['1.23','Substituir 3º e 4º suportes da carga mista'],['1.24','Refratário das faces norte, sul e leste até 3 m'],['1.25','Substituir chaparia do lado oeste'],['1.26','Refratário da região da carga mista'],['1.27','Reposicionar tijolos do piso'],['1.33','Dreno da carga mista: corte e LP']]},
+ {cod:'TRANS',nome:'Transição radiação-convecção',num:'07',estado:'nao',etapa:1,badge:[539,644],pts:[[598,624],[632,618],[636,648],[600,656]],ens:[],
+  med:[['1.24','Teto e paredes dos dutos de transição das extremidades']]},
+ {cod:'RAD',nome:'Câmara de radiação (carcaça e refratário)',num:'10',estado:'and',etapa:5,badge:[1009,531],pts:[[908,512],[975,515],[975,688],[910,705]],
+  ens:[{m:'Visual do refratário',ext:'teto, laterais e piso',f:1,t:1,r:0}],
+  rep:{txt:'Fibra cerâmica (teto 5, janelas superiores 35, inferiores 30)',f:28,t:70,u:'m²'},
+  med:[['1.10','Isolamento fixo e sanfonado junto à entrada dos pigtails'],['1.13','Portas, acessos, fibra cerâmica, muflas e frestas'],['1.14','6 vidros, 10 m² de chapa, pintura e identificação dos tubos'],['1.21','Substituir o sistema de cortinas (SADE_060)'],['SADE_075','Substituir as telhas'],['HI-23-02','Instalar 2 bocais no costado'],['HI-25-11','Instalar 7 bocais de 3" leste e oeste']]},
+ {cod:'QUEI',nome:'Dutos de ar e queimadores',num:'11',estado:'pen',etapa:4,badge:[786,363],pts:[[645,465],[950,505],[950,527],[645,487]],
+  ens:[{m:'Visual',ext:'queimadores removidos',f:98,t:98,r:1}],
+  rec:'Bico do queimador com obstrução. Troca prevista de 6 bicos internos e 3 externos (item 1.14), aguardando definição do MI/EE.',
+  med:[['1.11','98 indicadores de pressão do ar de combustão'],['1.14','Bicos de queimadores, difusores, muflas e flexíveis (MI/EE)'],['1.31','Furos nos 6 dutos de ar de combustão sobre os queimadores'],['SADE_105','Trocar vidro de inspeção dos pilotos'],['SADE_175','Apoio aos PIs de purga Q1 a Q7 e GC/GP filas 1 a 7'],['ZF-15686680','Limpeza dos vidros e pintura de TAGs']]},
+ {cod:'TUBOS',nome:'Tubos catalisadores',num:'12',estado:'and',etapa:5,badge:[820,627],pts:[[652,505],[905,540],[905,648],[652,620]],
+  ens:[{m:'Diâmetro em todo o comprimento',ext:'228 tubos remanescentes',f:228,t:228,r:0},{m:'Diâmetro em 6 alturas',ext:'84 colunas novas',f:10,t:84,r:0},{m:'Carbono',ext:'3 tubos por coluna nova',f:30,t:252,r:0}],
+  rep:{txt:'Colunas substituídas (A42 a F52 e A1 a F3, +10 a definir)',f:31,t:84,u:'colunas'},
+  med:[['1.5','Substituir 84 colunas e pigtails inferiores'],['1.12','Medição automatizada dos tubos remanescentes'],['1.29','Ajustar suportes de mola dos tubos substituídos']]},
+ {cod:'TUN',nome:'Túneis de gases',num:'13',estado:'nao',etapa:1,badge:[912,670],pts:[[612,632],[905,656],[905,712],[612,688]],ens:[],
+  med:[['1.13','Frestas entre fibra e túneis (40 m) e 10 lajotas do teto dos túneis'],['1.24','Teto dos túneis das extremidades (15 m²) e paredes (20 m²)']]},
+ {cod:'COL',nome:'Coletores, pigtails e penthouse',num:'14',estado:'and',etapa:3,badge:[889,342],pts:[[645,432],[950,472],[950,500],[645,460]],
+  ens:[{m:'LP',ext:'pigtail com coletor',f:22,t:60,r:0},{m:'LP',ext:'12 pigtails superiores',f:5,t:12,r:0},{m:'LP',ext:'crossover e distribuidores (28 de 8" + 24 de 1¼")',f:9,t:52,r:0}],
+  med:[['1.3','Substituir os 3 Tês do sistema de saída (API 942)'],['1.4','Substituir 6 suportes dos coletores de saída'],['1.6','Diâmetro em 3 pontos de todos os pigtails inferiores e LP'],['1.7','Recompor isolamento de coletores e pigtails'],['1.8','Instalar skin-points nos coletores'],['1.9','LP em 12 pigtails superiores'],['1.18','Ajustar 14 suportes de mola do penthouse'],['1.28','LP no crossover e distribuidores'],['1.30','Suportes de mola do crossover (SH4)'],['1.31','Furos nas chapas da guia do Tê do crossover'],['1.34','Pintura do distribuidor de purga da fileira B']]},
+ {cod:'LT',nome:'Linha de transferência',num:'15',estado:'and',etapa:2,badge:[960,730],pts:[[846,722],[878,716],[884,738],[852,744]],ens:[],
+  rep:{txt:'LT substituída integralmente',f:0,t:1,u:'LT'},
+  med:[['1.1','Substituir poços termopares (Inconel 601)'],['1.20','Substituir a LT integralmente e fire proof das bases'],['SADE_083','Remover o refratário da LT retirada'],['1.2','Cancelado pelo item 1.20'],['1.17','Cancelado pelo item 1.20']]},
+ {cod:'EST',nome:'Estrutura e plataformas',num:'16',estado:'and',etapa:1,badge:[728,703],pts:[],ens:[],med:[]}
+ ]},
+
+'01':{tag:'F-424101',nome:'Forno F-424101',sub:'U-4241 Geração de hidrogênio · ZR-14990740',tipo:'cil',coil:'helice',vb:[0,0,1064,622],
+ cap:'Esquema 3D ilustrativo, sem escala · base DE-5270.00-42311-421-FAB-003, 004, 005, 011, 012',
+ fora:[],
+ zonas:[
+ {cod:'CHAM',nome:'Chaminé',num:'01',estado:'nao',etapa:1,ens:[{m:'Visual interna',ext:'pela BV da chaminé',f:0,t:1,r:0},{m:'Sobrevoo com drone',ext:'trecho superior (Inspeção Petrobras)',f:0,t:1,r:0}],
+  med:[['1.9','Abrir a BV para visual interna; drone no trecho superior']]},
+ {cod:'DAMP',nome:'Damper',num:'02',estado:'nao',etapa:1,ens:[],med:[['1.7','Verificar desempenho e movimentação com MA/ED e OP/HDT']]},
+ {cod:'CONV',nome:'Convecção e caixas de curva',num:'03',estado:'and',etapa:3,ens:[{m:'ME',ext:'curvas nas caixas da convecção',f:14,t:32,r:0}],
+  med:[['1.8','Abrir todas as tampas das caixas de curva: visual e ME']]},
+ {cod:'RAD',nome:'Radiação: revestimento e teto',num:'04',estado:'and',etapa:5,ens:[{m:'Visual interna',ext:'refratário do teto',f:1,t:1,r:0}],
+  rep:{txt:'Reparo de concreto refratário',f:0,t:1,u:'m²'},
+  med:[['1.1','Andaime na radiação para inspeção dos tubos e do teto'],['1.2','Visual interna, atenção ao refratário do teto'],['1.6','Reparo em concreto refratário (1 m², DE-REPLAN-4241-42-407)']]},
+ {cod:'JAN',nome:'Janelas de inspeção',num:'05',estado:'nao',etapa:1,ens:[],med:[['1.3','Reparo da pintura na região das janelas']]},
+ {cod:'SERP',nome:'Serpentina da radiação',num:'06',estado:'esp',etapa:3,ens:[{m:'ME',ext:'pontos de controle (quantidade a definir)',f:20,t:24,r:0}],
+  rep:{txt:'Limpeza das duas primeiras espiras',f:2,t:2,u:'espiras'},
+  med:[['1.2','ME nos pontos de controle'],['1.5','Limpeza das duas primeiras espiras circulares']]},
+ {cod:'QUEI',nome:'Queimadores',num:'07',estado:'and',etapa:5,ens:[],
+  med:[['1.4','Remover queimadores para inspeção e manutenção (MI/EE)'],['ZF-15623094','Q-F-424101-002: vidro da janela, TH dos mangotes e limpeza do maçarico'],['SADE_175','Apoio aos PI-4241293 e PI-4241294']]}
+ ]},
+
+'8A':{tag:'F-428301A',nome:'Forno F-428301A',sub:'U-4283 HDT-3 Diesel · ZR-14990638',tipo:'cil',coil:'vertical',vb:[0,0,1064,622],
+ cap:'Esquema 3D ilustrativo, sem escala · base DE-5270.00-42313-421-FAB-201, 202, 205, 210, 211',
+ fora:[],zonas:null},
+'8B':{tag:'F-428301B',nome:'Forno F-428301B',sub:'U-4283 HDT-3 Diesel · ZR-14990639',tipo:'cil',coil:'vertical',vb:[0,0,1064,622],
+ cap:'Esquema 3D ilustrativo, sem escala · mesmo projeto do F-428301A (FAB-201 a 211)',
+ fora:[],zonas:null}
+};
+function zonas83(lado){const qz=lado==='A'?['ZF-15345947','Q-F-428301A-004: limpeza, bico do queimador 4 obstruído']:['ZF-15388101','Q-F-428301B-001: manutenção, limpeza e ajuste da porca de regulagem do gás'];
+ const a=lado==='A';
+ return [
+ {cod:'CHAM',nome:'Chaminé',num:'01',estado:a?'lib':'and',etapa:a?8:2,ens:[{m:'Visual interna',ext:'pela porta da chaminé',f:1,t:1,r:0}],rep:{txt:'Reparo do silplate da chaminé',f:a?1:0,t:1,u:'área'},
+  med:[['1.1','Abrir a porta de acesso da chaminé'],['1.2','Reparo do silplate da chaminé']]},
+ {cod:'DAMP',nome:'Damper',num:'02',estado:'nao',etapa:1,ens:[],med:[['1.5','Verificar desempenho e movimentação com MA/ED e OP/HDT']]},
+ {cod:'CONV',nome:'Convecção e caixas de curva leste/oeste',num:'03',estado:a?'esp':'and',etapa:a?6:3,ens:[{m:'ME',ext:'curvas da convecção (parte dos 56 pontos)',f:16,t:16,r:0}],
+  rep:{txt:'Reparo do silplate da convecção',f:a?2.5:0,t:2.5,u:'m²'},
+  med:[['1.1','Abrir o teto da convecção e as caixas de curvas leste e oeste'],['1.2','Reparo do silplate da convecção (mínimo 2,5 m²)'],['1.3','ME nas curvas conforme croqui']]},
+ {cod:'RAD',nome:'Radiação: revestimento do teto, bigodes e monogodes',num:'04',estado:'and',etapa:2,ens:[{m:'Visual',ext:'revestimento isolante do teto',f:0,t:1,r:0}],
+  med:[['1.1','Abrir portas da radiação, andaime e inspeção do teto, bigodes e monogodes']]},
+ {cod:'TUBOS',nome:'Tubos da radiação',num:'05',estado:a?'pen':'and',etapa:a?4:3,ens:[{m:'ME',ext:'tubos da radiação (parte dos 56 pontos)',f:a?40:18,t:40,r:a?1:0}],
+  rec:a?'Espessura abaixo do alerta em 2 tubos do passe 2. Aguarda avaliação da engenharia.':null,
+  med:[['1.1','Andaime na radiação para inspeção dos tubos'],['1.3','ME nos tubos conforme croqui']]},
+ {cod:'QUEI',nome:'Queimadores',num:'06',estado:'and',etapa:5,ens:[],med:[['1.4','Remover queimadores para inspeção e manutenção (MI/EE)'],qz]}
+ ]}
+FORNOS['8A'].zonas=zonas83('A');FORNOS['8B'].zonas=zonas83('B');
+
+const ITENS=[{"id": "02|1.1", "linha": 24, "forno": "02", "cod": "1.1", "nota": "ZR-14658907", "sade": [], "tipo": "INST", "zonas": ["LT"], "titulo": "Instrumentação · Substituir poço", "det": "Substituir os poços termopares TE-4241201ABCDE e TE-4241202ABC conforme GM REPLAN/OP/HDT 2022/0057 (novo material: Inconel 601).", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.2", "linha": 25, "forno": "02", "cod": "1.2", "nota": "ZR-14658907", "sade": [], "tipo": "REFR", "zonas": ["LT"], "titulo": "Linha Transferência · Refratário", "det": "Realizar reparos no refratário da linha de transferência do F-424102, conforme DE-REPLAN-4241-42-00017/00\n237. Estimado no momento aproximadamente 25% da área total.", "origem": "Licitação", "nt": "Cancelado pelo item 1.20 (substituição integral da LT).", "canc": true}, {"id": "02|1.3", "linha": 26, "forno": "02", "cod": "1.3", "nota": "ZR-14658907", "sade": [], "tipo": "SUBST", "zonas": ["COL"], "titulo": "Substituir os 3 TÊ`s", "det": "Substituir os 3 TÊ´s do sistema de saída do F-424102 conforme projeto, Posição 2 do DE-REPLAN-4241-42-000\n16. Os novos TÊ´s devem ter dimensões maiores que os atuais para soldar nos coletores de saída sem a presença de material de solda residual (material envelhecido), devem ser soldados atendendo as recomendações do API 942 (em atendimento ao 2021-004940-A-RTA-002).", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.4", "linha": 27, "forno": "02", "cod": "1.4", "nota": "ZR-14658907", "sade": [], "tipo": "CALD", "zonas": ["COL"], "titulo": "Substituir Suportes dos coletores", "det": "Substituir os 6 suportes provisórios (abraçadeiras) das extremidades dos coletores de saída conforme projeto a ser fornecido pelo SRGE.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.5", "linha": 28, "forno": "02", "cod": "1.5", "nota": "ZR-14658907", "sade": [], "tipo": "SUBST", "zonas": ["TUBOS"], "titulo": "Substituir Tubos e Pigtails", "det": "Substituir 84 colunas/tubos de catalizador incluíndo os respectivos pigtails inferiores do tubo até o coletor, sendo eles: na parede oeste os tubos A42 até F52 e na parede leste tubos A1 até F3 (os tubos F52, F51 e E52 já foram removidos);\n\nProvidenciar e planejar a substituição de mais 10 colunas/tubos a serem definidos após a medição total dos tubos;\n\nProvidenciar e planejar a substituição de mais 16 pigtails completos a serem definidos após a medição total dos pigtails;\n\nTodos os tubos e pigtails removidos devem ser identificados e armazenados até a definição de quais serão descartados e quais serão ensaiados, será realizada medição na base das colunas removidas antes ou após a remoção;\n\nNas novas colunas deverá ser realizada medição de diâmetro em 6 alturas (cada coluna é composto por 3 tubos, serão 2 medições por tubo) e uma medição de carbono em cada tubo das colunas (providenciar preparação de superfície, energia e deslocamento do equipamento). As colunas devem ser rastreáveis quanto a sua posição após instaladas no forno.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.6", "linha": 29, "forno": "02", "cod": "1.6", "nota": "ZR-14658907", "sade": [], "tipo": "END", "zonas": ["COL"], "titulo": "Pigtail Inferior · Ensaios", "det": "Montar acesso aos distribuidores que interligam aos pigtail inferior de todas as fileiras e remover completamente o isolamento térmico dos pigtail e coletores. (atentar com a suportação dos pigtails);\n\nRealizar medição de diâmetro em 3 pontos de todos os pigtails, sendo um no tubo inicial (junto ao tubo de catalizador), um abaixo da solda do tubo inicial e um na lira (a ser definido);\n\nRealizar ensaio de LP na ligação do Pigtail com o tubo coletor em 60 pontos distribuídos pelos coletores a serem definidos entre os que não serão substituídos.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.7", "linha": 30, "forno": "02", "cod": "1.7", "nota": "ZR-14658907", "sade": [], "tipo": "ISOL", "zonas": ["COL"], "titulo": "Pigtail Inferior ·  Isolamento", "det": "Após ensaios recompor o isolamento térmico dos coletores e pigtails inferiores conforme o projeto DE-REPLAN-4241-42-00013, ou proposta similar aprovada por grupo interdisciplinar. O modelo atual não atende, o isolamento deve envolver todo o comprimento do tubo e não permitir deslizamento.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.8", "linha": 31, "forno": "02", "cod": "1.8", "nota": "ZR-14658907", "sade": [], "tipo": "INST", "zonas": ["COL"], "titulo": "Coletores · Instalar skin-points", "det": "Instalar skin-points nas extremidades dos tubos coletores, conforme projeto. Na ausência de projeto serão soldados apenas os contatos nos tubos para implementação em campanha. / No mínimo 6 skin-points, entre o 4º e 5º pigtails apartir das extremidades de cada coletor. Preferencialmente, prever outros 6 skin-point s a serem instalados mais próximos dos Tês.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.9", "linha": 32, "forno": "02", "cod": "1.9", "nota": "ZR-14658907", "sade": [], "tipo": "END", "zonas": ["COL"], "titulo": "Pigtail Superior · Ensaios", "det": "Remover isolamento completo de 12 pigtails superiores a serem definidos para inspeção amostral e prevera reposição após ensaios;\n\nRealizar ensaio de LP na na ligação do Pigtail com o tubo distribuidor dos 12 pigtails.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.10", "linha": 33, "forno": "02", "cod": "1.10", "nota": "ZR-14658907", "sade": [], "tipo": "ISOL", "zonas": ["RAD"], "titulo": "Teto do forno · Isolamento", "det": "Manter e manutenir o isolamento térmico fixo na extremidade dos tubos de catalizador, junto a entrada do pigtail;\n\nInstalar isolamento sanfonado abaixo da entrada do pigtail até o teto do forno, de forma reter o calor quando da expansão dos tubos. Modelo a ser proposto e aprovado;\n\nRemover as cortinas instaladas entre as fileiras, mantendo apenas uma cortina funcional em ambos os lados de cada corredor que possa ser deslizada em todo o compimento da fileira.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.11", "linha": 34, "forno": "02", "cod": "1.11", "nota": "ZR-14658907", "sade": [], "tipo": "INST", "zonas": ["QUEI"], "titulo": "Instrumentação · Manômetros", "det": "Manutenção e calibração, preferencialmente substituir, os 98 indicadores de pressão dos dutos de ar de combustão.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.12", "linha": 35, "forno": "02", "cod": "1.12", "nota": "ZR-14658907", "sade": [], "tipo": "MED", "zonas": ["TUBOS"], "titulo": "Câmara de Radiação Ensaios", "det": "Prover estrutura para medição automatizada em todo o comprimento dos tubos de catalizador remanescentes e manual próximo ao piso do forno;\n\nRealizar a medição de diâmetro em todo o comprimento dos tubos remanescentes com contrato específico ou fornecimento Cenpes. E na base com circômetro e calibre.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.13", "linha": 36, "forno": "02", "cod": "1.13", "nota": "ZR-14658907", "sade": [], "tipo": "REFR", "zonas": ["RAD", "TUN"], "titulo": "Câmara de Radiação Isolamento", "det": "Abrir portas de acesso da radiação;\n\nMontar acesso para inspeção e reparos do refratário da radiação teto, laterais, piso e tuneis, deixando espaço para medição externa dos tubos do forno;\n\nPrever reparos módulos de fibra cerâmica do teto (5m²) e das laterias região das janelas superiores(35m²) e inferiores\n(30m²). DE-5270.00-42311-422-FAB-456;\n\nPrever reparo nas frestas entre a fibra cerâmica e os tunéis de concreto refratário(40metros lineares) E5.(DE-REPLAN-4241-331) / - Trocar mufla G7;\n\nPrever troca de 8 muflas a serem definidas pela IE;\n\nSubstituir 10 lajotas do teto dos tuneis.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.14", "linha": 37, "forno": "02", "cod": "1.14", "nota": "ZR-14658907", "sade": [], "tipo": "CALD", "zonas": ["RAD", "QUEI"], "titulo": "Câmara de Radiação Reparos", "det": "Substituir 6 vidros das janelas de inspeção;\n\nPrever 10m² de chapa de fechamento de forno para o teto, janelas de inspeção e tuneis;\n\nReparar pintura geral (chapas lateriais (D13), tuneis(35m²) e chapas de fundo(230m²);\n\nReparar pintura externa nas regiões das janelas (40m²);\n\nIdentificação dos tubos da radiação com giz na altura das janelas superior e inferior;\n\nDifusores, queimadores, muflas, flexiveis deverão ser manutenidos conforme PE-5AP-02432, escopo do MI/EE. Prever troca de 6 bicos queimadores do tipo interno e 3 do tipo externo;\n\nDumper's deverão ser manutenidos conforme procedimento do MI/ED.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.15", "linha": 38, "forno": "02", "cod": "1.15", "nota": "ZR-14658907", "sade": [], "tipo": "ACESSO", "zonas": ["CONV", "CHAM", "APH", "DUTO"], "titulo": "Convecção", "det": "Abrir todas as portas de acesso convecção e BV’s (dutos de ar frio, ar quente, PAF e chaminé) e montar acesso interno para inspeção nos dutos, refratários e juntas de expansão (DE-REPLAN-4241-42-330, 456, 465 e 466), Atentar para as BV’S 1,2,8, 11, 12, 13, 14, 15,16, 17,19, 20 e a do teto acima dos tubos da convecção;\n\nAbrir tampas das curvas da convecção, 6 tampas (DE-REPLAN-4241-42-011);\n\nMontar acesso ao recuperador de calor (PAF) da convecção na região inferior e superior, Prever instalação de chapas nas extremidades corroidas;\n\nPermutador placa do PAF: Prever neutralização e limpeza no PAF no início da parada de manutenção, com utilização de hidrojato pelos lados superior e inferior do lado do gás;\n\nRealizar ensaio de ultrassom em 24 curvas do lado norte e 12 do lado sul no sistema de Geração de Vapor I ;\n\nPrever acesso externo e preparar região entre os tunéis e o costado para medição de espessura em 14 regiões;\n\nMontar acesso para medição de espessura das curvas e coletores da convecção (DE-REPLAN-4241-42-040).", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.16", "linha": 39, "forno": "02", "cod": "1.16", "nota": "ZR-14658907", "sade": [], "tipo": "MED", "zonas": ["CONV", "VTI", "DUTO"], "titulo": "Convecção", "det": "Preparar pontos para medição de espessura nos seguintes pontos:\n\n1) Gerador de vapor I: lado norte 24 pontos, lado sul 12 pontos;\n2) Pré aquecedor de carga mista: lado norte 9 pontos, lado sul 18 pontos;\n3) Super aquecedor de vapor: lado norte 54 pontos, lado sul 72 pontos;\n4) Gerador de vapor II: lado norte 36 pontos, lado sul 24 pontos.\n\nPrever reparos na manta cerâmica para tampas inferior do lado norte e sul em 10 m²;\n\nPrever reparos no concreto refratário( 2m²) próximo a porta de acesso do lado sul e piso, abaixo dos tubos da convecção;\n\nPrever reparos no concreto refratário do piso(2m²) da convecção;\n\nRealizar reparos de pintura na chaparia, região inferior e laterais, 30m²;\n\nPrever curva de secagem do refratário substituído ou que foi molhado devido neutralização/ensaios;\n\nPrever neutralização e limpeza interna do rotor e da câmara de sucção do VE-F-424102-02;\n\nTrocar a lona da junta de expansão JE-05.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.17", "linha": 40, "forno": "02", "cod": "1.17", "nota": "ZR-14658907", "sade": [], "tipo": "END", "zonas": ["LT"], "titulo": "Linha de Transferência", "det": "Abrir Linha de Transferência e remover poços termopar para inspeção interna; \n\nAvaliar substituição do cone central e weldoletes dos pigtails fixados nos mesmos devido a dificil soldabilidade e ocorrencia de trincas;\n\nRealizar pintura externa com tinta indicadora de alta temperatura conforme N-1514;\n\nPreparar para inspeção tampao do focinho da linha de transferência. DE-REPLAN-4241-42-017 (detalhe J);\n\nRealizar LP nos 3 cones na região da solda dissimilar;\n\nRealizar ensaio de Phased Array nas soldas dissimilares;\n\nRealizar ensaio de Phased/RX para acompanhamento da trinca do \"Tê\" do coletor norte;\n\nRealizar pintura com tinta entumescente nas pernas do forno;\n\nAplicar fire proof na parte metálica das bases da linha de transferência.", "origem": "Licitação", "nt": "Cancelado pelo item 1.20 (substituição integral da LT).", "canc": true}, {"id": "02|1.18", "linha": 41, "forno": "02", "cod": "1.18", "nota": "ZR-14658907", "sade": [], "tipo": "SUP", "zonas": ["COL"], "titulo": "Penthouse", "det": "Montar acesso a cada suporte de mola (14 suportes) dos tubos de distribuição dos pigtail's superiores localizados no penthouse. DE-REPLAN-4241-42-336 e 338;\n\nPrever ajustes nos suportes de mola, caso esteja +H45 fora do valor.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.19", "linha": 42, "forno": "02", "cod": "1.19", "nota": "ZR-14658907", "sade": [], "tipo": "END", "zonas": ["CONV"], "titulo": "LP carga combinada", "det": "Realizar LP visível em 13 soldas circunferenciais nas soldas da tubulação de Carga Combinada próximo a #T” conforme figura 6 da Comunicação Técnica do Cenpes #Adequação do Sistema de Entrada do F-424102 da Replan”; \n\nRealizar LP visível em 6 soldas circunferenciais nas extremidades coletor de saída de Carga Combinada (Mista) na região de convecção do forno conforme solicitado pela Comunicação Técnica do Cenpes #Adequação do Sistema de Entrada do F-424102 da Replan”.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.20", "linha": 43, "forno": "02", "cod": "1.20", "nota": "ZR-14658907", "sade": [], "tipo": "SUBST", "zonas": ["LT"], "titulo": "Linha de transferência", "det": "Substituir a LT integralmente por estratégia de manutenção da Gerência do MA/PM (incluindo os cones). Com isso ficam cancelados os itens 1.2 e 1.17 desta ZR;\n\nAplicar fire proof na parte metálica das bases da linha de transferência.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.21", "linha": 44, "forno": "02", "cod": "1.21", "nota": "ZR-14658907", "sade": ["SADE_060"], "tipo": "CALD", "zonas": ["RAD"], "titulo": "Substituir Cortina", "det": "Correção do item 1.10, as cortinas não devem ser eliminadas, serão substituídas por um sistema novo de cortinas fornecido pelo MA/EE (ordem 2029253228), conforme disponibilidade de cortinas novas, podendo ser parcialmente reutilizadas as que estiverem em melhores condições, se necessário.", "origem": "Licitação", "nt": "Aparece duas vezes na declaração (linha 44 sem SADE e linha 61 com SADE_060). Uma plaqueta só.", "canc": false}, {"id": "02|1.22", "linha": 45, "forno": "02", "cod": "1.22", "nota": "ZR-14658907", "sade": [], "tipo": "SUBST", "zonas": ["CONV"], "titulo": "Carga mista · Serpentina", "det": "Substituir integralmente a serpentina de carga mista desenho DE-REPLAN-4241-42-00042 alterando o material\ndos tubos para P9;\n\nO serviço de substituição da serpentina de carga mista deve conter um critério de protusão máxima interna da solda de 1,6mm, recomendado ensaio de gamagrafia das soldas. Ação originada no grupo de trabalho de falha da serpentina.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.23", "linha": 46, "forno": "02", "cod": "1.23", "nota": "ZR-14658907", "sade": [], "tipo": "CALD", "zonas": ["CONV"], "titulo": "Carga mista · Suporte", "det": "Substituir o 3º e 4º suportes da serpentina de carga mista (contando de norte para sul) conforme DE-REPLAN-4241-42-00046;\n\nAlternativa no caso de indisponibilidade: instalar viga de reforço nos dois suportes.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.24", "linha": 47, "forno": "02", "cod": "1.24", "nota": "ZR-14658907", "sade": [], "tipo": "REFR", "zonas": ["CONV", "TRANS", "TUN"], "titulo": "Convecção · Refratário Inferior", "det": "Substituir o refratário do teto dos dois túneis/dutos de transição das extremidades (aprox. 15m²);\n\nSubstituir o refratário na convecção da face norte, sul e leste, do piso até altura de aproximadamente 3m (aprox. 71m²); \n\nRealizar reparos nas paredes dos túneis/dutos de transição (aprox. 20m²);\n\nOs materiais de projeto podem ser substituídos por itens comerciais desde que mantidas as características necessárias para operação segura do forno.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.25", "linha": 48, "forno": "02", "cod": "1.25", "nota": "ZR-14658907", "sade": [], "tipo": "CALD", "zonas": ["CONV"], "titulo": "Convecção · Substituir chapas", "det": "Substituir a chaparia da convecção do lado oeste, comprimento entre as colunas sul aproximadamente 2,9m, altura do módulo 2 e 3 (DE-REPLAN-4241-42-00011) aproximadamente 6,6m;\n\nConsiderar no planejamento:\n\nReinstalar a BV oeste;\nA substituição do refratário em todo trecho substituído até as juntas frias (aprox. 12m²);\n(Inclui o refratário em torno do suporte sul da GV I e carga mista);\n\nOs materiais de projeto podem ser substituídos por itens comerciais desde que mantidas as características necessárias para operação segura do forno.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.26", "linha": 49, "forno": "02", "cod": "1.26", "nota": "ZR-14658907", "sade": [], "tipo": "REFR", "zonas": ["CONV"], "titulo": "Convecção · Carga mista refratário", "det": "Devido os itens 1.22 e 1.23 substituição da serpentina e suportes, considerar no planejamento:\n\nReparos no refratário na região da serpentina removida;\n\nRefazer parcialmente o corbel da carga mista onde apresentar danos;\n\nRefazer refratário em torno das vigas/suportes a serem instaladas.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.27", "linha": 50, "forno": "02", "cod": "1.27", "nota": "ZR-14658907", "sade": [], "tipo": "REFR", "zonas": ["CONV"], "titulo": "Convecção · Piso", "det": "Reposicionar os tijolos do piso da convecção que estão deslocados.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.28", "linha": 51, "forno": "02", "cod": "1.28", "nota": "ZR-14658907", "sade": [], "tipo": "END", "zonas": ["COL"], "titulo": "Crossover x Distribuidor LP", "det": "Realizar LP nas 4 soldas de todas as 6 curvas e TEs dos distribuidores das fileiras x distribuidores dos pigstails; \n\nRealizar LP nas soldas dos 2 pigtails centrais de cada fileira, sendo 2 soldas cada, pigtail com weldolet do distribuidor e pigtail com weldolet do tubo catalisador;\n\nRealizar LP nas soldas dos distribuidores das fileiras A e F com a curva do crossover, e dos distribuidores das fileiras B e E com o TE do crossover. (Das fileiras C e D já foi solicitado na medida 1.19); \n\nRecompor o isolamento onde removido, no trecho do item 1.19 manter sem isolamento, mas garantir que não haja queda de tijolo nem manta;\n\nCroqui em anexo. Totalizando 28 soldas de 8\" e 24 soldas de 1.1/4\".", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.29", "linha": 52, "forno": "02", "cod": "1.29", "nota": "ZR-14658907", "sade": [], "tipo": "SUP", "zonas": ["TUBOS"], "titulo": "Suporte de mola · Tubo catalisador", "det": "Montar acesso e realizar ajuste em todos os suportes de mola dos tubos catalisadores a serem substituídos conforme item 1.5.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.30", "linha": 53, "forno": "02", "cod": "1.30", "nota": "ZR-14658907", "sade": [], "tipo": "SUP", "zonas": ["COL"], "titulo": "Suporte de mola Crossover", "det": "Realizar ajuste nos tirantes dos dois suportes de mola do trecho norte sul do crossover (SH4) após inspeção visual dos mesmos. Necessário suportar a linha com andaime (as guias das curvas e do TE não são projetadas para suportar o peso).", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.31", "linha": 54, "forno": "02", "cod": "1.31", "nota": "ZR-14658907", "sade": [], "tipo": "CALD", "zonas": ["COL", "QUEI"], "titulo": "Crossover · Penthouse", "det": "Realizar furo para escoamento da água de chuva que acumula sobre as chapas;\n\nNas abas superiores dos 6 dutos de distribuição de ar de combustão sobre os queimadores (DE-REPLAN-4241-42-00102/101);\n\nNas chapas horizontais da estrutura da guia do TE do crossover.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.32", "linha": 55, "forno": "02", "cod": "1.32", "nota": "ZR-14658907", "sade": [], "tipo": "CALD", "zonas": ["DUTO"], "titulo": "Dutos de Gás", "det": "Realizar furo para escoamento da água de chuva que acumula sobre as chapas;\n\nNa aba a 45º do duto de saída do VT-F-424102-02 para chaminé. (item da maquete EXTRUSION 1 of SUBEQUIPMENT /F-424102/DUTO7/226).", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.33", "linha": 56, "forno": "02", "cod": "1.33", "nota": "ZR-14658907", "sade": [], "tipo": "CALD", "zonas": ["CONV"], "titulo": "Carga mista · Dreno Corte/LP", "det": "Cortar e fazer rosca para reduzir o niple a jusante do bloqueio do dreno na saída do coletor da carga mista, impedindo que o dreno apoie na estrutura;\n\nRealizar ensaio de líquido penetrante na solda do dreno com a luva e da luva com o coletor.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|1.34", "linha": 57, "forno": "02", "cod": "1.34", "nota": "ZR-14658907", "sade": [], "tipo": "PINT", "zonas": ["COL"], "titulo": "Penthouse · Pintura", "det": "Preparação e pintura do trecho leste do distribuidor de gás de purga da fileira B com dano no revestimento;\n\nLinha 14\"-HD-4241-2503-Bb aproximadamente 1m.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|HI-23-02", "linha": 68, "forno": "02", "cod": "HI-23-02", "nota": "HI-23-02", "sade": [], "tipo": "CALD", "zonas": ["RAD"], "titulo": "Instalação de bocais", "det": "MD-REPLAN-4241-42-00006_Realizar instalação de 2 bocais no costado do F-424102", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|HI-25-11", "linha": 69, "forno": "02", "cod": "HI-25-11", "nota": "HI-25-11", "sade": [], "tipo": "CALD", "zonas": ["RAD"], "titulo": "Instalação de bocais", "det": "Realizar instalação de 7 bocais no costado de 3\" nos costados leste e oeste do F-424102", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|SADE_075", "linha": 62, "forno": "02", "cod": "SADE_075", "nota": "ZF", "sade": ["SADE_075"], "tipo": "CALD", "zonas": ["RAD"], "titulo": "Troca Telhas", "det": "Realizar a substituição total das telhas do F-424102.", "origem": "Aumento de escopo", "nt": "", "canc": false}, {"id": "02|SADE_083", "linha": 64, "forno": "02", "cod": "SADE_083", "nota": "ZR-14658907", "sade": ["SADE_083"], "tipo": "REFR", "zonas": ["LT"], "titulo": "Quebra de Refratário da LT", "det": "Realizar a remoção completa do concreto refratário da linha de transferência que será retirada do F-424102 / P-42410324103", "origem": "Licitação", "nt": "", "canc": false}, {"id": "02|SADE_105", "linha": 65, "forno": "02", "cod": "SADE_105", "nota": "ZF", "sade": ["SADE_105"], "tipo": "QUEI", "zonas": ["QUEI"], "titulo": "Trocar Vidro de Inspeção dos Pilotos", "det": "Trocar vidro de inspeção dos pilotos, conforme foto em anexo.\nNM 10.182.147 -Vidro liso esp.2,5mm diâm.57mm\nReserva - 0126715839 - 0008 - 50 unid.", "origem": "Aumento de escopo", "nt": "", "canc": false}, {"id": "02|SADE_175", "linha": 67, "forno": "02", "cod": "SADE_175", "nota": "LISTA INSTRUMENTAÇÃO", "sade": ["SADE_175"], "tipo": "INST", "zonas": ["QUEI"], "titulo": "APOIOS CONFORME LISTA", "det": "PI-4241104 PRESSÃO NO FT-424101;\nPI-4241260 HEADER PURGA Q1 F-424102;\nPI-4241263 HEADER PURGA Q2 F-424102;\nPI-4241266 HEADER PURGA Q3 F-424102;\nPI-4241269 HEADER PURGA Q4 F-424102;\nPI-4241272 HEADER PURGA Q5 F-424102;\nPI-4241275 HEADER PURGA Q6 F-424102;\nPI-4241278 HEADER PURGA Q7 F-424102;\nPI-4241289A GC QUEIM FILA 1 F-424102;\nPI-4241289B GC QUEIM FILA 2 F-424102;\nPI-4241289C GC QUEIM FILA 3 F-424102;\nPI-4241289D GC QUEIM FILA 4 F-424102;\nPI-4241289E GC QUEIM FILA 5 F-424102;\nPI-4241289F GC QUEIM FILA 6 F-424102;\nPI-4241289G GC QUEIM FILA 7 F-424102;\nPI-4241290A GP QUEIM FILA 1 F-424102;\nPI-4241290B GP QUEIM FILA 2 F-424102;\nPI-4241290C GP QUEIM FILA 3 F-424102;\nPI-4241290D GP QUEIM FILA 4 F-424102;\nPI-4241290E GP QUEIM FILA 5 F-424102;\nPI-4241290F GP QUEIM FILA 6 F-424102;\nPI-4241290G GP QUEIM FILA 7 F-424102;\nPI-4241293 GC ÚLTIMO QUEIM F-424101;\nPI-4241294 GC ÚLTIMO PILOTO F-424101;\nGÁS DE COMBUSTÃO NA SAÍDA DA CHAMINÉ;\nPDT-4241051 ENTR/SAÍDA DA T-424101;\nTT-4241020B SAÍDA EFLU. FORNO-F-424102;\nTT-4241020C GASES EFLUENTES F-02 P/ P-03;\nPV-4241037 Expansão AV-65;\nPV-4241038 Expansão V-45.", "origem": "Licitação", "nt": "Na declaração está atribuída ao P-424103, mas os instrumentos são do F-424102 (purga Q1 a Q7, queimadores filas 1 a 7) e do F-424101 (PI-4241293/294).", "canc": false}, {"id": "02|ZF-15686680", "linha": 73, "forno": "02", "cod": "ZF-15686680", "nota": "ZF-15686680", "sade": [], "tipo": "PINT", "zonas": ["QUEI"], "titulo": "PI-4241284N AR COMB F-424102 FILA4 Q1", "det": "Será realizado limpeza dos vidros das janelas do Forno; e será realizado pintura de TAGs.", "origem": "Licitação", "nt": "Título da declaração é a TAG PI-4241284N, mas a descrição é limpeza dos vidros e pintura de TAGs.", "canc": false}, {"id": "01|1.1", "linha": 15, "forno": "01", "cod": "1.1", "nota": "ZR-14990740", "sade": [], "tipo": "ACESSO", "zonas": ["RAD", "SERP"], "titulo": "Liberação / Acessos", "det": "Montar andaime na câmara de radiação para a inspeção dos tubos e do revestimento isolante do teto", "origem": "Licitação", "nt": "", "canc": false}, {"id": "01|1.2", "linha": 16, "forno": "01", "cod": "1.2", "nota": "ZR-14990740", "sade": [], "tipo": "MED", "zonas": ["SERP", "RAD"], "titulo": "Ensaio ME", "det": "Realizar inspeção visual interna e atentar para o refratário do teto;\n\nPreparar e realizar medição de espessura nos pontos de controle.", "origem": "Licitação", "nt": "A declaração não informa a quantidade de pontos de ME.", "canc": false}, {"id": "01|1.3", "linha": 17, "forno": "01", "cod": "1.3", "nota": "ZR-14990740", "sade": [], "tipo": "PINT", "zonas": ["JAN"], "titulo": "Pintura", "det": "Realizar reparo na pintura na região das janelas de inspeção.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "01|1.4", "linha": 18, "forno": "01", "cod": "1.4", "nota": "ZR-14990740", "sade": [], "tipo": "QUEI", "zonas": ["QUEI"], "titulo": "Queimadores", "det": "Remover queimadores para inspeção/manutenção, conforme orientação do MI/EE.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "01|1.5", "linha": 19, "forno": "01", "cod": "1.5", "nota": "ZR-14990740", "sade": [], "tipo": "LIMP", "zonas": ["SERP"], "titulo": "Limpeza de espiras", "det": "Realizar limpeza das duas primeiras espiras circulares.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "01|1.6", "linha": 20, "forno": "01", "cod": "1.6", "nota": "ZR-14990740", "sade": [], "tipo": "REFR", "zonas": ["RAD"], "titulo": "Reparo Refratário", "det": "Realizar reparo em concreto refratário conforme indicação da inspeção em 1M², prever concreto refratário e grampos conforme projeto.\n\nDesenho de referência :DE-REPLAN_4241-42-407", "origem": "Licitação", "nt": "", "canc": false}, {"id": "01|1.7", "linha": 21, "forno": "01", "cod": "1.7", "nota": "ZR-14990740", "sade": [], "tipo": "DAMP", "zonas": ["DAMP"], "titulo": "Damper", "det": "Planejar em conjunto com MA/ED e OP/HDT verificação do desempenho/movimentação do damper em parada.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "01|1.8", "linha": 22, "forno": "01", "cod": "1.8", "nota": "ZR-14990740", "sade": [], "tipo": "MED", "zonas": ["CONV"], "titulo": "Convecção ME", "det": "Complemento do item 1.2: Abrir todas as tamapas das caixas de curva na convecção para inspeção visual e m\nedição de espessura.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "01|1.9", "linha": 23, "forno": "01", "cod": "1.9", "nota": "ZR-14990740", "sade": [], "tipo": "INSP", "zonas": ["CHAM"], "titulo": "Chaminé", "det": "Abrir a BV da chaminé para inspeção visual interna;\n\nA Inspeção Petrobras irá realizar sobrevoo com drone para avaliação do trecho superior;\n\nDependendo do resultado da inspeção visual e desempenho do damper, conforme item 1.7, pode ser necessário\nacesso pontual para reparo.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "01|ZF-15623094", "linha": 72, "forno": "01", "cod": "ZF-15623094", "nota": "ZF-15623094", "sade": [], "tipo": "QUEI", "zonas": ["QUEI"], "titulo": "Queimadores", "det": "Q-F-424101-002_Será substituído vidro da janela de Inspeção; Será removido mangotes e  será realizado T.H. (Teste Hidrostático) em Oficina; e será realizado  limpeza do maçarico.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "8A|1.1", "linha": 5, "forno": "8A", "cod": "1.1", "nota": "ZR-14990638", "sade": [], "tipo": "ACESSO", "zonas": ["RAD", "TUBOS", "CONV", "CHAM"], "titulo": "Liberação / Acessos", "det": "Abrir todas as portas de acesso (radiação, teto convecção e chaminé) para inspeção interna;\n\nMontar andaime na câmara de radiação para a inspeção dos tubos e do revestimento isolante do teto e bigodes e monogodes;\n\nAbrir as caixas de curvas da convecção leste/oeste para medição de espessura das curvas.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "8A|1.2", "linha": 6, "forno": "8A", "cod": "1.2", "nota": "ZR-14990638", "sade": [], "tipo": "REFR", "zonas": ["CONV", "CHAM"], "titulo": "Concreto Refratário", "det": "Reparos do silplate da convecção e chaminé. Reservar material para no mínimo 2,5 m².", "origem": "Licitação", "nt": "", "canc": false}, {"id": "8A|1.3", "linha": 7, "forno": "8A", "cod": "1.3", "nota": "ZR-14990638", "sade": [], "tipo": "MED", "zonas": ["TUBOS", "CONV"], "titulo": "Ensaio ME", "det": "Providenciar acesso e preparação de superfície para medição de espessura nos pontos conforme croqui. / Total: 56 pontos", "origem": "Licitação", "nt": "56 pontos conforme croqui, que não acompanha a declaração.", "canc": false}, {"id": "8A|1.4", "linha": 8, "forno": "8A", "cod": "1.4", "nota": "ZR-14990638", "sade": [], "tipo": "QUEI", "zonas": ["QUEI"], "titulo": "Queimadores", "det": "Remover queimadores para inspeção/manutenção conforme orientação do MI/EE", "origem": "Licitação", "nt": "", "canc": false}, {"id": "8A|1.5", "linha": 9, "forno": "8A", "cod": "1.5", "nota": "ZR-14990638", "sade": [], "tipo": "DAMP", "zonas": ["DAMP"], "titulo": "Damper", "det": "Planejar em conjunto com MA/ED e OP/HDT verificação do desempenho/movimentação do damper em parada.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "8A|ZF-15345947", "linha": 70, "forno": "8A", "cod": "ZF-15345947", "nota": "ZF-15345947", "sade": [], "tipo": "QUEI", "zonas": ["QUEI"], "titulo": "Queimadores", "det": "Q-F-428301A-004_Necessidade de limpeza (bico do queimador 4 obstruído)", "origem": "Licitação", "nt": "", "canc": false}, {"id": "8B|1.1", "linha": 10, "forno": "8B", "cod": "1.1", "nota": "ZR-14990639", "sade": [], "tipo": "ACESSO", "zonas": ["RAD", "TUBOS", "CONV", "CHAM"], "titulo": "Liberação / Acessos", "det": "Abrir todas as portas de acesso (radiação, teto convecção e chaminé) para inspeção interna;\n\nMontar andaime na câmara de radiação para a inspeção dos tubos e do revestimento isolante do teto e bigodes e monogodes;\n\nAbrir as caixas de curvas da convecção leste/oeste para medição de espessura das curvas.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "8B|1.2", "linha": 11, "forno": "8B", "cod": "1.2", "nota": "ZR-14990639", "sade": [], "tipo": "REFR", "zonas": ["CONV", "CHAM"], "titulo": "Concreto Refratário", "det": "Reparos do silplate da convecção e chaminé. Reservar material para no mínimo 2,5 m².", "origem": "Licitação", "nt": "", "canc": false}, {"id": "8B|1.3", "linha": 12, "forno": "8B", "cod": "1.3", "nota": "ZR-14990639", "sade": [], "tipo": "MED", "zonas": ["TUBOS", "CONV"], "titulo": "Ensaio ME", "det": "Providenciar acesso e preparação de superfície para medição de espessura nos pontos conforme croqui. / Total: 56 pontos", "origem": "Licitação", "nt": "56 pontos conforme croqui, que não acompanha a declaração.", "canc": false}, {"id": "8B|1.4", "linha": 13, "forno": "8B", "cod": "1.4", "nota": "ZR-14990639", "sade": [], "tipo": "QUEI", "zonas": ["QUEI"], "titulo": "Queimadores", "det": "Remover queimadores para inspeção/manutenção conforme orientação do MI/EE", "origem": "Licitação", "nt": "", "canc": false}, {"id": "8B|1.5", "linha": 14, "forno": "8B", "cod": "1.5", "nota": "ZR-14990639", "sade": [], "tipo": "DAMP", "zonas": ["DAMP"], "titulo": "Damper", "det": "Planejar em conjunto com MA/ED e OP/HDT verificação do desempenho/movimentação do damper em parada.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "8B|ZF-15388101", "linha": 71, "forno": "8B", "cod": "ZF-15388101", "nota": "ZF-15388101", "sade": [], "tipo": "QUEI", "zonas": ["QUEI"], "titulo": "Queimadores", "det": "Q-F-428301B-001_Será realizado manutenção/ limpeza do Queimador...e será ajustado porca  de regulagem do gás.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "P3|1.5", "linha": 58, "forno": "P3", "cod": "1.5", "nota": "ZR-14990745", "sade": ["SADE_082"], "tipo": "REFR", "zonas": ["CALD"], "titulo": "Reparo Refratário", "det": "Prever refratário anti-ácido no espelho e meia cana infreior do carretel de saida;\n\nPrever 2 m² de refratário para reparo no carretel de entrada;\n\nPrever 0,5 m² de refratário para reparo no espelho do carretel de entrada;\n\nPrever 10 Ferrules para reposição;\n\nMateraial Incoloy 800H, diametro 21 ,3mm e espessura 2,1mm.\n\nRetificação: Prever material refratário para recomposição total do carretel de entrada.\n\nPrever a instalação de dois bocais de 4\" na geratriz superior para permitir aplicação de concreto isolante por fluência livre.\n\nRevisão SADE_082:\nReparar o refratário do P-424103 conforme descrito abaixo:\n\n- Prever material refratário no espelho e meia cana inferior do carretel de saída;\n\n- Prever material refratário para recomposição total do carretel de entrada;\n\n - Prever material de refratário para reparo no espelho do carretel de entrada;\n\nObservações:\nA remoção do refratário do espelho deve ser realizada com hidrojato, a fim de preservar os ferrules, que não serão substituídos.\nO refratário do carretel deve ser aplicado por derramamento na geratriz inferior e por projeção pneumática na geratriz superior.\nMateriais recomendados para serem utilizados:\n  - Isolante Castibar 1515\n  - Refratário de alta alumina Tafcast 95", "origem": "Licitação", "nt": "Revisado pela SADE_082 (linha 63). Divergência sobre os ferrules: a linha 58 prevê 10 novos, a SADE_082 diz que serão preservados.", "canc": false}, {"id": "P3|1.6", "linha": 59, "forno": "P3", "cod": "1.6", "nota": "ZR-14990745", "sade": [], "tipo": "PINT", "zonas": ["CALD"], "titulo": "Pintura Indicadora", "det": "Pintar carretel e boleado (lado leste) com Tinta Indicadora de Alta Temperatura Verde, Tipo 1, conforme a N-1514A.", "origem": "Licitação", "nt": "", "canc": false}, {"id": "P3|1.7", "linha": 60, "forno": "P3", "cod": "1.7", "nota": "ZR-14990745", "sade": ["SADE_061"], "tipo": "END", "zonas": ["CALD"], "titulo": "Ensaio LP/PM", "det": "Realizar ensaio de Líquido Penetrante ou Partícula Magnética internamente em toda a geratriz superior do carretel de entrada. (conforme item 1.5 provavelmente o refratário será substituído, realizar o ensaio antes da instalação do novo).", "origem": "Licitação", "nt": "Aparece duas vezes na declaração (linha 60 e linha 66 com SADE_061). Uma plaqueta só.", "canc": false}];
+/* ================= tipos de serviço e etapas (workflow por tipo) ================= */
+const TIPOS={
+ ACESSO:{n:'Acesso e liberação',c:'#64748B',e:[['Liberação do equipamento (PT)','Planejamento'],['Abertura de portas e BVs','Caldeiraria / Produção'],['Andaime montado','Complementar / Produção'],['Andaime liberado para uso','Inspeção'],['Desmontagem e fechamento','Caldeiraria / Produção']]},
+ REFR:{n:'Refratário',c:'#B45309',e:[['Liberação da área','Planejamento'],['Remoção do refratário danificado','Caldeiraria / Produção'],['Inspeção da chaparia e ancoragens','Inspeção'],['Aplicação do refratário','Caldeiraria / Produção'],['Cura e secagem','Caldeiraria / Produção'],['Inspeção final do refratário','Inspeção']]},
+ MED:{n:'Medição (espessura e diâmetro)',c:'#0E7490',e:[['Acesso aos pontos','Complementar / Produção'],['Preparação de superfície','Complementar / Produção'],['Medição','Inspeção'],['Laudo e avaliação','Inspeção']]},
+ END:{n:'Ensaio não destrutivo',c:'#7C3AED',e:[['Remoção de isolamento e acesso','Complementar / Produção'],['Preparação das soldas','Caldeiraria / Produção'],['Ensaio','Inspeção'],['Laudo','Inspeção'],['Recomposição','Complementar / Produção']]},
+ QUEI:{n:'Queimadores',c:'#DC2626',e:[['Remoção do queimador','Caldeiraria / Produção'],['Inspeção e manutenção (MI/EE)','Complementar / Produção'],['Teste','Inspeção'],['Reinstalação','Caldeiraria / Produção'],['Liberação','Inspeção']]},
+ DAMP:{n:'Damper',c:'#475569',e:[['Planejamento com MA/ED e OP/HDT','Planejamento'],['Verificação da movimentação','Inspeção'],['Manutenção','Complementar / Produção'],['Teste de desempenho','Inspeção']]},
+ SUBST:{n:'Substituição de tubos e linhas',c:'#0F4CBA',e:[['Fabricação e recebimento','Planejamento'],['Remoção','Caldeiraria / Produção'],['Montagem','Caldeiraria / Produção'],['Soldagem','Caldeiraria e Soldagem / Produção'],['END das soldas','Inspeção'],['Teste hidrostático','Inspeção'],['Liberação','Inspeção']]},
+ ISOL:{n:'Isolamento térmico',c:'#A16207',e:[['Remoção do isolamento','Complementar / Produção'],['Aplicação','Complementar / Produção'],['Inspeção do isolamento','Inspeção']]},
+ PINT:{n:'Pintura',c:'#15803D',e:[['Preparação de superfície','Complementar / Produção'],['Aplicação','Complementar / Produção'],['Inspeção de pintura','Inspeção']]},
+ INST:{n:'Instrumentação',c:'#0369A1',e:[['Remoção','Complementar / Produção'],['Manutenção ou calibração','Complementar / Produção'],['Reinstalação','Complementar / Produção'],['Liberação','Inspeção']]},
+ SUP:{n:'Suportes de mola',c:'#6D28D9',e:[['Acesso','Complementar / Produção'],['Inspeção visual','Inspeção'],['Ajuste','Caldeiraria / Produção'],['Registro da leitura','Inspeção']]},
+ LIMP:{n:'Limpeza e neutralização',c:'#0891B2',e:[['Preparação','Complementar / Produção'],['Limpeza ou neutralização','Complementar / Produção'],['Inspeção','Inspeção']]},
+ INSP:{n:'Inspeção visual',c:'#334155',e:[['Acesso','Complementar / Produção'],['Inspeção','Inspeção'],['Relatório','Inspeção']]},
+ CALD:{n:'Caldeiraria',c:'#1D4ED8',e:[['Preparação','Planejamento'],['Execução','Caldeiraria / Produção'],['Inspeção visual e dimensional','Inspeção'],['Liberação','Inspeção']]}
+};
+FORNOS.P3={tag:'P-424103',nome:'Caldeira de recuperação P-424103',sub:'U-4241 · ZR-14990745',tipo:'eq',zonas:[{cod:'CALD',nome:'Caldeira de recuperação',num:'01',estado:'and',etapa:3,ens:[],med:[]}]};
+const SLUG={'02':'f-424102','01':'f-424101','8A':'f-428301a','8B':'f-428301b','P3':'p-424103'},GULS=Object.fromEntries(Object.entries(SLUG).map(([k,v])=>[v,k]));
+const DOM='https://fornos.sigmacode.com.br/consulta.html';
+
+/* ================= efetivo de exemplo (nomes fictícios) ================= */
+const EFETIVO=[
+ {nome:'Marina Albuquerque',mat:'30412',funcao:'Inspetora de equipamentos',grupo:'Inspeção'},
+ {nome:'Rafael Toledo',mat:'30477',funcao:'Inspetor de END nível 2',grupo:'Inspeção'},
+ {nome:'Camila Prado',mat:'30519',funcao:'Inspetora de soldagem',grupo:'Inspeção'},
+ {nome:'José Arimatéia Lopes',mat:'31102',funcao:'Caldeireiro',grupo:'Caldeiraria / Produção'},
+ {nome:'Edson Furtado',mat:'31144',funcao:'Encarregado de caldeiraria',grupo:'Caldeiraria / Produção'},
+ {nome:'Wellington Sousa',mat:'31208',funcao:'Soldador · sinete S-114',grupo:'Caldeiraria e Soldagem / Produção'},
+ {nome:'Diego Fontana',mat:'31231',funcao:'Soldador · sinete S-127',grupo:'Caldeiraria e Soldagem / Produção'},
+ {nome:'Antônio Bezerra',mat:'32015',funcao:'Montador de andaime',grupo:'Complementar / Produção'},
+ {nome:'Luciana Matos',mat:'32088',funcao:'Refratarista',grupo:'Complementar / Produção'},
+ {nome:'Paulo Henrique Dias',mat:'32091',funcao:'Isolador',grupo:'Complementar / Produção'},
+ {nome:'Sandro Vieira',mat:'32130',funcao:'Pintor industrial',grupo:'Complementar / Produção'},
+ {nome:'Tiago Ramalho',mat:'32166',funcao:'Instrumentista',grupo:'Complementar / Produção'},
+ {nome:'Fernanda Lacerda',mat:'30201',funcao:'Planejadora',grupo:'Planejamento'}];
+const ESPEC={INST:'Instrumentista',REFR:'Refratarista',ISOL:'Isolador',PINT:'Pintor industrial',ACESSO:'Montador de andaime',LIMP:'Montador de andaime',END:'Inspetor de END nível 2',MED:'Inspetor de END nível 2',SUBST:'Inspetora de soldagem'};
+function pessoaPara(grupo,r,tipo){const l=EFETIVO.filter(e=>e.grupo===grupo);if(!l.length)return EFETIVO[0];
+  const esp=ESPEC[tipo]&&l.find(e=>e.funcao.startsWith(ESPEC[tipo]));if(esp)return esp;
+  if(grupo==='Complementar / Produção')return l.find(e=>e.funcao==='Montador de andaime');
+  if(grupo==='Inspeção')return l.find(e=>e.funcao.startsWith('Inspetora de equipamentos'));
+  return l[Math.floor(r*l.length)%l.length]}
+/* ================= estado de exemplo das plaquetas, coerente com o painel de zonas ================= */
+function hash(s){let h=2166136261;for(const c of s)h=Math.imul(h^c.charCodeAt(0),16777619);return(h>>>0)/4294967296}
+const ZN=(fo,cod)=>(FORNOS[fo].zonas||[]).find(z=>z.cod===cod);
+const pendUsada={};
+ITENS.forEach(p=>{const n=TIPOS[p.tipo].e.length,z=ZN(p.forno,p.zonas[0]),est=z?z.estado:'nao',r=hash(p.id);p.reg=[];p.estado='nao';p.feitas=0;
+  if(p.canc){p.estado='canc';return}
+  if(est==='lib'){p.feitas=n}
+  else if(est==='nao'){p.feitas=0}
+  else if(est==='esp'){p.feitas=Math.max(1,n-1-(r<.5?1:0))}
+  else if(est==='pen'){p.feitas=Math.max(1,Math.floor(n*.5));if(!pendUsada[p.forno+p.zonas[0]]&&['END','MED','QUEI'].includes(p.tipo)){pendUsada[p.forno+p.zonas[0]]=1;p.pend=z.rec||'Resultado fora do critério. Aguarda avaliação da engenharia.'}}
+  else{p.feitas=Math.min(n-1,Math.floor(n*(.25+r*.5)))}
+  for(let i=0;i<p.feitas;i++){const et=TIPOS[p.tipo].e[i];{const pe=pessoaPara(et[1],hash(p.id+i),p.tipo);p.reg.push({et:i,quando:dataEx(i,r),quem:pe.nome,fn:pe.funcao,res:'Sim',fotos:et[1]==='Inspeção'?2:1})}}
+  p.estado=p.pend?'pen':p.feitas>=n?'lib':p.feitas===0?'nao':(TIPOS[p.tipo].e[p.feitas][1]==='Inspeção'?'esp':'and')});
+function dataEx(i,r){const d=new Date(Date.UTC(2027,2,2+i*2+Math.floor(r*3)));return d.toISOString().slice(0,10)}
+const ESTP={na:'N/A · sem intervenção',nao:'Não iniciada',and:'Em andamento',esp:'Aguarda inspeção',pen:'Pendência',lib:'Concluída',canc:'Cancelada'};
+const fmt=d=>d.split('-').reverse().join('/');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ================= elementos rastreáveis dos itens grandes ================= */
+function colunas(){const L='ABCDEF',out=[];for(let f=0;f<6;f++)for(let p=1;p<=52;p++)if(p>=42||p<=3)out.push({id:L[f]+p,f,p});
+  const rem=new Set(['F52','F51','E52']);out.forEach(c=>{c.rem=rem.has(c.id)});
+  out.filter(c=>!c.rem).sort((a,b)=>b.p-a.p||a.f-b.f).forEach((c,i)=>{if(i<28){c.sub=true;c.med=i<10}});return out}
+function elementos(p){
+  if(p.forno==='02'&&p.cod==='1.5'){const cs=colunas();return{tit:'84 colunas (A42 a F52 e A1 a F3)',link:'mapa-tubos.html#f-424102',lista:cs.map(c=>({id:c.id,lado:c.p<=3?'leste':'oeste',st:c.rem?['Removida antes da parada','pen']:c.med?['Montada · 6 alturas e carbono medidos','lib']:c.sub?['Montada · medição pendente','and']:['Aguardando remoção','nao']}))}}
+  if(p.forno==='02'&&p.cod==='1.12')return{tit:'228 tubos remanescentes',link:'mapa-tubos.html#f-424102',grupos:[['Medição automatizada em todo o comprimento',228,228],['Medição na base com circômetro e calibre',228,140]]};
+  if(p.forno==='02'&&p.cod==='1.16')return{tit:'249 pontos de ME na convecção',grupos:[['Gerador de vapor I · norte',24,24],['Gerador de vapor I · sul',12,12],['Pré-aquecedor de carga mista · norte',9,9],['Pré-aquecedor de carga mista · sul',18,18],['Superaquecedor de vapor · norte',54,54],['Superaquecedor de vapor · sul',72,72],['Gerador de vapor II · norte',36,36],['Gerador de vapor II · sul',24,24]]};
+  if(p.forno==='02'&&p.cod==='1.28')return{tit:'52 soldas no crossover e distribuidores',grupos:[['Soldas de 8" (curvas e Tês dos distribuidores)',28,9],['Soldas de 1¼" (pigtails centrais)',24,0]]};
+  if(p.forno==='02'&&p.cod==='1.6')return{tit:'Pigtails inferiores',grupos:[['Medição de diâmetro em 3 pontos por pigtail',228,96],['LP na ligação pigtail × coletor',60,22]]};
+  if(p.forno==='02'&&p.cod==='1.9')return{tit:'12 pigtails superiores (amostral)',grupos:[['LP na ligação com o distribuidor',12,5]]};
+  if(p.forno==='02'&&p.cod==='1.19')return{tit:'19 soldas da carga combinada',grupos:[['Soldas próximas ao Tê (figura 6 Cenpes)',13,13],['Extremidades do coletor de saída',6,6]]};
+  if((p.forno==='8A'||p.forno==='8B')&&p.cod==='1.3')return{tit:'56 pontos de ME (distribuição de exemplo até chegar o croqui)',link:'mapa-tubos.html#'+SLUG[p.forno],grupos:[['Tubos da radiação (4 passes × 10)',40,p.forno==='8A'?40:18],['Curvas e tubos de choque da convecção',16,16]]};
+  if(p.forno==='01'&&p.cod==='1.2')return{tit:'Pontos de controle da serpentina',link:'mapa-tubos.html#f-424101',grupos:[['Radiação · pontos de controle (quantidade a definir)',24,20]]};
+  if(p.forno==='01'&&p.cod==='1.8')return{tit:'Curvas da convecção',link:'mapa-tubos.html#f-424101',grupos:[['Curvas nas caixas da convecção',32,14]]};
+  return null}
+
+function estZona(fo,zc){const ps=ITENS.filter(p=>p.forno===fo&&p.zonas.includes(zc)&&!p.canc);if(!ps.length)return{k:'na',ps,feitas:0};
+  const k=ps.some(p=>p.estado==='pen')?'pen':ps.every(p=>p.estado==='lib')?'lib':ps.some(p=>p.estado==='esp')?'esp':ps.every(p=>p.estado==='nao')?'nao':'and';
+  return{k,ps,feitas:ps.filter(p=>p.estado==='lib').length}}
+
+/* ================= juntas dos serviços de soldagem ================= */
+/* etapas e ensaios: os mesmos códigos de junta_etapa e ensaio_tipo do Sigma */
+const JETAPAS=[['visual_ajuste','Ajuste'],['dimensional','Dimensional'],['raiz','Raiz'],['enchimento','Enchimento'],['acabamento','Acabamento']];
+const ENS={EVS:'EVS',LP:'LP',RX:'RX',DUR:'Dureza',TTAT:'TTAT',PMI:'PMI'};
+const SERV=[
+ {cod:'1.5',nome:'Colunas de tubos catalisadores e pigtails inferiores',mat:'A-608 HP mod. × Incoloy 800 HT',
+  nota:'4 juntas por coluna: J1 e J2 entre os 3 tubos da coluna (verificar se vêm soldadas do fabricante), J3 pigtail × tubo e J4 pigtail × coletor. Requisitos de ensaio de exemplo, a definir no plano de inspeção.'},
+ {cod:'1.3',nome:'Tês do sistema de saída',mat:'conforme posição 2 do DE-REPLAN-4241-42-00016',req:['EVS','LP','DUR'],
+  nota:'3 Tês × 3 extremidades. Dureza conforme API 942, pedido no próprio item.'},
+ {cod:'1.20',nome:'Linha de transferência nova',mat:'conforme projeto da LT',req:['EVS','RX'],qt:12,
+  nota:'Quantidade de juntas de exemplo: levantar no desenho da LT nova.'},
+ {cod:'1.22',nome:'Serpentina de carga mista (P9)',mat:'P9',req:['EVS','RX','TTAT','DUR'],qt:24,
+  nota:'Protrusão interna máxima de 1,6 mm e gamagrafia recomendada (item 1.22). P9 com TTAT e dureza. Quantidade de juntas de exemplo.'},
+ {cod:'1.33',nome:'Dreno do coletor de carga mista',mat:'conforme linha',req:['LP'],qt:2,
+  nota:'Solda do dreno com a luva e da luva com o coletor, com LP (item 1.33).'},
+ {cod:'HI-23-02',nome:'2 bocais no costado',mat:'chaparia do costado',req:['EVS','LP'],qt:2,nota:'Uma junta por bocal. Ensaios de exemplo.'},
+ {cod:'HI-25-11',nome:'7 bocais de 3" leste e oeste',mat:'chaparia do costado',req:['EVS','LP'],qt:7,nota:'Uma junta por bocal. Ensaios de exemplo.'}];
+const SOLD=EFETIVO.filter(e=>e.grupo==='Caldeiraria e Soldagem / Produção');
+const INSP_S=EFETIVO.find(e=>e.funcao.startsWith('Inspetora de soldagem')),INSP_E=EFETIVO.find(e=>e.funcao.startsWith('Inspetor de END'));
+const JUNTAS=[];
+function dia(n){const d=new Date(Date.UTC(2027,2,3+n));return d.toISOString().slice(0,10)}
+function montaJunta(sv,id,ref,tipo,req,nivel,r){
+  /* nivel: 0 nada, 1 ajustada, 2 soldada sem END, 3 END em curso, 4 concluída */
+  const sold=SOLD[Math.floor(r*SOLD.length)%SOLD.length],j={sv:sv.cod,id,ref,tipo,req,et:{},en:{},sold};
+  const nEt=nivel>=2?5:nivel===1?2:0;
+  JETAPAS.slice(0,nEt).forEach(([c],i)=>{j.et[c]={quando:dia(i+Math.floor(r*4)),quem:i<2?INSP_S.nome:sold.nome,sinete:i<2?null:sold.funcao.split('· ')[1]}});
+  req.forEach((e,i)=>{if(nivel>=4||(nivel===3&&i<Math.ceil(req.length/2))){
+      const rep=e==='RX'&&r>.9;j.en[e]={res:rep?'reprovado':'aprovado',quando:dia(6+i),quem:e==='EVS'?INSP_S.nome:INSP_E.nome,rel:`${e}-${String(Math.floor(r*900)+100)}/27`}}});
+  return j}
+(function(){
+  const pl=c=>ITENS.find(p=>p.forno==='02'&&p.cod===c);
+  colunas().forEach(c=>{const r=hash(c.id);
+    const nv=c.rem||!c.sub?0:c.med?4:(r<.5?3:2);
+    [['J1','tubo 1 × tubo 2','JP'],['J2','tubo 2 × tubo 3','JP'],['J3','pigtail × tubo 3','JC'],['J4','pigtail × coletor','JC']].forEach(([s,ref,tp],k)=>{
+      const req=tp==='JP'?['EVS','RX']:['EVS','LP','PMI'];
+      JUNTAS.push(montaJunta(SERV[0],`${c.id}-${s}`,`Coluna ${c.id} · ${ref}`,tp,req,nv===3&&k<2?4:nv,hash(c.id+s)))})});
+  SERV.slice(1).forEach(sv=>{const p=pl(sv.cod),frac=p?(p.estado==='lib'?1:p.feitas/TIPOS[p.tipo].e.length):0;
+    const qt=sv.cod==='1.3'?9:sv.qt;
+    for(let i=0;i<qt;i++){const r=hash(sv.cod+i),pos=i/qt;
+      const nv=pos<frac*.7?4:pos<frac?3:pos<frac+.15?1:0;
+      const ref=sv.cod==='1.3'?`Tê ${Math.floor(i/3)+1} · extremidade ${i%3+1}`:sv.cod==='1.33'?(i?'luva × coletor':'dreno × luva'):sv.cod.startsWith('HI')?`bocal ${i+1} × costado`:`junta ${i+1}`;
+      JUNTAS.push(montaJunta(sv,`${sv.cod}-J${String(i+1).padStart(2,'0')}`,ref,'JC',sv.req,nv,r))}});
+})();
+function estJ(j){const sol=!!j.et.acabamento,aj=Object.keys(j.et).length>0;
+  if(Object.values(j.en).some(e=>e.res==='reprovado'))return'rep';
+  if(sol&&j.req.every(e=>j.en[e]&&j.en[e].res==='aprovado'))return'ok';
+  if(sol)return'end';if(aj)return'sol';return'nao'}
+const JEST={nao:['Não iniciada','#CBD2DC','#4B5563'],sol:['Em soldagem','#0F4CBA','#fff'],end:['Soldada, aguardando END','#F59E0B','#3F2207'],rep:['Reparo (END reprovado)','#EF4444','#fff'],ok:['Concluída','#16A34A','#fff']};
+
+const $=id=>document.getElementById(id);
+let svAtivo='1.5',jSel=null,filtro='';
+{const h=decodeURIComponent(location.hash.slice(1));if(SERV.some(s=>s.cod===h))svAtivo=h}
+function kpis(){const t=JUNTAS.length,s=JUNTAS.filter(j=>j.et.acabamento).length,req=JUNTAS.reduce((a,j)=>a+j.req.length,0),
+  lau=JUNTAS.reduce((a,j)=>a+Object.keys(j.en).length,0),rep=JUNTAS.filter(j=>estJ(j)==='rep').length;
+  $('kpis').innerHTML=[[t,'','Juntas nos serviços de soldagem'],[s,` de ${t}`,'Soldadas (acabamento feito)'],[lau,` de ${req}`,'Ensaios com laudo'],[rep,'','Em reparo por END reprovado']]
+    .map(([n,sm,l])=>`<div class="kpi"><div class="n">${n}<small>${sm}</small></div><div class="l">${l}</div></div>`).join('')}
+function porServico(){
+  $('porSv').innerHTML=SERV.map(sv=>{const js=JUNTAS.filter(j=>j.sv===sv.cod),s=js.filter(j=>j.et.acabamento).length,ok=js.filter(j=>estJ(j)==='ok').length,rep=js.filter(j=>estJ(j)==='rep').length;
+    return `<button type="button" class="sv ${sv.cod===svAtivo?'on':''}" data-sv="${sv.cod}"><span class="cod">${esc(sv.cod)}</span><span class="t"><b>${esc(sv.nome)}</b>
+      <small>${js.length} juntas · ${s} soldadas · ${ok} concluídas${rep?` · <em>${rep} em reparo</em>`:''}</small>
+      <span class="bar2"><i style="width:${Math.round(ok/js.length*100)}%;background:#16A34A"></i><i style="width:${Math.round((s-ok)/js.length*100)}%;background:#F59E0B"></i></span></span></button>`}).join('');
+  document.querySelectorAll('[data-sv]').forEach(b=>b.onclick=()=>{svAtivo=b.dataset.sv;jSel=null;history.replaceState(null,'','#'+encodeURIComponent(svAtivo));tudo();document.getElementById('m-tit').scrollIntoView({behavior:'smooth',block:'start'})})}
+function matriz(){const cols=[...JETAPAS.map(([c,n])=>({c,n,et:1})),...Object.entries(ENS).map(([c,n])=>({c,n}))];
+  $('mx').innerHTML=`<table class="mx"><thead><tr><th>Serviço</th>${cols.map(c=>`<th>${c.n}</th>`).join('')}</tr></thead><tbody>${SERV.map(sv=>{const js=JUNTAS.filter(j=>j.sv===sv.cod);
+    return `<tr><td><b>${esc(sv.cod)}</b></td>${cols.map(c=>{const alvo=c.et?js:js.filter(j=>j.req.includes(c.c));if(!alvo.length)return '<td class="na">·</td>';
+      const f=alvo.filter(j=>c.et?j.et[c.c]:j.en[c.c]).length,pc=f/alvo.length,rp=!c.et&&alvo.some(j=>j.en[c.c]&&j.en[c.c].res==='reprovado');
+      return `<td><span class="cel" style="background:rgba(15,76,186,${(.08+pc*.82).toFixed(2)});color:${pc>.5?'#fff':'#0B3A91'}${rp?';box-shadow:inset 0 0 0 2px #EF4444':''}">${f}/${alvo.length}</span></td>`}).join('')}</tr>`}).join('')}</tbody></table>`}
+function mapa(){const sv=SERV.find(s=>s.cod===svAtivo);let js=JUNTAS.filter(j=>j.sv===svAtivo);
+  if(filtro)js=js.filter(j=>estJ(j)===filtro);
+  $('m-tit').textContent=`${sv.cod} · ${sv.nome}`;$('m-sub').textContent=`${sv.mat} · ${sv.nota}`;
+  $('fil').innerHTML=[['','Todas'],...Object.entries(JEST).map(([k,v])=>[k,v[0]])].map(([k,n])=>`<button type="button" class="uchip" data-f="${k}" aria-pressed="${filtro===k}">${n}</button>`).join('');
+  document.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{filtro=b.dataset.f;jSel=null;tudo()});
+  let h='';
+  if(svAtivo==='1.5'){const grupos={};js.forEach(j=>{const c=j.id.split('-')[0];(grupos[c]=grupos[c]||[]).push(j)});
+    h=`<div class="cols">${Object.entries(grupos).map(([c,l])=>`<div class="colj"><span class="cn">${c}</span><div class="jj">${l.map(j=>chipJ(j,j.id.split('-')[1])).join('')}</div></div>`).join('')}</div>`}
+  else h=`<div class="jl">${js.map(j=>chipJ(j,j.id.split('-').pop())).join('')}</div>`;
+  $('mapa').innerHTML=js.length?h:'<p class="vz">Nenhuma junta neste filtro.</p>';
+  $('mapa').querySelectorAll('[data-j]').forEach(b=>b.onclick=()=>{jSel=b.dataset.j;lado();marca()});
+  $('leg').innerHTML=Object.values(JEST).map(v=>`<span><i style="background:${v[1]}"></i>${v[0]}</span>`).join('')}
+function chipJ(j,rot){const e=JEST[estJ(j)];return `<button type="button" class="jc${jSel===j.id?' sel':''}" data-j="${j.id}" style="background:${e[1]};color:${e[2]}" title="${esc(j.ref)} · ${e[0]}">${esc(rot)}</button>`}
+function marca(){document.querySelectorAll('[data-j]').forEach(b=>b.classList.toggle('sel',b.dataset.j===jSel))}
+function lado(){const j=JUNTAS.find(x=>x.id===jSel);
+  if(!j){const sv=SERV.find(s=>s.cod===svAtivo),js=JUNTAS.filter(x=>x.sv===svAtivo),c={};js.forEach(x=>{const k=estJ(x);c[k]=(c[k]||0)+1});
+    $('side').innerHTML=`<div class="hs-t">${esc(sv.cod)} · ${esc(sv.nome)}</div><div class="hs-q">Toque numa junta para ver as etapas, o soldador e os laudos.</div>
+      <dl class="kv">${Object.entries(JEST).map(([k,v])=>`<dt><i class="dt" style="background:${v[1]}"></i>${v[0]}</dt><dd>${c[k]||0}</dd>`).join('')}</dl>
+      <a class="hbtn" style="margin-top:14px;text-decoration:none" href="consulta.html#f-424102/p/${encodeURIComponent(sv.cod)}">Abrir a plaqueta ${esc(sv.cod)} na consulta</a>`;return}
+  const e=estJ(j),E=JEST[e];
+  $('side').innerHTML=`<button type="button" class="hs-fechar" id="b-f">← Resumo do serviço</button>
+    <div class="hs-t" style="margin-top:4px">Junta ${esc(j.id)}</div><div class="hs-q" style="margin:2px 0 8px">${esc(j.ref)} · ${j.tipo==='JP'?'junta de pré-fabricação':'junta de campo'}</div>
+    <span class="chip" style="background:${E[1]};color:${E[2]};border-color:${E[1]}">${E[0]}</span>
+    <h3>Etapas de soldagem</h3><ol class="ets">${JETAPAS.map(([c,n])=>{const r=j.et[c];return `<li class="${r?'ok':''}"><span>${r?'✓':'·'}</span><div><b>${n}</b><small>${r?`${esc(r.quem)}${r.sinete?' · sinete '+r.sinete:''} · ${r.quando.split('-').reverse().join('/')}`:'pendente'}</small></div></li>`}).join('')}</ol>
+    <h3>Ensaios exigidos</h3><ol class="ets">${j.req.map(c=>{const r=j.en[c];return `<li class="${r?(r.res==='aprovado'?'ok':'rp'):''}"><span>${r?(r.res==='aprovado'?'✓':'✕'):'·'}</span><div><b>${ENS[c]}</b><small>${r?`${r.res==='aprovado'?'Aprovado':'Reprovado, reparo aberto'} · ${esc(r.rel)} · ${esc(r.quem)}`:'sem laudo'}</small></div></li>`}).join('')}</ol>
+    <h3>Soldador</h3><p class="zm">${esc(j.sold.nome)} · ${esc(j.sold.funcao)}</p>`;
+  $('b-f').onclick=()=>{jSel=null;lado();marca()}}
+function tudo(){kpis();porServico();matriz();mapa();lado()}
+tudo();
+
+</script>
+
+<script>
+(function(){function aplicar(t){document.documentElement.setAttribute("data-theme",t);try{localStorage.setItem("sigma-tema",t==="dark"?"escuro":"claro")}catch(e){}
+var s=document.getElementById("b-tema-t");if(s)s.textContent=t==="dark"?"Claro":"Escuro";if(typeof tudo==="function")tudo();}
+function trocar(){aplicar(document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark")}
+var b=document.getElementById("b-tema");if(b)b.onclick=trocar;
+document.addEventListener("keydown",function(e){if((e.key==="t"||e.key==="T")&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))trocar()});
+aplicar(document.documentElement.getAttribute("data-theme")||"light");})();
+</script>
+</body>
+</html>

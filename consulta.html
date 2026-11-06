@@ -10,7 +10,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root{--blue:#0F4CBA;--blue-700:#0B3A91;--blue-300:#5B8AE6;--canvas:#F1F4F9;--ink:#1F2937;--ink-soft:#4B5563;--muted:#6B7280;--line:#E5E7EB;--field:#F4F6FA;--field-line:#D7DEEA;
-  --s-nao:#9CA3AF;--s-and:#0F4CBA;--s-esp:#F59E0B;--s-pen:#EF4444;--s-lib:#16A34A;--s-canc:#9CA3AF;
+  --s-nao:#9CA3AF;--s-and:#0F4CBA;--s-esp:#F59E0B;--s-pen:#EF4444;--s-lib:#16A34A;--s-canc:#9CA3AF;--s-na:#6B9080;
   --font-d:'Exo 2',system-ui,sans-serif;--font-ui:'Inter',system-ui,sans-serif;--r:8px;--r-md:12px;--r-lg:16px;--sh:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.10)}
 *{box-sizing:border-box;margin:0;padding:0}
 [hidden]{display:none!important}
@@ -42,17 +42,19 @@ main{max-width:880px;margin:0 auto;padding:22px max(16px,env(safe-area-inset-rig
 .sub{font-size:12px;color:var(--muted);margin-top:3px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .eyebrow{font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-bottom:4px}
 .zonas{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
-.zc{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:var(--r-md);text-decoration:none}
+.zc{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;align-items:start;padding:12px;border:1px solid var(--line);border-radius:var(--r-md);text-decoration:none}
 .zc:hover{background:var(--field);border-color:var(--field-line)}
 .zn{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;font:800 12px var(--font-d)}
 .zn.big{width:40px;height:40px;font-size:15px}
 .zt b{display:block;font-family:var(--font-d);font-size:13.5px;line-height:1.25}
-.zt small{font-size:11.5px;color:var(--muted)}
+.zt small{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
+.zchip{display:block;margin-top:7px}
 .zh{display:flex;gap:12px;align-items:center}
 .acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .st{font-size:11px;font-weight:800;border-radius:20px;padding:3px 9px;white-space:nowrap;border:1px solid;display:inline-block}
 .st-nao{background:#F1F3F6;color:#4B5563;border-color:#CBD2DC}.st-and{background:#E8EFFC;color:#0B3A91;border-color:#0F4CBA}
 .st-esp{background:#FFF7E6;color:#92400E;border-color:#F59E0B}.st-pen{background:#FDECEC;color:#991B1B;border-color:#EF4444}
+.st-na{background:#EEF4F1;color:#3F5F52;border-color:#9BB8AA}
 .st-lib{background:#E7F6EE;color:#166534;border-color:#16A34A}.st-canc{background:#F3F4F6;color:#6B7280;border-color:#D1D5DB;text-decoration:line-through}
 .tp{font-size:10.5px;font-weight:800;border-radius:6px;padding:2px 7px;color:var(--t);background:#fff;border:1px solid var(--t);white-space:nowrap}
 .pls{display:grid;gap:8px}
@@ -111,6 +113,51 @@ h3{font-family:var(--font-d);font-weight:800;font-size:11.5px;letter-spacing:.04
 .demo{font-size:11.5px;color:#92400E;background:#FFF7E6;border-radius:6px;padding:6px 8px}
 .mact{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
 .top nav .lbl-c{display:none}
+.mbox{max-height:calc(100vh - 32px);overflow:auto}
+.mh{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.mx{background:none;border:0;font-size:16px;color:var(--muted);cursor:pointer;padding:2px 6px}
+.picks{display:grid;gap:6px;margin-top:8px}
+.picks button{text-align:left;padding:9px 11px;border:1px solid var(--line);border-radius:var(--r);background:#fff;cursor:pointer;font-family:var(--font-ui)}
+.picks button:hover{background:var(--field)}
+.picks b,.quembox b{display:block;font-size:13px}
+.picks small,.quembox small{font-size:11.5px;color:var(--muted)}
+.miss{font-size:12.5px;color:#B91C1C;margin-top:6px}
+.quembox{display:flex;gap:10px;align-items:center;padding:9px 11px;border:1px solid #BFDBFE;background:#EFF4FF;border-radius:var(--r)}
+.quembox .btn{margin-left:auto}
+.av{width:32px;height:32px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font:800 13px var(--font-d);flex:none}
+.tarefa{display:grid;gap:2px;padding:10px 0}
+.tarefa small{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.tarefa b{font-family:var(--font-d);font-size:15px}
+.tarefa span{font-size:12px;color:var(--muted)}
+.resp{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.resp .r{position:relative}
+.resp input{position:absolute;opacity:0}
+.resp span{display:block;text-align:center;padding:9px 0;border:1px solid var(--line);border-radius:var(--r);font:700 13px var(--font-ui);cursor:pointer}
+.resp .r0 input:checked+span{background:#16A34A;border-color:#16A34A;color:#fff}.resp .r1 input:checked+span{background:#EF4444;border-color:#EF4444;color:#fff}
+.resp .r2 input:checked+span{background:#64748B;border-color:#64748B;color:#fff}.resp .r3 input:checked+span{background:#1F2937;border-color:#1F2937;color:#fff}
+.resp input:focus-visible+span{outline:2px solid var(--blue-300);outline-offset:2px}
+.drop{display:block;text-align:center;padding:12px;border:1.5px dashed var(--field-line);border-radius:var(--r);font-size:12.5px;color:var(--muted);cursor:pointer;text-transform:none;letter-spacing:0;font-weight:600}
+.fots{display:flex;flex-wrap:wrap;gap:6px}.fots span{font-size:11px;background:var(--field);border-radius:6px;padding:3px 7px}
+.btn.full{width:100%;justify-content:center;padding:11px;margin-top:6px}
+.pinbox{display:grid;gap:8px;text-align:center;padding:6px 0}
+.pinbox b{font-family:var(--font-d);font-size:16px}
+.pinbox span{font-size:13px;color:var(--muted)}
+.pinbox input{text-align:center;font-size:22px;letter-spacing:.3em}
+.pinbox small{font-size:11px;color:var(--muted)}
+.pinbox .mact{justify-content:center}
+.et small b.quem{display:inline;font-size:11.5px;color:var(--ink)}
+.et small i{color:var(--ink-soft)}
+.aviso.warn{margin:0}
+.zr{margin-top:18px;border-top:1px solid var(--line);padding-top:4px}
+.zr-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.zr-i{border:1px solid var(--line);border-left:3px solid #F59E0B;border-radius:0;padding:9px 11px;margin-bottom:8px}
+.zr-i p{font-size:13px;margin:5px 0 3px}
+.zr-i small{font-size:11.5px;color:var(--muted)}
+.zrb{font-size:10.5px;font-weight:800;border-radius:20px;padding:2px 8px;border:1px solid}
+.zrb-aguardando_fiscalizacao{background:#FFF7E6;color:#92400E;border-color:#F59E0B}.zrb-aprovada{background:#E7F6EE;color:#166534;border-color:#16A34A}.zrb-reprovada{background:#F3F4F6;color:#4B5563;border-color:#9CA3AF}
+.zr-nota{font-size:11.5px;color:var(--muted);margin:6px 0 10px}
+.zr-btn{border-color:#F59E0B;color:#92400E;background:#FFFBEB}
+.zr-btn:hover{background:#FEF3C7}
 .foot{text-align:center;font-size:11px;color:#9CA3AF;margin-top:12px}
 @media(max-width:560px){.pl{grid-template-columns:auto minmax(0,1fr)}.pl .st{grid-column:2;justify-self:start}.top nav .lbl{display:none}.top nav .lbl-c{display:inline}}
 </style>
@@ -119,9 +166,19 @@ h3{font-family:var(--font-d);font-weight:800;font-size:11.5px;letter-spacing:.04
 <header class="top">
   <a class="logo" href="index.html" aria-label="Início"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V9l4 3V9l4 3V5h4v16"/><path d="M15 9h2"/></svg></a>
   <div class="name">Consultar forno<small>REPLAN · Contrato 5900.0135110.26.2 · OS 035</small></div>
-  <nav aria-label="Navegação"><a class="btn" href="index.html">Início</a><a class="btn" href="painel-zonas.html"><span class="lbl">Painel de zonas</span><span class="lbl-c">Zonas</span></a><a class="btn" href="mapa-tubos.html">Mapa de tubos</a></nav>
+  <nav aria-label="Navegação"><a class="btn" href="index.html">Início</a><a class="btn" href="painel-zonas.html"><span class="lbl">Painel de zonas</span><span class="lbl-c">Zonas</span></a><a class="btn" href="mapa-tubos.html">Mapa de tubos</a><a class="btn" href="mapa-juntas.html">Mapa de juntas</a></nav>
 </header>
 <main id="app"></main>
+<div id="zr-modal" class="modal" hidden><div class="mbox" role="dialog" aria-modal="true" aria-labelledby="zr-t">
+  <div class="mh"><div><h3 id="zr-t">Possível abertura de ZR</h3><p class="msub" id="zr-sub"></p></div><button type="button" class="mx" id="zr-x" aria-label="Fechar">✕</button></div>
+  <label for="zr-busca">Identifique-se</label><input id="zr-busca" placeholder="Nome, CPF ou matrícula…" autocomplete="off"><div id="zr-res"></div>
+  <label for="zr-obs">O que foi observado?</label><textarea id="zr-obs" rows="3" placeholder="Descreva o que indica necessidade de serviço adicional (ZR), fora do escopo atual…"></textarea>
+  <label>Foto (opcional)</label><label class="drop" for="zr-fot">Clique para anexar foto (opcional), até 8</label><input type="file" id="zr-fot" accept="image/*" multiple hidden><div class="fots" id="zr-fots"></div>
+  <p class="erro" id="zr-erro" hidden></p>
+  <button type="button" class="btn pri full" id="zr-ok">Registrar observação</button>
+  <p class="demo">Demonstração com efetivo fictício: o aviso fica só nesta tela e não grava no banco.</p>
+</div></div>
+
 <p class="foot">Protótipo de demonstração · plaquetas lógicas geradas da Declaração de Escopo rev. 1 · estados e registros de exemplo</p>
 <script>
 /* ---------- zonas por forno, ligadas aos itens da Declaração de Escopo rev. 1 ---------- */
@@ -236,6 +293,27 @@ FORNOS.P3={tag:'P-424103',nome:'Caldeira de recuperação P-424103',sub:'U-4241 
 const SLUG={'02':'f-424102','01':'f-424101','8A':'f-428301a','8B':'f-428301b','P3':'p-424103'},GULS=Object.fromEntries(Object.entries(SLUG).map(([k,v])=>[v,k]));
 const DOM='https://fornos.sigmacode.com.br/consulta.html';
 
+/* ================= efetivo de exemplo (nomes fictícios) ================= */
+const EFETIVO=[
+ {nome:'Marina Albuquerque',mat:'30412',funcao:'Inspetora de equipamentos',grupo:'Inspeção'},
+ {nome:'Rafael Toledo',mat:'30477',funcao:'Inspetor de END nível 2',grupo:'Inspeção'},
+ {nome:'Camila Prado',mat:'30519',funcao:'Inspetora de soldagem',grupo:'Inspeção'},
+ {nome:'José Arimatéia Lopes',mat:'31102',funcao:'Caldeireiro',grupo:'Caldeiraria / Produção'},
+ {nome:'Edson Furtado',mat:'31144',funcao:'Encarregado de caldeiraria',grupo:'Caldeiraria / Produção'},
+ {nome:'Wellington Sousa',mat:'31208',funcao:'Soldador · sinete S-114',grupo:'Caldeiraria e Soldagem / Produção'},
+ {nome:'Diego Fontana',mat:'31231',funcao:'Soldador · sinete S-127',grupo:'Caldeiraria e Soldagem / Produção'},
+ {nome:'Antônio Bezerra',mat:'32015',funcao:'Montador de andaime',grupo:'Complementar / Produção'},
+ {nome:'Luciana Matos',mat:'32088',funcao:'Refratarista',grupo:'Complementar / Produção'},
+ {nome:'Paulo Henrique Dias',mat:'32091',funcao:'Isolador',grupo:'Complementar / Produção'},
+ {nome:'Sandro Vieira',mat:'32130',funcao:'Pintor industrial',grupo:'Complementar / Produção'},
+ {nome:'Tiago Ramalho',mat:'32166',funcao:'Instrumentista',grupo:'Complementar / Produção'},
+ {nome:'Fernanda Lacerda',mat:'30201',funcao:'Planejadora',grupo:'Planejamento'}];
+const ESPEC={INST:'Instrumentista',REFR:'Refratarista',ISOL:'Isolador',PINT:'Pintor industrial',ACESSO:'Montador de andaime',LIMP:'Montador de andaime',END:'Inspetor de END nível 2',MED:'Inspetor de END nível 2',SUBST:'Inspetora de soldagem'};
+function pessoaPara(grupo,r,tipo){const l=EFETIVO.filter(e=>e.grupo===grupo);if(!l.length)return EFETIVO[0];
+  const esp=ESPEC[tipo]&&l.find(e=>e.funcao.startsWith(ESPEC[tipo]));if(esp)return esp;
+  if(grupo==='Complementar / Produção')return l.find(e=>e.funcao==='Montador de andaime');
+  if(grupo==='Inspeção')return l.find(e=>e.funcao.startsWith('Inspetora de equipamentos'));
+  return l[Math.floor(r*l.length)%l.length]}
 /* ================= estado de exemplo das plaquetas, coerente com o painel de zonas ================= */
 function hash(s){let h=2166136261;for(const c of s)h=Math.imul(h^c.charCodeAt(0),16777619);return(h>>>0)/4294967296}
 const ZN=(fo,cod)=>(FORNOS[fo].zonas||[]).find(z=>z.cod===cod);
@@ -247,10 +325,10 @@ ITENS.forEach(p=>{const n=TIPOS[p.tipo].e.length,z=ZN(p.forno,p.zonas[0]),est=z?
   else if(est==='esp'){p.feitas=Math.max(1,n-1-(r<.5?1:0))}
   else if(est==='pen'){p.feitas=Math.max(1,Math.floor(n*.5));if(!pendUsada[p.forno+p.zonas[0]]&&['END','MED','QUEI'].includes(p.tipo)){pendUsada[p.forno+p.zonas[0]]=1;p.pend=z.rec||'Resultado fora do critério. Aguarda avaliação da engenharia.'}}
   else{p.feitas=Math.min(n-1,Math.floor(n*(.25+r*.5)))}
-  for(let i=0;i<p.feitas;i++){const et=TIPOS[p.tipo].e[i];p.reg.push({et:i,quando:dataEx(i,r),quem:et[1].split(' / ')[0],res:'Sim',fotos:et[1]==='Inspeção'?2:1})}
+  for(let i=0;i<p.feitas;i++){const et=TIPOS[p.tipo].e[i];{const pe=pessoaPara(et[1],hash(p.id+i),p.tipo);p.reg.push({et:i,quando:dataEx(i,r),quem:pe.nome,fn:pe.funcao,res:'Sim',fotos:et[1]==='Inspeção'?2:1})}}
   p.estado=p.pend?'pen':p.feitas>=n?'lib':p.feitas===0?'nao':(TIPOS[p.tipo].e[p.feitas][1]==='Inspeção'?'esp':'and')});
 function dataEx(i,r){const d=new Date(Date.UTC(2027,2,2+i*2+Math.floor(r*3)));return d.toISOString().slice(0,10)}
-const ESTP={nao:'Não iniciada',and:'Em andamento',esp:'Aguarda inspeção',pen:'Pendência',lib:'Concluída',canc:'Cancelada'};
+const ESTP={na:'N/A · sem intervenção',nao:'Não iniciada',and:'Em andamento',esp:'Aguarda inspeção',pen:'Pendência',lib:'Concluída',canc:'Cancelada'};
 const fmt=d=>d.split('-').reverse().join('/');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
@@ -271,9 +349,42 @@ function elementos(p){
   if(p.forno==='01'&&p.cod==='1.8')return{tit:'Curvas da convecção',link:'mapa-tubos.html#f-424101',grupos:[['Curvas nas caixas da convecção',32,14]]};
   return null}
 
-function estZona(fo,zc){const ps=ITENS.filter(p=>p.forno===fo&&p.zonas.includes(zc)&&!p.canc);if(!ps.length)return{k:'nao',ps,feitas:0};
+function estZona(fo,zc){const ps=ITENS.filter(p=>p.forno===fo&&p.zonas.includes(zc)&&!p.canc);if(!ps.length)return{k:'na',ps,feitas:0};
   const k=ps.some(p=>p.estado==='pen')?'pen':ps.every(p=>p.estado==='lib')?'lib':ps.some(p=>p.estado==='esp')?'esp':ps.every(p=>p.estado==='nao')?'nao':'and';
   return{k,ps,feitas:ps.filter(p=>p.estado==='lib').length}}
+
+/* ================= possível abertura de ZR (escopo extra achado em campo) ================= */
+const ZR_L={aguardando_fiscalizacao:'Aguardando fiscalização',aprovada:'Aprovada',reprovada:'Reprovada'};
+const ZRS=[
+ {fo:'02',zona:'QUEI',cod:'1.14',status:'aguardando_fiscalizacao',obs:'Garganta refratária do queimador da fila 4 com trinca passante, além dos 6 bicos internos e 3 externos previstos no item 1.14.',quem:'Marina Albuquerque',quando:'2027-03-06 14:20',fotos:2},
+ {fo:'02',zona:'CONV',cod:'1.24',status:'aguardando_fiscalizacao',obs:'Refratário da face oeste da convecção solto acima dos 3 m previstos no item 1.24, aproximadamente 6 m² adicionais.',quem:'Luciana Matos',quando:'2027-03-07 09:05',fotos:3},
+ {fo:'8A',zona:'TUBOS',cod:'1.3',status:'aprovada',obs:'Abaulamento visível em 2 tubos do passe 2. Pedido de ME adicional em malha e réplica metalográfica.',quem:'Rafael Toledo',quando:'2027-03-05 16:40',fotos:4,resp:'Aprovada pela fiscalização, virou SADE de exemplo'},
+ {fo:'01',zona:'CHAM',cod:'1.9',status:'reprovada',obs:'Corrosão externa na saia da chaminé próxima à BV.',quem:'Marina Albuquerque',quando:'2027-03-04 11:10',fotos:1,resp:'Reprovada: fica para a próxima campanha'}];
+function zrDe(fo,zona,cod){return ZRS.filter(z=>z.fo===fo&&(cod?z.cod===cod:z.zona===zona))}
+function zrSecao(fo,zona,cod){const l=zrDe(fo,zona,cod),at=l.filter(z=>z.status==='aguardando_fiscalizacao');
+  return `<div class="zr"><div class="zr-h"><h3>Possível abertura de ZR</h3>${at.length?`<span class="st st-esp">${at.length} aguardando fiscalização</span>`:''}</div>
+   ${l.length?l.map(z=>`<div class="zr-i"><span class="zrb zrb-${z.status}">${ZR_L[z.status]}</span>${!cod&&z.cod?` <a class="zlink" href="#${SLUG[fo]}/p/${encodeURIComponent(z.cod)}">${esc(z.cod)}</a>`:''}<p>${esc(z.obs)}</p><small>${esc(z.quem)} · ${z.quando.split(' ')[0].split('-').reverse().join('/')} ${z.quando.split(' ')[1]||''} · ${z.fotos} foto${z.fotos===1?'':'s'}${z.resp?' · '+esc(z.resp):''}</small></div>`).join(''):'<p class="vazio">Nenhum aviso nesta '+(cod?'plaqueta':'zona')+' no momento.</p>'}
+   <p class="zr-nota">É escopo extra encontrado em campo: fica aguardando a fiscalização confirmar se entra ou não.</p>
+   <button type="button" class="btn zr-btn" data-zr="${fo}|${zona}|${cod||''}">⚠ Registrar possível abertura de ZR</button></div>`}
+function ligaZR(){document.querySelectorAll('[data-zr]').forEach(b=>b.onclick=()=>{const [fo,zona,cod]=b.dataset.zr.split('|');abrirZR(fo,zona,cod)})}
+let zrCtx=null,zrQuem=null;
+function abrirZR(fo,zona,cod){zrCtx={fo,zona,cod};zrQuem=null;const z=ZN(fo,zona);
+  $('zr-sub').textContent=FORNOS[fo].tag+' · '+(cod?'plaqueta '+cod:(z?z.nome:zona));
+  ['zr-busca','zr-obs'].forEach(i=>$(i).value='');$('zr-res').innerHTML='';$('zr-fots').innerHTML='';$('zr-erro').hidden=true;$('zr-modal').hidden=false;$('zr-busca').focus()}
+function initZR(){
+  $('zr-x').onclick=()=>{$('zr-modal').hidden=true};
+  $('zr-busca').oninput=()=>{const t=$('zr-busca').value.trim().toLowerCase();zrQuem=null;if(t.length<3){$('zr-res').innerHTML='';return}
+    const l=EFETIVO.filter(e=>(e.nome+' '+e.mat+' '+e.funcao).toLowerCase().includes(t));
+    $('zr-res').innerHTML=l.length?'<div class="picks">'+l.map(e=>`<button type="button" data-i="${EFETIVO.indexOf(e)}"><b>${esc(e.nome)}</b><small>${e.mat} · ${esc(e.funcao)}</small></button>`).join('')+'</div>':'<p class="miss">Não encontrado. Confira nome, CPF ou matrícula.</p>';
+    $('zr-res').querySelectorAll('button').forEach(x=>x.onclick=()=>{zrQuem=EFETIVO[+x.dataset.i];$('zr-busca').value=zrQuem.nome;
+      $('zr-res').innerHTML=`<div class="quembox"><span class="av">${esc(zrQuem.nome[0])}</span><div><b>${esc(zrQuem.nome)}</b><small>${zrQuem.mat} · ${esc(zrQuem.funcao)}</small></div></div>`})};
+  $('zr-fot').onchange=e=>{$('zr-fots').innerHTML=[...e.target.files].slice(0,8).map(f=>`<span>${esc(f.name)}</span>`).join('')};
+  $('zr-ok').onclick=()=>{const obs=$('zr-obs').value.trim();
+    if(!zrQuem){$('zr-erro').textContent='Identifique-se antes de registrar.';$('zr-erro').hidden=false;return}
+    if(obs.length<10){$('zr-erro').textContent='Descreva o que foi observado.';$('zr-erro').hidden=false;return}
+    const n=$('zr-fot').files.length,d=new Date();
+    ZRS.unshift({fo:zrCtx.fo,zona:zrCtx.zona,cod:zrCtx.cod||null,status:'aguardando_fiscalizacao',obs,quem:zrQuem.nome,quando:d.toISOString().slice(0,10)+' '+d.toTimeString().slice(0,5),fotos:Math.min(n,8)});
+    $('zr-modal').hidden=true;rota()}}
 
 /* ================= navegação por endereço ================= */
 const $=id=>document.getElementById(id);
@@ -305,12 +416,13 @@ function telaInicio(fo){const F=FORNOS[fo];
     <p>Pela zona do desenho, pelo item da declaração, pela nota ou SADE, ou pelo tubo.</p>
     <form id="fb" class="fbusca" role="search"><input id="q" type="search" placeholder="Ex.: 1.5, ZR-14658907, SADE_082, A42, refratário" autocomplete="off" aria-label="Buscar"><button type="submit" class="btn pri">Buscar</button></form>
   </section>
+  ${(()=>{const n=ZRS.filter(z=>z.status==='aguardando_fiscalizacao').length;return n?`<div class="aviso warn"><b>${n} possíve${n>1?'is':'l'} abertura${n>1?'s':''} de ZR aguardando fiscalização:</b> ${ZRS.filter(z=>z.status==='aguardando_fiscalizacao').map(z=>`<a href="#${SLUG[z.fo]}/z/${z.zona}">${FORNOS[z.fo].tag} · ${esc((ZN(z.fo,z.zona)||{}).nome||z.zona)}</a>`).join(' · ')}</div>`:''})()}
   ${cabForno(fo)}
   <section class="card">
     <div class="ch"><div><h2>${esc(F.nome)}</h2><div class="sub">${esc(F.sub)} · ${ITENS.filter(p=>p.forno===fo).length} plaquetas</div></div></div>
     <div class="zonas">${F.zonas.map(z=>{const e=estZona(fo,z.cod);return `<a class="zc" href="#${SLUG[fo]}/z/${z.cod}">
-      <span class="zn" style="background:var(--s-${e.k==='lib'?'lib':e.k})">${z.num}</span>
-      <span class="zt"><b>${esc(z.nome)}</b><small>${e.ps.length?`${e.feitas} de ${e.ps.length} plaquetas concluídas`:'Sem item da declaração'}</small></span>${chip(e.k)}</a>`}).join('')}</div>
+      <span class="zn" style="background:var(--s-${e.k})">${z.num}</span>
+      <span class="zt"><b>${esc(z.nome)}</b><small>${e.ps.length?`${e.feitas} de ${e.ps.length} plaquetas concluídas`:'Sem item na declaração'}</small><span class="zchip">${chip(e.k)}</span></span></a>`}).join('')}</div>
   </section>`;
   $('fb').onsubmit=ev=>{ev.preventDefault();const v=$('q').value.trim();if(v)ir('busca/'+v)}}
 
@@ -337,16 +449,17 @@ function telaZona(fo,zc){const F=FORNOS[fo],z=ZN(fo,zc);if(!z)return telaInicio(
     <div class="ch"><div class="zh"><span class="zn big" style="background:var(--s-${e.k})">${z.num}</span><div><h2>${esc(z.nome)}</h2><div class="sub">${F.tag} · ${esc(F.sub)}</div></div></div>
       <div class="acts">${chip(e.k)}<button type="button" class="btn" id="b-qr">QR da zona</button>${F.tipo!=='eq'?`<a class="btn" href="painel-zonas.html#${SLUG[fo]}">Ver no painel</a>`:''}</div></div>
     <div id="qrbox" class="qrbox" hidden><div id="qr"></div><div><b>QR para a porta de acesso desta zona</b><p>Ao ler, o celular abre esta lista. Imprima e fixe na entrada da zona.</p><code>${esc(url)}</code></div></div>
-    <div class="aviso ${trava.length?'warn':'ok'}"><b>Fechamento da zona ${trava.length?'bloqueado':'liberado'}</b>${trava.length?`: ${trava.length} de ${e.ps.length} plaquetas ainda abertas.`:': todas as plaquetas concluídas.'}</div>
+    ${e.k==='na'?'<div class="aviso ok"><b>N/A, sem intervenção.</b> A declaração de escopo não tem item nesta zona, então ela conta como concluída para o fechamento do forno.</div>':`<div class="aviso ${trava.length?'warn':'ok'}"><b>Fechamento da zona ${trava.length?'bloqueado':'liberado'}</b>${trava.length?`: ${trava.length} de ${e.ps.length} plaquetas ainda abertas.`:': todas as plaquetas concluídas.'}</div>`}
     <div class="pls">${e.ps.map(linhaPlaq).join('')||'<p class="vazio">Nenhum item da declaração nesta zona.</p>'}</div>
     ${canc.length?`<div class="grp">Canceladas</div><div class="pls">${canc.map(linhaPlaq).join('')}</div>`:''}
-  </section>`;
+    ${zrSecao(fo,zc,null)}
+  </section>`;ligaZR();
   $('b-qr').onclick=()=>{const b=$('qrbox');b.hidden=!b.hidden;if(!b.hidden&&!$('qr').childNodes.length){try{new QRCode($('qr'),{text:url,width:132,height:132,correctLevel:QRCode.CorrectLevel.M})}catch(err){$('qr').textContent='QR indisponível sem internet.'}}}}
 
 /* ---------- ficha da plaqueta ---------- */
 function telaPlaqueta(fo,cod){const p=ITENS.find(x=>x.forno===fo&&x.cod===cod);if(!p)return telaInicio(fo);const F=FORNOS[fo],T=TIPOS[p.tipo],n=T.e.length,el=elementos(p);
   const etapas=T.e.map(([nome,fn],i)=>{const r=p.reg.find(x=>x.et===i),feita=i<p.feitas,atual=i===p.feitas&&!p.canc&&p.estado!=='lib';
-    return `<li class="et ${feita?'ok':atual?'agora':''}"><span class="n">${feita?'✓':i+1}</span><div><b>${esc(nome)}</b><small>${esc(fn)}${r?` · ${fmt(r.quando)} · ${r.fotos} foto${r.fotos>1?'s':''} · PIN confirmado`:''}</small></div>${atual?'<button type="button" class="btn pri sm" id="b-reg">Registrar</button>':''}</li>`}).join('');
+    return `<li class="et ${feita?'ok':atual?'agora':''}"><span class="n">${feita?'✓':i+1}</span><div><b>${esc(nome)}</b><small>${r?`<b class="quem">${esc(r.quem)}</b> ${esc(r.fn||fn)} · ${fmt(r.quando)} · ${r.res&&r.res!=='Sim'?esc(r.res)+' · ':''}${r.fotos} foto${r.fotos===1?'':'s'} · PIN confirmado${r.obs?`<br><i>“${esc(r.obs)}”</i>`:''}`:esc(fn)}</small></div>${atual?'<button type="button" class="btn pri sm" id="b-reg">Registrar</button>':''}</li>`}).join('');
   const zs=p.zonas.map(c=>{const z=ZN(fo,c);return z?`<a class="zlink" href="#${SLUG[fo]}/z/${c}">${z.num} ${esc(z.nome)}</a>`:''}).join('');
   let elH='';if(el){
     if(el.lista){const g={};el.lista.forEach(x=>{(g[x.st[0]]=g[x.st[0]]||{k:x.st[1],l:[]}).l.push(x.id)});
@@ -366,21 +479,56 @@ function telaPlaqueta(fo,cod){const p=ITENS.find(x=>x.forno===fo&&x.cod===cod);i
         <h3>O que a declaração pede</h3><div class="det">${esc(p.det)}</div></div>
     </div>
     ${el?`<h3>${esc(el.tit)}</h3>${elH}`:''}
+    ${p.forno==='02'&&['1.5','1.3','1.20','1.22','1.33','HI-23-02','HI-25-11'].includes(p.cod)?`<h3>Juntas soldadas</h3><a class="btn" href="mapa-juntas.html#${encodeURIComponent(p.cod)}">Abrir no mapa de juntas</a>`:''}
+    ${zrSecao(fo,p.zonas[0],p.cod)}
   </section>
   <div id="modal" class="modal" hidden><div class="mbox" role="dialog" aria-modal="true" aria-labelledby="mt">
-    <h3 id="mt">Registrar etapa</h3><p class="msub">${esc(p.cod)} · ${esc(T.e[Math.min(p.feitas,n-1)][0])}</p>
-    <label for="m-obs">Observação</label><textarea id="m-obs" rows="2" placeholder="Opcional"></textarea>
-    <label for="m-pin">PIN</label><input id="m-pin" inputmode="numeric" maxlength="6" placeholder="••••">
-    <p class="erro" id="m-erro" hidden>Digite o PIN com 4 dígitos ou mais.</p>
-    <p class="demo">Demonstração: o registro fica só nesta tela e não grava no banco.</p>
-    <div class="mact"><button type="button" class="btn" id="m-c">Cancelar</button><button type="button" class="btn pri" id="m-ok">Confirmar com PIN</button></div></div></div>`;
-  const b=$('b-reg');if(b)b.onclick=()=>{$('modal').hidden=false;$('m-pin').focus()};
-  $('m-c').onclick=()=>{$('modal').hidden=true};
-  $('m-pin').oninput=()=>{$('m-erro').hidden=true};
-  $('m-ok').onclick=()=>{if($('m-pin').value.trim().length<4){$('m-erro').hidden=false;return}
-    const et=T.e[p.feitas];p.reg.push({et:p.feitas,quando:new Date().toISOString().slice(0,10),quem:et[1],fotos:1});p.feitas++;
-    p.estado=p.feitas>=n?'lib':(T.e[p.feitas][1]==='Inspeção'?'esp':'and');if(p.pend&&p.feitas>=n)delete p.pend;telaPlaqueta(fo,cod)}}
+    <div class="mh"><div><h3 id="mt">Registrar atividade</h3><p class="msub">${esc(p.cod)} · ${esc(p.titulo)}</p></div><button type="button" class="mx" id="m-x" aria-label="Fechar">✕</button></div>
+    <div id="m1"><label for="m-busca">Identifique-se</label><input id="m-busca" placeholder="Nome, CPF ou matrícula…" autocomplete="off"><div id="m-res"></div></div>
+    <div id="m2" hidden>
+      <div class="quembox" id="m-quem"></div>
+      <div class="tarefa"><small>Etapa ${Math.min(p.feitas+1,n)} de ${n}</small><b>${esc(T.e[Math.min(p.feitas,n-1)][0])}?</b><span>Função: ${esc(T.e[Math.min(p.feitas,n-1)][1])}</span></div>
+      <p class="aviso warn" id="m-fn" hidden></p>
+      <div class="resp" role="radiogroup" aria-label="Resposta">${['Sim','Não','N/A','Cancelado'].map((x,i)=>`<label class="r r${i}"><input type="radio" name="m-r" value="${x}"${i===0?' checked':''}><span>${x}</span></label>`).join('')}</div>
+      <div id="m-canc" hidden><label for="m-doc">Qual documento cancela esta etapa?</label><input id="m-doc" placeholder="Ex.: RT-2027-014, revisão, e-mail…"></div>
+      <label for="m-obs">Observações</label><textarea id="m-obs" rows="2" placeholder="Detalhe o que foi verificado (opcional)…"></textarea>
+      <label>Anexar fotos</label><label class="drop" for="m-fot">Clique para selecionar (opcional), até 8</label><input type="file" id="m-fot" accept="image/*" multiple hidden><div class="fots" id="m-fots"></div>
+      <p class="erro" id="m-erro" hidden></p>
+      <button type="button" class="btn pri full" id="m-ok">Registrar atividade</button>
+    </div>
+    <div id="m3" hidden class="pinbox"><b>Confirme seu PIN</b><span id="m-pnome"></span><input id="m-pin" inputmode="numeric" maxlength="6" placeholder="••••" autocomplete="off"><p class="erro" id="m-perro" hidden>Digite o PIN com 4 dígitos ou mais.</p>
+      <div class="mact"><button type="button" class="btn" id="m-pc">Cancelar</button><button type="button" class="btn pri" id="m-ass">Assinar</button></div><small>O PIN é pessoal e intransferível. Este registro fica assinado no seu nome.</small></div>
+    <p class="demo">Demonstração com efetivo fictício: o registro fica só nesta tela e não grava no banco.</p>
+  </div></div>`;
+  ligaZR();
+  let quem=null,fotos=[];
+  const fechaM=()=>{$('modal').hidden=true};
+  const b=$('b-reg');if(b)b.onclick=()=>{$('modal').hidden=false;$('m1').hidden=false;$('m2').hidden=true;$('m3').hidden=true;$('m-busca').value='';$('m-res').innerHTML='';$('m-busca').focus()};
+  $('m-x').onclick=fechaM;
+  const escolhe=e=>{quem=e;$('m1').hidden=true;$('m2').hidden=false;
+    $('m-quem').innerHTML=`<span class="av">${esc(e.nome[0])}</span><div><b>${esc(e.nome)}</b><small>${e.mat} · ${esc(e.funcao)}</small></div><button type="button" class="btn sm" id="m-troca">Trocar</button>`;
+    $('m-troca').onclick=()=>{$('m1').hidden=false;$('m2').hidden=true;$('m-busca').focus()};
+    const req=T.e[Math.min(p.feitas,n-1)][1],fn=$('m-fn');fn.hidden=e.grupo===req;fn.textContent=`Esta etapa é da função ${req}. O cadastro de ${e.nome.split(' ')[0]} é ${e.grupo}; o registro vai para conferência do planejamento.`};
+  $('m-busca').oninput=()=>{const t=$('m-busca').value.trim().toLowerCase();if(t.length<3){$('m-res').innerHTML='';return}
+    const l=EFETIVO.filter(e=>(e.nome+' '+e.mat+' '+e.funcao).toLowerCase().includes(t));
+    if(!l.length){$('m-res').innerHTML='<p class="miss">Não encontrado. Confira nome, CPF ou matrícula.</p>';return}
+    $('m-res').innerHTML='<div class="picks">'+l.map(e=>`<button type="button" data-i="${EFETIVO.indexOf(e)}"><b>${esc(e.nome)}</b><small>${e.mat} · ${esc(e.funcao)}</small></button>`).join('')+'</div>';
+    $('m-res').querySelectorAll('button').forEach(x=>x.onclick=()=>escolhe(EFETIVO[+x.dataset.i]))};
+  document.querySelectorAll('input[name="m-r"]').forEach(x=>x.onchange=()=>{$('m-canc').hidden=!(x.value==='Cancelado'&&x.checked)});
+  $('m-fot').onchange=e=>{fotos=[...e.target.files].slice(0,8);$('m-fots').innerHTML=fotos.map(f=>`<span>${esc(f.name)}</span>`).join('')};
+  $('m-ok').onclick=()=>{const r=document.querySelector('input[name="m-r"]:checked').value;
+    if(r==='Cancelado'&&!$('m-doc').value.trim()){$('m-erro').textContent='Informe o documento que cancela a etapa.';$('m-erro').hidden=false;return}
+    $('m-erro').hidden=true;$('m2').hidden=true;$('m3').hidden=false;$('m-pnome').textContent=quem.nome;$('m-pin').value='';$('m-pin').focus()};
+  $('m-pc').onclick=()=>{$('m3').hidden=true;$('m2').hidden=false};
+  $('m-pin').oninput=()=>{$('m-perro').hidden=true};
+  $('m-pin').onkeydown=e=>{if(e.key==='Enter')$('m-ass').click()};
+  $('m-ass').onclick=()=>{if($('m-pin').value.trim().length<4){$('m-perro').hidden=false;return}
+    const r=document.querySelector('input[name="m-r"]:checked').value;
+    p.reg.push({et:p.feitas,quando:new Date().toISOString().slice(0,10),quem:quem.nome,fn:quem.funcao,res:r,obs:$('m-obs').value.trim(),fotos:fotos.length});
+    if(r!=='Não')p.feitas++;
+    p.estado=p.feitas>=n?'lib':r==='Não'?'pen':(T.e[p.feitas][1]==='Inspeção'?'esp':'and');if(p.pend&&p.feitas>=n)delete p.pend;telaPlaqueta(fo,cod)}}
 
+initZR();
 rota();
 
 </script>

@@ -164,6 +164,9 @@ select{font-family:var(--font-ui);font-size:13px;font-weight:600;color:var(--ink
 .plq b{display:block;font-size:12.5px;line-height:1.3}
 .plq small{font-size:11px;color:var(--muted)}
 .plq .dot{width:10px;height:10px;border-radius:50%}
+:root{--s-na:#6B9080;--s-na-bg:#EEF4F1;--s-na-tx:#3F5F52}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--s-na:#7FA897;--s-na-bg:#1C2E27;--s-na-tx:#A9CDBE}}
+:root[data-theme="dark"]{--s-na:#7FA897;--s-na-bg:#1C2E27;--s-na-tx:#A9CDBE}
 </style>
 <style>[hidden]{display:none!important} body{margin:0} img{max-width:100%} .nav-f{display:flex;gap:8px;flex-wrap:wrap} .nav-f a{text-decoration:none}</style>
 <script>(function(){var t="light";try{if(localStorage.getItem("sigma-tema")==="escuro")t="dark"}catch(e){}document.documentElement.setAttribute("data-theme",t)})();</script>
@@ -177,7 +180,7 @@ select{font-family:var(--font-ui);font-size:13px;font-weight:600;color:var(--ink
     <div class="tt" id="h-tt">Forno reformador F-424102</div>
     <div class="st" id="h-st"></div>
   </div>
-  <nav class="nav-f" aria-label="Navegação"><a class="hbtn" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21H3z"/></svg>Início</a><a class="hbtn" href="consulta.html">Consultar</a><a class="hbtn" id="lk-outro" href="mapa-tubos.html">Mapa de tubos</a><button type="button" class="hbtn" id="b-tema" title="Claro ou escuro (tecla T)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><span id="b-tema-t">Escuro</span></button></nav>
+  <nav class="nav-f" aria-label="Navegação"><a class="hbtn" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21H3z"/></svg>Início</a><a class="hbtn" href="consulta.html">Consultar</a><a class="hbtn" id="lk-outro" href="mapa-tubos.html">Mapa de tubos</a><a class="hbtn" href="mapa-juntas.html">Mapa de juntas</a><button type="button" class="hbtn" id="b-tema" title="Claro ou escuro (tecla T)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><span id="b-tema-t">Escuro</span></button></nav>
   <span class="tag-prot">Protótipo · estados de exemplo</span>
 </header>
 
@@ -351,6 +354,22 @@ FORNOS.P3={tag:'P-424103',nome:'Caldeira de recuperação P-424103',sub:'U-4241 
 const SLUG={'02':'f-424102','01':'f-424101','8A':'f-428301a','8B':'f-428301b','P3':'p-424103'},GULS=Object.fromEntries(Object.entries(SLUG).map(([k,v])=>[v,k]));
 const DOM='https://fornos.sigmacode.com.br/consulta.html';
 
+/* ================= efetivo de exemplo (nomes fictícios) ================= */
+const EFETIVO=[
+ {nome:'Marina Albuquerque',mat:'30412',funcao:'Inspetora de equipamentos',grupo:'Inspeção'},
+ {nome:'Rafael Toledo',mat:'30477',funcao:'Inspetor de END nível 2',grupo:'Inspeção'},
+ {nome:'Camila Prado',mat:'30519',funcao:'Inspetora de soldagem',grupo:'Inspeção'},
+ {nome:'José Arimatéia Lopes',mat:'31102',funcao:'Caldeireiro',grupo:'Caldeiraria / Produção'},
+ {nome:'Edson Furtado',mat:'31144',funcao:'Encarregado de caldeiraria',grupo:'Caldeiraria / Produção'},
+ {nome:'Wellington Sousa',mat:'31208',funcao:'Soldador · sinete S-114',grupo:'Caldeiraria e Soldagem / Produção'},
+ {nome:'Diego Fontana',mat:'31231',funcao:'Soldador · sinete S-127',grupo:'Caldeiraria e Soldagem / Produção'},
+ {nome:'Antônio Bezerra',mat:'32015',funcao:'Montador de andaime',grupo:'Complementar / Produção'},
+ {nome:'Luciana Matos',mat:'32088',funcao:'Refratarista',grupo:'Complementar / Produção'},
+ {nome:'Paulo Henrique Dias',mat:'32091',funcao:'Isolador',grupo:'Complementar / Produção'},
+ {nome:'Sandro Vieira',mat:'32130',funcao:'Pintor industrial',grupo:'Complementar / Produção'},
+ {nome:'Tiago Ramalho',mat:'32166',funcao:'Instrumentista',grupo:'Complementar / Produção'},
+ {nome:'Fernanda Lacerda',mat:'30201',funcao:'Planejadora',grupo:'Planejamento'}];
+function pessoaPara(grupo,r){const l=EFETIVO.filter(e=>e.grupo===grupo);return l.length?l[Math.floor(r*l.length)%l.length]:EFETIVO[0]}
 /* ================= estado de exemplo das plaquetas, coerente com o painel de zonas ================= */
 function hash(s){let h=2166136261;for(const c of s)h=Math.imul(h^c.charCodeAt(0),16777619);return(h>>>0)/4294967296}
 const ZN=(fo,cod)=>(FORNOS[fo].zonas||[]).find(z=>z.cod===cod);
@@ -362,10 +381,10 @@ ITENS.forEach(p=>{const n=TIPOS[p.tipo].e.length,z=ZN(p.forno,p.zonas[0]),est=z?
   else if(est==='esp'){p.feitas=Math.max(1,n-1-(r<.5?1:0))}
   else if(est==='pen'){p.feitas=Math.max(1,Math.floor(n*.5));if(!pendUsada[p.forno+p.zonas[0]]&&['END','MED','QUEI'].includes(p.tipo)){pendUsada[p.forno+p.zonas[0]]=1;p.pend=z.rec||'Resultado fora do critério. Aguarda avaliação da engenharia.'}}
   else{p.feitas=Math.min(n-1,Math.floor(n*(.25+r*.5)))}
-  for(let i=0;i<p.feitas;i++){const et=TIPOS[p.tipo].e[i];p.reg.push({et:i,quando:dataEx(i,r),quem:et[1].split(' / ')[0],res:'Sim',fotos:et[1]==='Inspeção'?2:1})}
+  for(let i=0;i<p.feitas;i++){const et=TIPOS[p.tipo].e[i];{const pe=pessoaPara(et[1],hash(p.id+i));p.reg.push({et:i,quando:dataEx(i,r),quem:pe.nome,fn:pe.funcao,res:'Sim',fotos:et[1]==='Inspeção'?2:1})}}
   p.estado=p.pend?'pen':p.feitas>=n?'lib':p.feitas===0?'nao':(TIPOS[p.tipo].e[p.feitas][1]==='Inspeção'?'esp':'and')});
 function dataEx(i,r){const d=new Date(Date.UTC(2027,2,2+i*2+Math.floor(r*3)));return d.toISOString().slice(0,10)}
-const ESTP={nao:'Não iniciada',and:'Em andamento',esp:'Aguarda inspeção',pen:'Pendência',lib:'Concluída',canc:'Cancelada'};
+const ESTP={na:'N/A · sem intervenção',nao:'Não iniciada',and:'Em andamento',esp:'Aguarda inspeção',pen:'Pendência',lib:'Concluída',canc:'Cancelada'};
 const fmt=d=>d.split('-').reverse().join('/');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
@@ -386,7 +405,7 @@ function elementos(p){
   if(p.forno==='01'&&p.cod==='1.8')return{tit:'Curvas da convecção',link:'mapa-tubos.html#f-424101',grupos:[['Curvas nas caixas da convecção',32,14]]};
   return null}
 
-function estZona(fo,zc){const ps=ITENS.filter(p=>p.forno===fo&&p.zonas.includes(zc)&&!p.canc);if(!ps.length)return{k:'nao',ps,feitas:0};
+function estZona(fo,zc){const ps=ITENS.filter(p=>p.forno===fo&&p.zonas.includes(zc)&&!p.canc);if(!ps.length)return{k:'na',ps,feitas:0};
   const k=ps.some(p=>p.estado==='pen')?'pen':ps.every(p=>p.estado==='lib')?'lib':ps.some(p=>p.estado==='esp')?'esp':ps.every(p=>p.estado==='nao')?'nao':'and';
   return{k,ps,feitas:ps.filter(p=>p.estado==='lib').length}}
 
@@ -457,7 +476,7 @@ function desenhoCil(F){
   return g.join('')}
 
 const ETAPAS=['Liberação e acesso','Inspeção visual inicial','Ensaios conforme plano','Relatório e recomendação','Execução dos reparos','Inspeção após reparo','Liberação para fechamento','Fechamento'];
-const EST={nao:'Não iniciada',and:'Em andamento',esp:'Aguarda inspeção',pen:'Pendência',lib:'Liberada'};
+const EST={na:'N/A',nao:'Não iniciada',and:'Em andamento',esp:'Aguarda inspeção',pen:'Pendência',lib:'Liberada'};
 const cor=k=>`var(--s-${k})`, corBg=k=>`var(--s-${k}-bg)`, corTx=k=>`var(--s-${k}-tx)`;
 const NS='http://www.w3.org/2000/svg', $=id=>document.getElementById(id);
 const el=(t,a={})=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e};
@@ -518,14 +537,14 @@ function ladoLista(){const F=Fo();
   $('side').innerHTML=`<div class="hs-t">Zonas do ${F.tag}</div><div class="hs-q">Toque numa zona, no desenho ou aqui, para aproximar e abrir o detalhe. O estado de cada zona vem das plaquetas dela: os itens da declaração de escopo.</div>
   <ul class="lista">${Z().map((z,i)=>`<li class="zrow" tabindex="0" data-i="${i}" role="button" aria-label="${z.nome}">
     <span class="num" style="background:${cor(z.estado)}">${z.num}</span>
-    <span><div class="zn">${z.nome}</div><div class="zm">${z.plaq.length?`${feitas(z)} de ${z.plaq.length} plaquetas concluídas`:'Sem item da declaração'}</div></span>
+    <span><div class="zn">${z.nome}</div><div class="zm">${z.plaq.length?`${feitas(z)} de ${z.plaq.length} plaquetas concluídas`:'Sem item na declaração, conta como concluída'}</div></span>
     <span class="chip" style="background:${corBg(z.estado)};color:${corTx(z.estado)};border-color:${cor(z.estado)}">${EST[z.estado]}</span>
     <span class="barra"><span style="width:${pct(z)}%;background:${cor(z.estado)}"></span></span></li>`).join('')}</ul>
   ${F.fora.length?`<div class="fora"><b>Fora desta vista:</b> ${F.fora.map(f=>`<b>${f.tag}</b> ${f.nome}`).join(' · ')}.</div>`:''}`;
   $('side').querySelectorAll('.zrow').forEach(r=>{r.onclick=()=>sel(+r.dataset.i);r.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();sel(+r.dataset.i)}}})}
 function ladoDetalhe(){const z=Z()[ativa],sl=SLUG[fk];
   const m=trava(z),pode=!m.length;
-  const aviso=`<div class="aviso" style="background:${corBg(pode?'lib':'esp')};color:${corTx(pode?'lib':'esp')};border-color:${cor(pode?'lib':'esp')}"><b>Fechamento da zona ${pode?'liberado':'bloqueado'}</b>${m.length?': '+m.join(', ')+'.':': todas as plaquetas concluídas e ensaios laudados.'}</div>`;
+  const aviso=`<div class="aviso" style="background:${corBg(pode?'lib':'esp')};color:${corTx(pode?'lib':'esp')};border-color:${cor(pode?'lib':'esp')}"><b>Fechamento da zona ${pode?'liberado':'bloqueado'}</b>${m.length?': '+m.join(', ')+'.':z.estado==='na'?': N/A, a declaração não tem item nesta zona.':': todas as plaquetas concluídas e ensaios laudados.'}</div>`;
   const ens=z.ens.length?`<table><thead><tr><th>Ensaio</th><th>Laudos</th><th>Reprov.</th></tr></thead><tbody>${z.ens.map(e=>`<tr><td>${e.m}<div class="zm">${e.ext}</div></td><td class="n">${e.f}/${e.t}</td><td class="n" style="color:${e.r?corTx('pen'):'inherit'}">${e.r}</td></tr>`).join('')}</tbody></table>`:'<p class="hs-vazio">A declaração não pede ensaio nesta zona.</p>';
   const pl=p=>{const n=TIPOS[p.tipo].e.length,k=p.estado==='canc'?'nao':p.estado;return `<li><a class="plq" href="consulta.html#${sl}/p/${encodeURIComponent(p.cod)}"><code>${p.cod}</code><span><b>${esc(p.titulo)}</b><small>${TIPOS[p.tipo].n}${p.canc?' · cancelado pelo 1.20':` · etapa ${Math.min(p.feitas+1,n)} de ${n}`}</small></span><i class="dot" style="background:${cor(k)}" title="${ESTP[p.estado]}"></i></a></li>`};
   $('side').innerHTML=`<button type="button" class="hs-voltar" id="b-voltar">← Todas as zonas</button>
@@ -543,10 +562,10 @@ function resumo(){const F=Fo(),n=k=>Z().filter(z=>z.estado===k).length;
   $('h-tt').textContent=F.nome;$('h-st').textContent='REPLAN · '+F.sub+' · Contrato 5900.0135110.26.2 · OS 035 · Parada março 2027';
   $('cap').textContent=F.cap;$('b-ed').hidden=F.tipo!=='img';
   ['02','01','8A','8B'].forEach(k=>$('ab-'+k).setAttribute('aria-pressed',fk===k));
-  $('r-lib').innerHTML=`${n('lib')}<small> de ${Z().length}</small>`;$('r-esp').textContent=n('esp');$('r-pen').textContent=n('pen');
+  $('r-lib').innerHTML=`${n('lib')+n('na')}<small> de ${Z().length}</small>`;$('r-esp').textContent=n('esp');$('r-pen').textContent=n('pen');
   const f=Z().reduce((a,z)=>a+z.ens.reduce((b,e)=>b+e.f,0),0),t=Z().reduce((a,z)=>a+z.ens.reduce((b,e)=>b+e.t,0),0);$('r-end').innerHTML=`${f}<small> de ${t}</small>`;
-  const ok=Z().every(z=>z.estado==='lib');$('k-forno').classList.toggle('ok',ok);
-  $('r-forno').innerHTML=`<span class="pil" style="color:${cor(ok?'lib':'pen')}">${ok?'Sim':'Não'}</span><small>${ok?'todas liberadas':(Z().length-n('lib'))+' zonas abertas'}</small>`;
+  const ok=Z().every(z=>z.estado==='lib'||z.estado==='na');$('k-forno').classList.toggle('ok',ok);
+  $('r-forno').innerHTML=`<span class="pil" style="color:${cor(ok?'lib':'pen')}">${ok?'Sim':'Não'}</span><small>${ok?'todas liberadas':(Z().length-n('lib')-n('na'))+' zonas abertas'}</small>`;
   $('legenda').innerHTML=Object.keys(EST).map(k=>`<span><i style="background:${cor(k)}"></i>${EST[k]}</span>`).join('')}
 
 function tudo(){desenhar();resumo();if(ativa>=0&&!modoEd)ladoDetalhe();else ladoLista()}
