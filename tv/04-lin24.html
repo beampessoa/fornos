@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fornos · Linha do Flare</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="sigma.css?v=3">
+</head>
+<body data-page="lin24" data-title='Juntas soldadas · fornos'>
+<div class="screen">
+  <header id="hdr"></header>
+  <main class="stage"><section class="panel">
+    <div class="grid" style="grid-template-columns:.78fr 1.22fr">
+
+      <div class="grid" style="grid-template-rows:1fr auto auto">
+        <div class="box"><div class="cap">Juntas completas dos fornos</div>
+          <div class="gauge"><div class="gaugebox" id="gFlare"></div><div class="gcap" id="gFlareCap">—</div></div>
+        </div>
+        <div class="footbox" style="grid-template-columns:repeat(3,1fr)">
+          <div class="kbox"><span class="k">Juntas</span><span class="v num" id="flTot">—</span></div>
+          <div class="kbox"><span class="k">Completas</span><span class="v num" id="flOk">—</span></div>
+          <div class="kbox"><span class="k">Faltam</span><span class="v num" id="flPen">—</span></div>
+        </div>
+        <div class="box" style="max-height:40vh"><div class="cap">Campo x pré-fabricação</div>
+          <div class="scroll"><table id="tFlarePlaq"></table></div>
+        </div>
+      </div>
+
+      <div class="grid" style="grid-template-rows:1.05fr .95fr">
+        <div class="box"><div class="cap">Juntas por zona do forno</div>
+          <div class="scroll"><table id="tFlareDiam"></table></div>
+          <div class="legend">
+            <span><b style="background:var(--g2)"></b>Completo</span>
+            <span><b style="background:var(--warn)"></b>Em andamento</span>
+            <span><b style="background:var(--bad)"></b>Sem evento</span>
+          </div>
+        </div>
+        <div class="box"><div class="cap">LT nova (item 1.20) · junta por junta</div>
+          <div class="scroll"><table id="tFlare24"></table></div>
+          <div id="flNota" style="padding:.25em .9em .6em;font-size:.72em;color:var(--mut);text-align:center;line-height:1.4"></div>
+        </div>
+      </div>
+
+    </div>
+  </section></main>
+  <footer id="ftr"></footer>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="tv-dados.js"></script>
+<script src="sigma.js"></script>
+<script>/* QR gerado aqui mesmo quando a biblioteca carregou; senão fica o serviço externo */
+(function(){function troca(){if(typeof QRCode==="undefined")return;document.querySelectorAll("img[src*=\"qrserver\"]").forEach(function(im){var u=decodeURIComponent((im.src.split("data=")[1]||"").split("&")[0]).replace("campo.sigmacode","fornos.sigmacode");var d=document.createElement("div");new QRCode(d,{text:u,width:256,height:256,correctLevel:QRCode.CorrectLevel.M});var c=d.querySelector("canvas");if(c)im.src=c.toDataURL("image/png")})}setTimeout(troca,400);setTimeout(troca,1600)})();</script>
+</body>
+</html>

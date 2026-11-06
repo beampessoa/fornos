@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fornos · Resumo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="sigma.css?v=3">
+</head>
+<body data-page="resumo" data-title="Report — Resumo">
+<div class="screen">
+  <header id="hdr"></header>
+  <main class="stage"><section class="panel">
+    <div class="grid" style="grid-template-columns:1fr 1fr">
+      <div class="grid" style="grid-template-rows:auto 1fr">
+        <div class="grid" style="grid-template-columns:.8fr 1.2fr; grid-template-rows:auto">
+          <div class="box"><div class="cap">% Realizado geral</div><div class="gauge"><div class="gaugebox" id="gRes"></div></div></div>
+          <div class="box"><div class="cap">Caminho crítico</div><table id="tCrit"></table></div>
+        </div>
+        <div class="box"><div class="cap">Status de execução · plaquetas por tipo de serviço</div><div class="scroll"><table id="tResumo"></table></div></div>
+      </div>
+      <div class="grid" style="grid-template-rows:auto auto 1fr">
+        <div class="box"><div class="cap">Colunas do reformador F-424102 (item 1.5)</div><table id="tPsv"></table></div>
+        <div class="box"><div class="cap">Avanço por forno</div><table id="tGm"></table></div>
+        <div class="box"><div class="cap">Escopo da declaração e possível abertura de ZR</div><table id="tZr"></table></div>
+      </div>
+    </div>
+  </section></main>
+  <footer id="ftr"></footer>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="tv-dados.js"></script>
+<script src="sigma.js"></script>
+<script>/* QR gerado aqui mesmo quando a biblioteca carregou; senão fica o serviço externo */
+(function(){function troca(){if(typeof QRCode==="undefined")return;document.querySelectorAll("img[src*=\"qrserver\"]").forEach(function(im){var u=decodeURIComponent((im.src.split("data=")[1]||"").split("&")[0]).replace("campo.sigmacode","fornos.sigmacode");var d=document.createElement("div");new QRCode(d,{text:u,width:256,height:256,correctLevel:QRCode.CorrectLevel.M});var c=d.querySelector("canvas");if(c)im.src=c.toDataURL("image/png")})}setTimeout(troca,400);setTimeout(troca,1600)})();</script>
+</body>
+</html>

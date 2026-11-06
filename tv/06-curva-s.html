@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fornos · Curva S</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="sigma.css?v=3">
+</head>
+<body data-page="curvas" data-title='Curva "S"'>
+<div class="screen">
+  <header id="hdr"></header>
+  <main class="stage"><section class="panel">
+    <div class="grid" style="grid-template-rows:2.3fr 1fr">
+      <div class="grid" style="grid-template-columns:.75fr 3fr">
+        <div class="grid" style="grid-template-rows:1fr 1fr 1fr">
+          <div class="box"><div class="cap">Avanço por percentual</div>
+            <div class="miniStat"><span>Prev.</span><b id="cpPrev">—</b></div>
+            <div class="miniStat"><span>Real.</span><b id="cpReal">—</b></div>
+            <div class="miniStat"><span>Desv.</span><b id="cpDesv">—</b></div></div>
+          <div class="box"><div class="cap">Avanço por atividades</div>
+            <div class="miniStat"><span>Prev.</span><b id="atP">—</b></div>
+            <div class="miniStat"><span>Real.</span><b id="atR">—</b></div>
+            <div class="miniStat"><span>Restante</span><b id="atS">—</b></div></div>
+          <div class="box"><div class="cap">Avanço por HH</div>
+            <div class="miniStat"><span>Prev.</span><b id="hhP">—</b></div>
+            <div class="miniStat"><span>Real.</span><b id="hhR">—</b></div>
+            <div class="miniStat"><span>Restante</span><b id="hhS">—</b></div></div>
+        </div>
+        <div class="box">
+          <div class="termo"><span>Término planejado</span><b id="termPlan">—</b></div>
+          <div class="termo" style="border-top:1px solid var(--line)"><span>Término real</span><b id="termReal" style="color:var(--ok)">—</b></div>
+          <div class="svgwrap"><svg class="chart" id="curvaS" viewBox="0 0 1000 380" preserveAspectRatio="none"></svg></div>
+        </div>
+      </div>
+      <div class="footbox">
+        <div class="box"><div class="cap">Acesse os indicadores</div>
+          <div style="display:grid;place-items:center;flex:1;padding:.4em"><img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://campo.sigmacode.com.br" style="width:5em;background:#fff;padding:.2em;border-radius:.3em"></div></div>
+        <div class="box"><div class="cap">Condições climáticas</div>
+          <div class="weather"><span class="tmp" id="clima">—</span><small style="color:var(--mut)" id="climaX"></small></div></div>
+        <div class="box"><div class="cap">Paralizações</div><div style="flex:1;padding:.5em;font-size:.8em;color:var(--mut)" id="paraliz">—</div></div>
+        <div class="box"><div class="cap">Análise de planejamento</div><div style="flex:1;padding:.5em;font-size:.8em;color:var(--mut)" id="analise">—</div></div>
+      </div>
+    </div>
+  </section></main>
+  <footer id="ftr"></footer>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="tv-dados.js"></script>
+<script src="sigma.js"></script>
+<script>/* QR gerado aqui mesmo quando a biblioteca carregou; senão fica o serviço externo */
+(function(){function troca(){if(typeof QRCode==="undefined")return;document.querySelectorAll("img[src*=\"qrserver\"]").forEach(function(im){var u=decodeURIComponent((im.src.split("data=")[1]||"").split("&")[0]).replace("campo.sigmacode","fornos.sigmacode");var d=document.createElement("div");new QRCode(d,{text:u,width:256,height:256,correctLevel:QRCode.CorrectLevel.M});var c=d.querySelector("canvas");if(c)im.src=c.toDataURL("image/png")})}setTimeout(troca,400);setTimeout(troca,1600)})();</script>
+</body>
+</html>

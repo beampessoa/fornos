@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fornos · Menu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="sigma.css?v=3">
+</head>
+<body data-page="menu" data-title="Menu">
+<div class="screen">
+  <header id="hdr"></header>
+  <main class="stage"><section class="panel">
+    <div class="cover">
+      <div class="left">
+        <div class="eyebrow">PAINEL</div>
+        <h2>INTEGRADO DE<br>INDICADORES</h2>
+        <div class="tag">MANUTENÇÃO</div>
+        <div class="qr"><img id="qr" src="" alt="QR"><small>Aponte a câmera do seu celular para acessar os indicadores</small></div>
+      </div>
+      <div class="right">
+        <img id="refLogo" class="ref-logo" alt="" style="display:none">
+        <div class="unit"><b id="unidade">U-4241</b><span id="refinaria">REFINARIA DE PAULÍNIA · FORNOS</span></div>
+      </div>
+      <div class="cover-foot">
+        <div class="upd-menu">Última atualização:<b id="updMenu"></b></div>
+        <div class="gcb-corner" id="gcbMenu">SUA EMPRESA</div>
+      </div>
+    </div>
+  </section></main>
+  <footer id="ftr"></footer>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="tv-dados.js"></script>
+<script src="sigma.js"></script>
+<script>/* QR gerado aqui mesmo quando a biblioteca carregou; senão fica o serviço externo */
+(function(){function troca(){if(typeof QRCode==="undefined")return;document.querySelectorAll("img[src*=\"qrserver\"]").forEach(function(im){var u=decodeURIComponent((im.src.split("data=")[1]||"").split("&")[0]).replace("campo.sigmacode","fornos.sigmacode");var d=document.createElement("div");new QRCode(d,{text:u,width:256,height:256,correctLevel:QRCode.CorrectLevel.M});var c=d.querySelector("canvas");if(c)im.src=c.toDataURL("image/png")})}setTimeout(troca,400);setTimeout(troca,1600)})();</script>
+</body>
+</html>

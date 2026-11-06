@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fornos · Punch List</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="sigma.css?v=3">
+<style>
+  /* v2 24/09/2026: só a Pendências de inspeção, reparos de solda e possíveis ZR, rolando por dentro */
+  .panel>.box{ flex:1; min-height:0; }
+  .cap .cnt{ font-family:var(--font-ui); font-weight:600; color:var(--mut); text-transform:none; letter-spacing:0; margin-left:.6em; }
+  #tPunchZr td{ white-space:nowrap; }
+  #tPunchZr td.l{ white-space:normal; }
+</style>
+</head>
+<body data-page="punch" data-title="Pendências · o que segura o fechamento">
+<div class="screen">
+  <header id="hdr"></header>
+  <main class="stage"><section class="panel">
+    <div class="box"><div class="cap">Pendências de inspeção, reparos de solda e possíveis ZR <span class="cnt" id="zrCnt"></span></div><div class="scroll"><table id="tPunchZr"></table></div></div>
+  </section></main>
+  <footer id="ftr"></footer>
+</div>
+<!-- A caixa das etapas NÃO saiu da tela a pedido da PO (24/09). A tabela fica
+     escondida porque o renderPunch() do sigma.js escreve nela: sem o elemento
+     ele quebra e a faixa de alerta deixa de ser desenhada. -->
+<table id="tPunch" hidden></table>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="tv-dados.js"></script>
+<script src="sigma.js"></script>
+<script>/* QR gerado aqui mesmo quando a biblioteca carregou; senão fica o serviço externo */
+(function(){function troca(){if(typeof QRCode==="undefined")return;document.querySelectorAll("img[src*=\"qrserver\"]").forEach(function(im){var u=decodeURIComponent((im.src.split("data=")[1]||"").split("&")[0]).replace("campo.sigmacode","fornos.sigmacode");var d=document.createElement("div");new QRCode(d,{text:u,width:256,height:256,correctLevel:QRCode.CorrectLevel.M});var c=d.querySelector("canvas");if(c)im.src=c.toDataURL("image/png")})}setTimeout(troca,400);setTimeout(troca,1600)})();</script>
+<script>
+(function(){
+  function e(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function d(s){if(!s)return '\u2014';var p=String(s).slice(0,10).split('-');return p[2]+'/'+p[1]}
+  function cls(t){return /ZR/.test(t)?'run':/Reparo/.test(t)?'bad':'bad'}
+  function desenha(){var tb=document.getElementById('tPunchZr');if(!tb)return;var L=window.TV_PUNCH||[];
+    var c=document.getElementById('zrCnt');if(c)c.textContent=L.length?'· '+L.length:'';
+    tb.innerHTML="<thead><tr><th>Forno</th><th class='l'>Zona</th><th>Item</th><th class='l'>O que segura</th><th>Situação</th><th class='l'>Registrado por</th><th>Data</th></tr></thead><tbody>"+
+      (L.length?L.map(function(r){return "<tr><td><b>"+e(r.fo)+"</b></td><td class='l'>"+(r.zona?e(r.zona.num+' '+r.zona.nome):'\u2014')+"</td><td>"+e(r.item)+"</td><td class='l'>"+e(r.txt)+"</td><td><span class='stat "+cls(r.sit)+"'>"+e(r.sit)+"</span></td><td class='l'>"+e(r.quem)+"</td><td>"+d(r.quando)+"</td></tr>"}).join('')
+        :"<tr><td colspan='7' class='empty'>Nenhuma pendência aberta<br><small>nada segura o fechamento dos fornos agora</small></td></tr>")+"</tbody>"}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',desenha);else desenha();setTimeout(desenha,800);
+})();
+</script>
+</body>
+</html>
