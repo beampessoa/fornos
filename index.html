@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>SIGMA CODE · Fornos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#0F4CBA;--blue-700:#0B3A91;--blue-500:#3B72D4;--blue-300:#5B8AE6;--blue-50:#EDF3FE;
+  --green:#16A34A;--green-700:#15803D;--green-500:#0B893F;
+  --roxo:#7C3AED;--roxo-700:#6D28D9;
+  --teal:#0E7490;--teal-700:#0B5C73;
+  --amarelo:#F5A524;--amarelo-ink:#3F2207;
+  --red:#C62828;--cinza:#64748B;
+  --white:#fff;--canvas:#F1F4F9;
+  --ink:#1F2937;--ink-soft:#4B5563;--muted:#6B7280;
+  --line:#E5E7EB;--field:#F4F6FA;--field-line:#D7DEEA;
+  --font-d:'Exo 2',system-ui,sans-serif;
+  --font-ui:'Inter',system-ui,sans-serif;
+  --r:8px;--r-md:12px;--r-lg:16px;
+  --sh:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.10);
+  --sh-md:0 10px 24px -12px rgba(16,24,40,.18);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+body{font-family:var(--font-ui);color:var(--ink);background:var(--canvas);-webkit-font-smoothing:antialiased;min-height:100vh}
+.top{display:flex;align-items:center;gap:12px;padding:14px max(20px,env(safe-area-inset-right,0px)) 14px max(20px,env(safe-area-inset-left,0px));background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+.top .logo{width:34px;height:34px;border-radius:9px;background:var(--blue);display:flex;align-items:center;justify-content:center;flex:none}
+.top .logo svg{width:18px;height:18px;color:#fff}
+.top .name{font-family:var(--font-d);font-size:16px;font-weight:800;letter-spacing:.01em}
+.top .name small{display:block;font-family:var(--font-ui);font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.03em}
+.top .tag{margin-left:auto;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#92400E;background:#FFF7E6;border:1px solid #F59E0B;border-radius:20px;padding:5px 11px;white-space:nowrap}
+.wrap{max-width:920px;margin:0 auto;padding:30px max(20px,env(safe-area-inset-right,0px)) 60px max(20px,env(safe-area-inset-left,0px))}
+.hero{margin-bottom:24px}
+.hero .eyebrow{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
+.hero h1{font-family:var(--font-d);font-size:26px;font-weight:800;line-height:1.2;margin-bottom:10px;max-width:640px;text-wrap:balance}
+.hero p{font-size:14px;color:var(--muted);max-width:640px;line-height:1.55;text-wrap:pretty}
+.estado{display:flex;align-items:center;gap:10px;margin:18px 0 0;padding:12px 16px;border-radius:var(--r-md);font-size:13px;line-height:1.5;border:1px solid var(--blue-300);background:#EFF4FF;color:var(--blue-700)}
+.estado .dot{width:9px;height:9px;border-radius:50%;flex:none;background:var(--blue)}
+.estado b{font-family:var(--font-d)}
+.sec-label{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:32px 0 12px}
+.cta{display:flex;align-items:center;gap:16px;background:var(--blue);color:#fff;border-radius:var(--r-lg);padding:22px 24px;text-decoration:none;box-shadow:var(--sh-md);transition:background .15s}
+.cta:hover{background:var(--blue-700)}
+.cta:focus-visible{outline:3px solid var(--blue-300);outline-offset:3px}
+.cta .ico{width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex:none}
+.cta .ico svg{width:23px;height:23px}
+.cta .txt h2{font-family:var(--font-d);font-size:18px;font-weight:700;margin-bottom:3px}
+.cta .txt p{font-size:13px;opacity:.9}
+.cta .arrow{margin-left:auto;flex:none}
+.cta .arrow svg{width:20px;height:20px}
+.ctas{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px}
+@media(max-width:900px){.ctas{grid-template-columns:1fr}}
+.cta.roxo{background:var(--roxo)}
+.cta.roxo:hover{background:var(--roxo-700)}
+.cta.teal{background:var(--teal)}
+.cta.teal:hover{background:var(--teal-700)}
+.cta.slim{padding:16px 18px}
+.cta.slim .ico{width:40px;height:40px}
+.cta.slim .txt h2{font-size:16px}
+.cta.slim .txt p{font-size:12.5px}
+.fornos{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media(max-width:700px){.fornos{grid-template-columns:1fr}}
+.forno{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh);overflow:hidden;display:flex;flex-direction:column}
+.forno .faixa{height:5px;background:var(--c)}
+.forno .corpo{padding:18px 20px;display:flex;flex-direction:column;gap:10px;flex:1}
+.forno .cab{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.forno h3{font-family:var(--font-d);font-size:17px;font-weight:800}
+.forno .un{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:2px}
+.forno .tipo{font-size:10.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border-radius:20px;background:var(--c-soft);color:var(--c);white-space:nowrap}
+.forno p{font-size:12.5px;color:var(--ink-soft);line-height:1.55}
+.forno .nums{display:flex;gap:18px;flex-wrap:wrap}
+.forno .nums div{font-size:11px;color:var(--muted);font-weight:600}
+.forno .nums b{display:block;font-family:var(--font-d);font-size:20px;font-weight:800;color:var(--ink)}
+.forno .acoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:6px}
+.forno .acoes a{display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:var(--r);font-size:12.5px;font-weight:700;text-decoration:none;border:1px solid var(--line);color:var(--ink);background:#fff}
+.forno .acoes a:hover{background:var(--field)}
+.forno .acoes a.pri{background:var(--c);border-color:var(--c);color:#fff}
+.forno .acoes a.pri:hover{filter:brightness(.92)}
+.forno .acoes svg{width:14px;height:14px}
+.forno.f02{--c:var(--blue);--c-soft:#EFF4FF}
+.forno.f01{--c:var(--teal);--c-soft:#E6F4F7}
+.forno.f8a{--c:var(--roxo);--c-soft:#F3EEFE}
+.forno.f8b{--c:#9333EA;--c-soft:#F5EEFF}
+.foot{text-align:center;font-size:11px;color:#9CA3AF;margin-top:36px;line-height:1.6}
+.foot .legal{max-width:620px;margin:11px auto 0;padding-top:11px;border-top:1px solid var(--line);font-size:10.5px;color:#A8AFBB}
+@media (max-width:640px){.hero h1{font-size:22px}.top .tag{display:none}}
+@media (prefers-reduced-motion:reduce){.cta{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V9l4 3V9l4 3V5h4v16"/><path d="M15 9h2"/></svg>
+  </div>
+  <div class="name">SIGMA CODE<small>Fornos · E-Sigma</small></div>
+  <span class="tag">Protótipo · dados de exemplo</span>
+</div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Parada de Manutenção · REPLAN · Fornos 2027 · Contrato 5900.0135110.26.2 · OS 035</div>
+    <h1>Cada forno dividido em zonas, cada tubo com a sua história.</h1>
+    <p>Acompanhe por zona o que a declaração de escopo pede em cada forno, o que já foi inspecionado e o que ainda segura o fechamento, e consulte o mapa dos tubos com as medições de cada campanha.</p>
+    <div class="estado"><span class="dot"></span><span><b>Preparação.</b> Parada prevista para março de 2027 nas unidades U-4241 (Geração de Hidrogênio) e U-4283 (HDT-3 Diesel).</span></div>
+  </div>
+
+  <a class="cta" href="painel-zonas.html">
+    <div class="ico">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+    </div>
+    <div class="txt">
+      <h2>Painel de zonas dos fornos</h2>
+      <p>O forno em 3D com cada zona pintada pelo estado, os itens do escopo e a trava de liberação para fechamento</p>
+    </div>
+    <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+  </a>
+
+  <div class="ctas">
+    <a class="cta roxo slim" href="mapa-tubos.html">
+      <div class="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="14" r="2"/><circle cx="12" cy="14" r="2"/><circle cx="18" cy="14" r="2"/><path d="M3 20h18"/></svg>
+      </div>
+      <div class="txt">
+        <h2>Mapa de tubos</h2>
+        <p>Os 312 tubos catalisadores e as serpentinas, com crescimento diametral, espessura e histórico</p>
+      </div>
+      <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </a>
+    <a class="cta teal slim" href="painel-zonas.html#f-424102">
+      <div class="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      </div>
+      <div class="txt">
+        <h2>Liberação para fechamento</h2>
+        <p>O que ainda segura cada forno: laudos de ensaio, recomendações abertas e reparos</p>
+      </div>
+      <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </a>
+  </div>
+
+  <div class="sec-label">Fornos do escopo</div>
+  <div class="fornos">
+
+    <div class="forno f02"><div class="faixa"></div><div class="corpo">
+      <div class="cab"><div><h3>F-424102</h3><div class="un">U-4241 · ZR-14658907</div></div><span class="tipo">Reformador</span></div>
+      <p>312 tubos catalisadores em 6 fileiras (A a F) e 98 queimadores no teto. Substituição de 84 colunas, LT nova e convecção com 249 pontos de ME.</p>
+      <div class="nums"><div><b>14</b>zonas</div><div><b>41</b>itens</div><div><b>84</b>colunas novas</div></div>
+      <div class="acoes"><a class="pri" href="painel-zonas.html#f-424102">Zonas</a><a href="mapa-tubos.html#f-424102">Tubos</a></div>
+    </div></div>
+
+    <div class="forno f01"><div class="faixa"></div><div class="corpo">
+      <div class="cab"><div><h3>F-424101</h3><div class="un">U-4241 · ZR-14990740</div></div><span class="tipo">Serpentina helicoidal</span></div>
+      <p>Radiação cilíndrica com 2 serpentinas de 13 voltas e convecção de 10 fileiras. ME nos pontos de controle e limpeza das duas primeiras espiras.</p>
+      <div class="nums"><div><b>7</b>zonas</div><div><b>10</b>itens</div><div><b>26</b>voltas</div></div>
+      <div class="acoes"><a class="pri" href="painel-zonas.html#f-424101">Zonas</a><a href="mapa-tubos.html#f-424101">Tubos</a></div>
+    </div></div>
+
+    <div class="forno f8a"><div class="faixa"></div><div class="corpo">
+      <div class="cab"><div><h3>F-428301A</h3><div class="un">U-4283 · ZR-14990638</div></div><span class="tipo">Tubos verticais</span></div>
+      <p>Radiação com 4 passes de 10 tubos verticais e convecção de 12 fileiras. ME em 56 pontos conforme croqui e silplate da convecção e da chaminé.</p>
+      <div class="nums"><div><b>6</b>zonas</div><div><b>6</b>itens</div><div><b>56</b>pontos de ME</div></div>
+      <div class="acoes"><a class="pri" href="painel-zonas.html#f-428301a">Zonas</a><a href="mapa-tubos.html#f-428301a">Tubos</a></div>
+    </div></div>
+
+    <div class="forno f8b"><div class="faixa"></div><div class="corpo">
+      <div class="cab"><div><h3>F-428301B</h3><div class="un">U-4283 · ZR-14990639</div></div><span class="tipo">Tubos verticais</span></div>
+      <p>Mesmo projeto do F-428301A, com medições e estados próprios. Escopo idêntico ao do A, mais a manutenção do queimador 1.</p>
+      <div class="nums"><div><b>6</b>zonas</div><div><b>6</b>itens</div><div><b>56</b>pontos de ME</div></div>
+      <div class="acoes"><a class="pri" href="painel-zonas.html#f-428301b">Zonas</a><a href="mapa-tubos.html#f-428301b">Tubos</a></div>
+    </div></div>
+
+  </div>
+
+  <div class="foot">
+    SIGMA CODE Engenharia · E-Sigma<br>
+    Protótipo de demonstração. Estados, avanços e medições são exemplos; geometria e itens vêm dos desenhos de fabricação e da Declaração de Escopo rev. 1.
+    <div class="legal">© 2026 3R Conveniência e Locações Ltda. Software registrado no INPI sob o nº BR 51 2026 007740-0.</div>
+  </div>
+
+</div>
+</body>
+</html>
