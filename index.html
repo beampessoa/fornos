@@ -93,6 +93,19 @@ body{font-family:var(--font-ui);color:var(--ink);background:var(--canvas);-webki
 .tabela td:nth-child(-n+3){white-space:nowrap}
 .tabela td b{font-family:var(--font-d);color:var(--ink)}
 .tabela .n{text-align:right;font-family:var(--font-d);font-weight:700;color:var(--ink)}
+.paineis{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media(max-width:640px){.paineis{grid-template-columns:1fr}}
+.painel{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;text-decoration:none;color:var(--ink);box-shadow:var(--sh);transition:transform .12s,box-shadow .15s}
+.painel:hover{transform:translateY(-2px);box-shadow:var(--sh-md)}
+.painel .faixa{height:5px;background:var(--c)}
+.painel .corpo{padding:20px;display:flex;flex-direction:column;flex:1}
+.painel .ico{width:42px;height:42px;border-radius:11px;background:var(--c-soft);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.painel .ico svg{width:21px;height:21px;color:var(--c)}
+.painel h3{font-family:var(--font-d);font-size:16px;font-weight:700;margin-bottom:6px}
+.painel p{font-size:12.5px;color:var(--muted);line-height:1.55;flex:1}
+.painel .go{margin-top:14px;font-size:12.5px;font-weight:700;color:var(--c);display:inline-flex;align-items:center;gap:5px}
+.painel .go svg{width:13px;height:13px}
+.painel.azul{--c:var(--blue);--c-soft:#EFF4FF}.painel.roxo{--c:#7C3AED;--c-soft:#F3EEFE}
 .foot{text-align:center;font-size:11px;color:#9CA3AF;margin-top:36px;line-height:1.6}
 .foot .legal{max-width:620px;margin:11px auto 0;padding-top:11px;border-top:1px solid var(--line);font-size:10.5px;color:#A8AFBB}
 @media (max-width:640px){.hero h1{font-size:22px}.top .tag{display:none}}
@@ -113,34 +126,27 @@ body{font-family:var(--font-ui);color:var(--ink);background:var(--canvas);-webki
 
   <div class="hero">
     <div class="eyebrow">Parada de Manutenção · REPLAN · Fornos 2027 · Contrato 5900.0135110.26.2 · OS 035</div>
-    <h1>Cada forno dividido em zonas, cada tubo com a sua história.</h1>
-    <p>Acompanhe por zona o que a declaração de escopo pede em cada forno, o que já foi inspecionado e o que ainda segura o fechamento, e consulte o mapa dos tubos com as medições de cada campanha.</p>
+    <h1>Cada forno dividido em zonas, cada item do escopo com a sua plaqueta.</h1>
+    <p>Consulte cada item da declaração de escopo pela zona onde ele acontece, registre as etapas com PIN e acompanhe nos painéis o que ainda segura o fechamento de cada forno.</p>
     <div class="estado"><span class="dot"></span><span><b>Preparação.</b> Parada prevista para março de 2027 nas unidades U-4241 (Geração de Hidrogênio) e U-4283 (HDT-3 Diesel).</span></div>
   </div>
 
-  <a class="cta" href="painel-zonas.html">
-    <div class="ico">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
-    </div>
-    <div class="txt">
-      <h2>Painel de zonas dos fornos</h2>
-      <p>O forno em 3D com cada zona pintada pelo estado, os itens do escopo e a trava de liberação para fechamento</p>
-    </div>
+  <a class="cta" href="consulta.html">
+    <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
+    <div class="txt"><h2>Consultar forno</h2><p>Pela zona, pelo item da declaração, pela nota ou SADE, ou pelo tubo. Ficha da plaqueta com as etapas e o registro por PIN</p></div>
     <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
   </a>
 
-  <div class="ctas um">
-    <a class="cta roxo slim" href="mapa-tubos.html">
-      <div class="ico">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="14" r="2"/><circle cx="12" cy="14" r="2"/><circle cx="18" cy="14" r="2"/><path d="M3 20h18"/></svg>
-      </div>
-      <div class="txt">
-        <h2>Mapa de tubos</h2>
-        <p>Os 312 tubos catalisadores e as serpentinas, com crescimento diametral, espessura e histórico</p>
-      </div>
-      <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-    </a>
-
+  <div class="sec-label">Painéis de acompanhamento</div>
+  <div class="paineis">
+    <a class="painel azul" href="painel-zonas.html"><div class="faixa"></div><div class="corpo">
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg></div>
+      <h3>Painel de zonas</h3><p>Cada forno em 3D com as zonas pintadas pelo estado das plaquetas e o que ainda segura o fechamento. Feito para ficar aberto na TV.</p>
+      <span class="go">Abrir <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>
+    <a class="painel roxo" href="mapa-tubos.html"><div class="faixa"></div><div class="corpo">
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="14" r="2"/><circle cx="12" cy="14" r="2"/><circle cx="18" cy="14" r="2"/><path d="M3 20h18"/></svg></div>
+      <h3>Mapa de tubos</h3><p>Os 312 tubos catalisadores e as serpentinas, com crescimento diametral, espessura e histórico por campanha.</p>
+      <span class="go">Abrir <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>
   </div>
 
   <div class="sec-label">Escopo da declaração rev. 1</div>
