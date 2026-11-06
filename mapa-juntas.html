@@ -358,8 +358,10 @@ ITENS.forEach(p=>{const n=TIPOS[p.tipo].e.length,z=ZN(p.forno,p.zonas[0]),est=z?
   else if(est==='esp'){p.feitas=Math.max(1,n-1-(r<.5?1:0))}
   else if(est==='pen'){p.feitas=Math.max(1,Math.floor(n*.5));if(!pendUsada[p.forno+p.zonas[0]]&&['END','MED','QUEI'].includes(p.tipo)){pendUsada[p.forno+p.zonas[0]]=1;p.pend=z.rec||'Resultado fora do critério. Aguarda avaliação da engenharia.'}}
   else{p.feitas=Math.min(n-1,Math.floor(n*(.25+r*.5)))}
-  for(let i=0;i<p.feitas;i++){const et=TIPOS[p.tipo].e[i];{const pe=pessoaPara(et[1],hash(p.id+i),p.tipo);p.reg.push({et:i,quando:dataEx(i,r),quem:pe.nome,fn:pe.funcao,res:'Sim',fotos:et[1]==='Inspeção'?2:1})}}
+  for(let i=0;i<p.feitas;i++){const et=TIPOS[p.tipo].e[i];{const pe=pessoaPara(et[1],hash(p.id+i),p.tipo);p.reg.push({et:i,quando:dataRec(p.feitas-1-i,hash(p.id+'d'+i)),quem:pe.nome,fn:pe.funcao,res:'Sim',fotos:et[1]==='Inspeção'?2:1})}}
   p.estado=p.pend?'pen':p.feitas>=n?'lib':p.feitas===0?'nao':(TIPOS[p.tipo].e[p.feitas][1]==='Inspeção'?'esp':'and')});
+/* a etapa mais recente de cada plaqueta fica perto de hoje na parada (10/03/2027) e as anteriores vão para trás */
+function dataRec(k,r){const d=new Date(Date.UTC(2027,2,Math.max(2,10-k-Math.floor(r*2.4))));return d.toISOString().slice(0,10)}
 function dataEx(i,r){const d=new Date(Date.UTC(2027,2,2+i*2+Math.floor(r*3)));return d.toISOString().slice(0,10)}
 const ESTP={na:'N/A · sem intervenção',nao:'Não iniciada',and:'Em andamento',esp:'Aguarda inspeção',pen:'Pendência',lib:'Concluída',canc:'Cancelada'};
 const fmt=d=>d.split('-').reverse().join('/');
