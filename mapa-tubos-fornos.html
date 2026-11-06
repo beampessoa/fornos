@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mapa de tubos dos fornos</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: Painel Gerencial de Campo do Sigma. Abas por forno, mapa à esquerda, ficha do tubo ao lado */
+
+/* Layout: o mesmo do Painel Gerencial de Campo (campo-graf.html): cabeçalho branco com logo azul, KPIs, painéis brancos com cabeçalho e corpo */
+:root{
+  --blue:#0F4CBA; --blue-700:#0B3A91; --blue-300:#5B8AE6;
+  --green:#22C55E; --green-600:#16A34A;
+  --canvas:#F1F4F9; --panel:#FFFFFF; --ink:#1F2937; --ink-soft:#4B5563; --muted:#6B7280;
+  --line:#E5E7EB; --field:#F4F6FA; --field-line:#D7DEEA; --stage:#F6F8FB;
+  --s-nao:#9CA3AF; --s-and:#0F4CBA; --s-esp:#F59E0B; --s-pen:#EF4444; --s-lib:#16A34A;
+  --s-nao-bg:#F1F3F6; --s-and-bg:#E8EFFC; --s-esp-bg:#FFF7E6; --s-pen-bg:#FDECEC; --s-lib-bg:#E7F6EE;
+  --s-nao-tx:#4B5563; --s-and-tx:#0B3A91; --s-esp-tx:#92400E; --s-pen-tx:#991B1B; --s-lib-tx:#166534;
+  --font-d:'Exo 2',system-ui,sans-serif; --font-ui:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --r:8px; --r-md:12px; --r-lg:16px;
+  --sh:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.10);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --blue:#5B8AE6; --blue-700:#8FB0F0; --blue-300:#3B67C4;
+  --canvas:#0F141B; --panel:#171E28; --ink:#E5EAF1; --ink-soft:#B8C2CF; --muted:#8B97A6;
+  --line:#263140; --field:#1D2632; --field-line:#2E3A4A; --stage:#E9EDF2;
+  --s-nao:#9CA3AF; --s-and:#4F7FE0; --s-esp:#F59E0B; --s-pen:#F05252; --s-lib:#22C55E;
+  --s-nao-bg:#232C38; --s-and-bg:#18294A; --s-esp-bg:#3A2A0E; --s-pen-bg:#3D1A1A; --s-lib-bg:#123A22;
+  --s-nao-tx:#C3CAD4; --s-and-tx:#A9C2F5; --s-esp-tx:#F8C567; --s-pen-tx:#F8A5A5; --s-lib-tx:#86E0A8;
+  --sh:0 1px 2px rgba(0,0,0,.3); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --blue:#5B8AE6; --blue-700:#8FB0F0; --blue-300:#3B67C4;
+  --canvas:#0F141B; --panel:#171E28; --ink:#E5EAF1; --ink-soft:#B8C2CF; --muted:#8B97A6;
+  --line:#263140; --field:#1D2632; --field-line:#2E3A4A; --stage:#E9EDF2;
+  --s-nao:#9CA3AF; --s-and:#4F7FE0; --s-esp:#F59E0B; --s-pen:#F05252; --s-lib:#22C55E;
+  --s-nao-bg:#232C38; --s-and-bg:#18294A; --s-esp-bg:#3A2A0E; --s-pen-bg:#3D1A1A; --s-lib-bg:#123A22;
+  --s-nao-tx:#C3CAD4; --s-and-tx:#A9C2F5; --s-esp-tx:#F8C567; --s-pen-tx:#F8A5A5; --s-lib-tx:#86E0A8;
+  --sh:0 1px 2px rgba(0,0,0,.3); color-scheme:dark }
+*{box-sizing:border-box}
+body{font-family:var(--font-ui);color:var(--ink);background:var(--canvas);-webkit-font-smoothing:antialiased;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:20;background:var(--panel)}
+.es-header{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--panel);border-bottom:1px solid var(--line);
+  padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.es-header .logo{width:38px;height:38px;border-radius:10px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+.es-header .logo svg{width:20px;height:20px}
+.es-header .tit{min-width:190px;flex:1 1 auto}
+.es-header .tt{font-family:var(--font-d);font-weight:800;font-size:16px;line-height:1.1}
+.es-header .st{font-size:11.5px;color:var(--muted)}
+.tag-prot{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--s-esp-tx);background:var(--s-esp-bg);border:1px solid var(--s-esp);border-radius:20px;padding:5px 11px;white-space:nowrap}
+.wrap{max-width:1280px;margin:0 auto;padding-block:20px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:16px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-md);padding:16px;box-shadow:var(--sh);min-width:0}
+.kpi .n{font-family:var(--font-d);font-size:30px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.kpi .n small{font-size:14px;color:var(--muted);font-weight:700}
+.kpi .l{font-size:12px;color:var(--muted);margin-top:6px;font-weight:600}
+.kpi.forno{border-top:3px solid var(--s-pen)}
+.kpi.forno.ok{border-top-color:var(--s-lib)}
+.trava{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pil{font-family:var(--font-d);font-weight:800;font-size:22px;line-height:1}
+.duas{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:920px){.duas{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh);overflow:hidden;min-width:0}
+.panel-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between}
+.panel-h .tt{font-weight:800;font-size:14px}
+.panel-h .q{font-size:11.5px;color:var(--muted);margin-top:3px}
+.acoes{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.uchip{font-family:var(--font-ui);font-size:12.5px;font-weight:700;padding:7px 13px;border-radius:20px;border:1px solid var(--line);background:var(--panel);color:var(--ink-soft);cursor:pointer;white-space:nowrap}
+.uchip:hover{background:var(--field)}
+.uchip[aria-pressed="true"]{background:var(--blue);color:#fff;border-color:var(--blue)}
+.hbtn{display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border-radius:var(--r);font-family:var(--font-ui);font-size:12.5px;font-weight:700;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink);white-space:nowrap}
+.hbtn:hover{background:var(--field)}
+.hbtn svg{width:15px;height:15px}
+.hbtn.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+button:focus-visible,select:focus-visible,.zrow:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.palco{background:var(--stage)}
+.palco svg{display:block;width:100%;height:auto}
+.zona{cursor:pointer;mix-blend-mode:multiply;transition:fill-opacity .15s}
+.zona:hover,.zona.ativa{fill-opacity:.62!important}
+.zona.ativa{stroke-width:3.5!important}
+.sem-area .zona{display:none}
+.ed .zona{pointer-events:none}
+.legenda{display:flex;flex-wrap:wrap;gap:6px 16px;padding:12px 18px;border-top:1px solid var(--line);font-size:12px;font-weight:600;color:var(--ink-soft)}
+.legenda i{display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:6px;vertical-align:-1px}
+.lista{list-style:none;margin:0;padding:6px 8px}
+.zrow{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding:9px 10px;border-radius:var(--r);cursor:pointer;border-bottom:1px solid var(--line)}
+.zrow:last-child{border-bottom:0}
+.zrow:hover{background:var(--field)}
+.zrow.ativa{background:var(--field);box-shadow:inset 3px 0 0 var(--blue)}
+.num{font-family:var(--font-d);font-size:12px;font-weight:800;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff}
+.zn{font-family:var(--font-d);font-weight:700;font-size:13px;line-height:1.25}
+.zm{font-size:11.5px;color:var(--muted)}
+.barra{grid-column:2/4;height:4px;background:var(--field);border-radius:3px;overflow:hidden}
+.barra span{display:block;height:100%;border-radius:3px}
+.chip{font-size:11px;font-weight:800;letter-spacing:.02em;border-radius:20px;padding:3px 9px;white-space:nowrap;border:1px solid transparent}
+.fora{font-size:12px;color:var(--muted);padding:10px 18px 14px;border-top:1px solid var(--line);line-height:1.55}
+.fora b{font-family:var(--font-d);color:var(--ink)}
+.det{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:20px;padding:16px 18px}
+.det h3{font-family:var(--font-d);font-weight:800;font-size:12px;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.trilho{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px}
+.trilho div{height:30px;border-radius:6px;font:800 11px var(--font-d);display:grid;place-items:center}
+.trilho-rot{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;font-size:10px;color:var(--muted);margin-top:5px;line-height:1.2;font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+td,th{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:10.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+td.n{font-family:var(--font-d);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.med{margin:0;padding:0;list-style:none;font-size:12.5px}
+.med li{padding:6px 0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px}
+.med li:last-child{border-bottom:0}
+.med code{font-family:var(--font-d);font-weight:700;font-size:11.5px;color:var(--blue);background:var(--field);border:1px solid var(--field-line);border-radius:6px;padding:1px 6px;white-space:nowrap;align-self:start}
+.aviso{border-radius:var(--r-md);padding:11px 13px;font-size:12.5px;line-height:1.55;margin-top:12px;border:1px solid}
+.aviso b{font-weight:800}
+.edbar{display:none;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 18px;border-bottom:1px solid #FDE68A;background:#FFFBEB;font-size:12.5px;color:#92400E}
+.ed .edbar{display:flex}
+.edbar label{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+select{font-family:var(--font-ui);font-size:13px;font-weight:600;color:var(--ink);background:var(--field);border:1px solid var(--field-line);border-radius:var(--r);padding:7px 10px;cursor:pointer}
+.nota{font-size:12px;color:var(--muted);max-width:90ch;line-height:1.6;margin:0 4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+:root{ --g-ok:#16A34A; --g-al:#F59E0B; --g-rt:#DC2626; --g-sem:#CBD2DC; --map-bg:#FBFCFE; --map-ink:#334155; --map-line:#CBD5E1; --burner:#E2E8F0 }
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){ --g-sem:#3A4656; --map-bg:#121922; --map-ink:#B8C2CF; --map-line:#334155; --burner:#263140 }}
+:root[data-theme="dark"]{ --g-sem:#3A4656; --map-bg:#121922; --map-ink:#B8C2CF; --map-line:#334155; --burner:#263140 }
+.abas{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.abas .lb{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.uchip .fx{font-weight:600;opacity:.75;font-size:11px;margin-left:4px}
+.uchip:disabled{cursor:not-allowed;opacity:.55}
+.hm-wrap{display:grid;grid-template-columns:minmax(0,1fr) 360px;align-items:stretch}
+@media(max-width:1020px){.hm-wrap{grid-template-columns:minmax(0,1fr)}}
+.mapa-col{min-width:0;display:flex;flex-direction:column}
+.ctrl{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line)}
+.ctrl .lb{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.ctrl .grp{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.ctrl input[type=number]{width:70px;font-family:var(--font-ui);font-size:13px;font-weight:700;color:var(--ink);background:var(--field);border:1px solid var(--field-line);border-radius:var(--r);padding:6px 8px}
+.ctrl .ex{font-size:11px;color:var(--muted)}
+.chk{display:inline-flex;gap:6px;align-items:center;font-size:12.5px;font-weight:700;color:var(--ink-soft);cursor:pointer}
+.mapa{overflow-x:auto;background:var(--map-bg);flex:1}
+.mapa svg{display:block;min-width:760px;width:100%;height:auto}
+.mapa text{fill:var(--map-ink);font-family:var(--font-ui)}
+.tb{cursor:pointer}
+.tb:hover{stroke:var(--ink);stroke-width:2}
+.tb.sel{stroke:var(--blue);stroke-width:3}
+.tb3{cursor:pointer}
+.tb3:hover{filter:brightness(1.12)}
+.esm .tb:not(.prog){opacity:.18}
+.legenda{display:flex;flex-wrap:wrap;gap:6px 16px;padding:12px 18px;border-top:1px solid var(--line);font-size:12px;font-weight:600;color:var(--ink-soft);align-items:center}
+.legenda i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.hm-side{border-left:1px solid var(--line);padding:16px 18px;min-width:0;max-height:820px;overflow:auto}
+@media(max-width:1020px){.hm-side{border-left:0;border-top:1px solid var(--line);max-height:none}}
+.hs-t{font-family:var(--font-d);font-weight:800;font-size:15px;line-height:1.3}
+.hs-q{font-size:11.5px;color:var(--muted);margin:3px 0 10px;line-height:1.5}
+.hm-side h3{font-family:var(--font-d);font-weight:800;font-size:11.5px;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);margin:18px 0 8px}
+.hs-fechar{background:none;border:0;color:var(--blue);font-family:var(--font-ui);font-size:12px;font-weight:700;cursor:pointer;padding:6px 0}
+.chip{font-size:11px;font-weight:800;border-radius:20px;padding:3px 9px;white-space:nowrap;border:1px solid transparent;display:inline-block}
+.kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;font-size:12.5px}
+.kv dt{color:var(--muted);font-weight:600}
+.kv dd{margin:0;font-weight:600}
+.big{font-family:var(--font-d);font-weight:800;font-size:28px;line-height:1}
+.big small{font-size:13px;color:var(--muted);font-weight:700}
+.top{list-style:none;margin:0;padding:0}
+.top li{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:8px;align-items:center;padding:7px 4px;border-bottom:1px solid var(--line);cursor:pointer;font-size:12.5px;border-radius:6px}
+.top li:hover{background:var(--field)}
+.top b{font-family:var(--font-d)}
+.faixas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.faixas>div{border:1px solid var(--line);border-radius:10px;padding:10px}
+.faixas .n{font-family:var(--font-d);font-weight:800;font-size:22px}
+.faixas .l{font-size:11px;color:var(--muted);font-weight:600}
+.aviso{border-radius:var(--r-md);padding:11px 13px;font-size:12.5px;line-height:1.55;margin-top:12px;border:1px solid}
+.graf svg{display:block;width:100%;height:auto}
+.graf text{font-family:var(--font-ui);fill:var(--muted)}
+.prox{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;padding:16px 18px}
+.prox .c{border:1px solid var(--line);border-radius:var(--r-md);padding:14px}
+.prox .c .tt{font-family:var(--font-d);font-weight:800;font-size:13.5px}
+.prox .c p{font-size:12.5px;color:var(--ink-soft);margin:6px 0 0;line-height:1.55}
+.prox .c .st{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin-top:8px}
+</style>
+<style>[hidden]{display:none!important} body{margin:0} img{max-width:100%}</style>
+</head>
+<body>
+
+
+<header class="es-header">
+  <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="6" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="14" r="2"/><circle cx="12" cy="14" r="2"/><circle cx="18" cy="14" r="2"/><path d="M3 20h18"/></svg></div>
+  <div class="tit">
+    <div class="tt">Mapa de tubos dos fornos</div>
+    <div class="st">REPLAN · U-4241 Geração de hidrogênio · Contrato 5900.0135110.26.2 · Parada março 2027</div>
+  </div>
+  <span class="tag-prot">Protótipo · medições de exemplo</span>
+</header>
+
+<main class="wrap">
+  <div class="abas" role="tablist" aria-label="Forno">
+    <span class="lb">Forno</span>
+    <button type="button" class="uchip" id="ab-02" aria-pressed="true">F-424102<span class="fx">reformador · 312 tubos</span></button>
+    <button type="button" class="uchip" id="ab-01" aria-pressed="false">F-424101<span class="fx">serpentina helicoidal</span></button>
+    <button type="button" class="uchip" id="ab-8A" aria-pressed="false">F-428301A<span class="fx">tubos verticais</span></button>
+    <button type="button" class="uchip" id="ab-8B" aria-pressed="false">F-428301B<span class="fx">tubos verticais</span></button>
+  </div>
+
+  <section class="kpis" id="kpis" aria-label="Resumo do forno"></section>
+
+  <section class="panel">
+    <div class="panel-h">
+      <div><div class="tt" id="p-tit"></div><div class="q" id="p-sub"></div></div>
+    </div>
+    <div class="hm-wrap">
+      <div class="mapa-col">
+        <div class="ctrl" id="ctrl"></div>
+        <div class="mapa" id="mapa"></div>
+        <div class="legenda" id="legenda"></div>
+      </div>
+      <aside class="hm-side" id="side" aria-live="polite"></aside>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-h"><div><div class="tt">Como isso vale para os 4 fornos</div><div class="q">O mesmo cadastro de tubos e medições; muda só o desenho do mapa de cada forno</div></div></div>
+    <div class="prox">
+      <div class="c"><div class="tt">F-424102 · reformador</div><p>Grade em planta: 6 fileiras de 52 tubos catalisadores (312), separadas por 7 fileiras de 14 queimadores. Medição de crescimento diametral por elevação e histórico por campanha.</p><div class="st" style="color:var(--s-lib-tx)">Desenhos recebidos</div></div>
+      <div class="c"><div class="tt">F-424101 · serpentina helicoidal</div><p>Radiação planificada: 2 serpentinas intercaladas de 13 voltas, abertas de 0° a 360°. Convecção em grade de 10 fileiras de 4 tubos. Medição de espessura por ponto.</p><div class="st" style="color:var(--s-lib-tx)">Desenhos recebidos</div></div>
+      <div class="c"><div class="tt">F-428301A e F-428301B</div><p>Radiação com 4 passes de 10 tubos verticais na parede (40 tubos), vista em cilindro, planificada ou em planta. Convecção em grade de 12 fileiras de 4 tubos. Mesmo projeto para A e B, com medições separadas.</p><div class="st" style="color:var(--s-lib-tx)">Desenhos recebidos</div></div>
+    </div>
+  </section>
+
+  <p class="nota">Protótipo para discutir o conceito. A geometria vem dos desenhos; as medições, as campanhas, os tubos programados e as faixas de cor são exemplos e precisam do critério do plano de inspeção. A numeração dos tubos (fileira e posição) é provisória até confirmarmos a convenção usada pela REPLAN. Base F-424102: DE-5270.00-42311-422-FAB-050, 051, 063 e I-DE-5270.00-4231-422-PPC-002. Base F-424101: DE-5270.00-42311-421-FAB-003, 004, 011 e 012. Base F-428301A/B: DE-5270.00-42313-421-FAB-202, 210 e 211.</p>
+</main>
+
+<script>
+/* ---------- utilidades ---------- */
+const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
+const el=(t,a={},txt)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;return e};
+const gv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function rng(s){return()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const f1=(v,d=2)=>v.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const st=(k)=>`background:var(--s-${k}-bg);color:var(--s-${k}-tx);border-color:var(--s-${k})`;
+
+/* =========================================================
+   F-424102 · reformador: 6 fileiras x 52 tubos
+   ========================================================= */
+const R2={fileiras:6,eixos:[7,8,9,10,11,12],grupos:[11,10,10,10,11],colunas:['K2','L1','L2','L4','M1','M2'],
+  elev:[{n:'Tubo 1 · 1 m',k:.8},{n:'Tubo 1 · 3 m',k:1},{n:'Tubo 2 · 5 m',k:.95},{n:'Tubo 2 · 7 m',k:.84},{n:'Tubo 3 · 9 m',k:.7},{n:'Tubo 3 · 11 m',k:.55}],
+  camp:['2018','2021','2024','2027'], lim:{al:1.5,rt:2.5}};
+const FIL='ABCDEF';
+const TUB=[];
+(function gerar(){const r=rng(424102);
+  for(let f=0;f<6;f++)for(let p=0;p<52;p++){
+    const meio=Math.sin(Math.PI*(p+.5)/52), cen=(f===2||f===3)?.18:0;
+    let g=.45+.85*meio+cen+(r()-.5)*.38;
+    if(p>=41)g+=.9+(p-41)*.05+r()*.4;
+    if(p<=2)g+=.75+r()*.35;
+    const novo=r()<.05;if(novo)g=.15+r()*.25;
+    TUB.push({f,p,id:`${FIL[f]}${p+1}`,g:Math.max(.05,g),inst:novo?'2021':'2012'})}
+  /* item 1.5: parede oeste A42 a F52 e parede leste A1 a F3 = 84; F52, F51 e E52 já removidos */
+  TUB.forEach(t=>{if(t.p>=41||t.p<=2)t.prog=true;if(['F52','F51','E52'].includes(t.id))t.rem=true});
+  TUB.filter(t=>t.prog&&!t.rem).sort((a,b)=>b.p-a.p||a.f-b.f).forEach((t,i)=>{if(i<28){t.subst=true;t.rx=i<10?'laudado':'pendente'}});
+})();
+function perfil(t){return R2.elev.map(e=>t.g*e.k)}
+function hist(t){const f=t.inst==='2021'?[null,0,.55,1]:[.45,.68,.85,1];return f.map(x=>x==null?null:t.g*x)}
+function corG(g){return g>=R2.lim.rt?gv('--g-rt'):g>=R2.lim.al?gv('--g-al'):gv('--g-ok')}
+function sit(t){if(t.rem)return['Já removido antes da parada','pen'];if(t.subst)return t.rx==='laudado'?['Substituído · medição feita','lib']:['Substituído · medição pendente','and'];if(t.prog)return['Programado para substituir','esp'];return['Mantido','nao']}
+const corSit={lib:'--s-lib',and:'--s-and',esp:'--s-esp',nao:'--g-sem',pen:'--s-pen'};
+
+let forno='02', metrica='g', soProg=false, sel=null, vista='iso', filFoco=-1;
+
+function mapa02(){
+  const p=15, gapG=Math.round(520/254*p)-p, x0=96, y0=46, dy=74;
+  const larg=x0+52*p+4*gapG+96, alt=y0+7*dy+30;
+  const s=el('svg',{viewBox:`0 0 ${larg} ${alt}`,role:'img','aria-label':'Planta do F-424102 com os 312 tubos catalisadores'});
+  const xs=[];let x=x0;R2.grupos.forEach((n,gi)=>{for(let i=0;i<n;i++){xs.push(x);x+=p}x+=gapG});
+  const xIni=xs[0]-p, xFim=xs[51]+p;
+  /* colunas da estrutura */
+  const cx=[xIni-6];let acc=0;R2.grupos.forEach((n,gi)=>{acc+=n;cx.push(gi<4?(xs[acc-1]+xs[acc])/2:xFim+6)});
+  cx.forEach((c,i)=>{s.appendChild(el('line',{x1:c,y1:y0-12,x2:c,y2:y0+7*dy-14,stroke:gv('--map-line'),'stroke-dasharray':'3 4'}));
+    s.appendChild(el('text',{x:c,y:y0-20,'text-anchor':'middle','font-size':11,'font-weight':700},R2.colunas[i]))});
+  /* queimadores: 7 fileiras de 14 */
+  for(let q=0;q<7;q++){const y=y0+q*dy;for(let k=0;k<14;k++){const bx=xIni+(xFim-xIni)*(k+.5)/14;
+    s.appendChild(el('rect',{x:bx-9,y:y-7,width:18,height:14,rx:3,fill:gv('--burner'),stroke:gv('--map-line')}))}}
+  s.appendChild(el('text',{x:xFim+14,y:y0+4,'font-size':10.5},'queimadores'));
+  /* tubos */
+  TUB.forEach(t=>{const y=y0+dy/2+t.f*dy, cxx=xs[t.p];
+    const fill=metrica==='g'?corG(t.g):gv(corSit[sit(t)[1]]);
+    const c=el('circle',{cx:cxx,cy:y,r:6.2,fill,class:'tb'+(t.prog?' prog':'')+(sel===t?' sel':''),stroke:t.prog&&metrica==='g'?gv('--ink'):'none','stroke-width':t.prog&&metrica==='g'?1.2:0});
+    c.appendChild(el('title',{},`${t.id} · ${f1(t.g)}% · ${sit(t)[0]}`));c.addEventListener('click',()=>{sel=t;tudo()});s.appendChild(c)});
+  for(let f=0;f<6;f++){const y=y0+dy/2+f*dy;s.appendChild(el('text',{x:10,y:y+4,'font-size':11.5,'font-weight':800},`Fileira ${FIL[f]}`));
+    s.appendChild(el('text',{x:10,y:y+17,'font-size':10},`eixo ${R2.eixos[f]}`))}
+  s.appendChild(el('text',{x:xs[0],y:alt-8,'font-size':10.5},'posição 01'));
+  s.appendChild(el('text',{x:xs[51],y:alt-8,'font-size':10.5,'text-anchor':'end'},'52'));
+  if(soProg)s.classList.add('esm');
+  return s}
+
+/* ---------- F-424102 · vista isométrica ---------- */
+function mapa02iso(){
+  const P=13, G=Math.round(520/254*P)-P, H=230, DX=30, DY=52, INC=.22, x0=40, y0=560;
+  const Xs=[];let x=0;R2.grupos.forEach(n=>{for(let i=0;i<n;i++){Xs.push(x);x+=P}x+=G});
+  const Xmax=Xs[51];
+  const base=(X,d)=>[x0+X+d*DX, y0+X*INC-d*DY];
+  const larg=x0+Xmax+5*DX+120, alt=y0+Xmax*INC+60;
+  const s=el('svg',{viewBox:`0 0 ${larg} ${alt}`,role:'img','aria-label':'Vista isométrica dos 312 tubos catalisadores do F-424102'});
+  const line=gv('--map-line'), ink=gv('--map-ink');
+  /* piso e teto */
+  const q=(X,d,z)=>{const[b1,b2]=base(X,d);return `${b1},${b2-z}`};
+  const cant=[[-24,-.6],[Xmax+24,-.6],[Xmax+24,5.6],[-24,5.6]];
+  s.appendChild(el('polygon',{points:cant.map(([X,d])=>q(X,d,0)).join(' '),fill:gv('--burner'),'fill-opacity':.45,stroke:line}));
+  s.appendChild(el('polygon',{points:cant.map(([X,d])=>q(X,d,H+10)).join(' '),fill:'none',stroke:line,'stroke-dasharray':'4 4'}));
+  [[-24,-.6],[Xmax+24,-.6],[-24,5.6]].forEach(([X,d])=>{const[a,b]=base(X,d);s.appendChild(el('line',{x1:a,y1:b,x2:a,y2:b-H-10,stroke:line,'stroke-dasharray':'4 4'}))});
+  /* colunas da estrutura na frente */
+  let acc=0;const cx=[-12];R2.grupos.forEach((n,gi)=>{acc+=n;cx.push(gi<4?(Xs[acc-1]+Xs[acc])/2:Xmax+12)});
+  cx.forEach((X,i)=>{const[a,b]=base(X,-.6);s.appendChild(el('text',{x:a,y:b+18,'font-size':11,'font-weight':700,'text-anchor':'middle'},R2.colunas[i]))});
+  /* das fileiras do fundo (F1) para a frente (F6) */
+  const rot=[];
+  for(let f=0;f<6;f++){
+    const d=5-f, g=el('g',{opacity:(filFoco<0||filFoco===f)?1:.1});
+    /* fileira de queimadores atrás desta fileira de tubos, no teto */
+    const qd=d+.5;for(let k=0;k<14;k++){const X=-12+(Xmax+24)*(k+.5)/14;const[a,b]=base(X,qd);
+      g.appendChild(el('rect',{x:a-7,y:b-H-16,width:14,height:7,rx:2,fill:line,opacity:.75}))}
+    /* coletor de saída embaixo */
+    const[s1,s2]=base(-8,d),[e1,e2]=base(Xmax+8,d);
+    g.appendChild(el('line',{x1:s1,y1:s2+7,x2:e1,y2:e2+7,stroke:ink,'stroke-width':3,'stroke-linecap':'round',opacity:.55}));
+    TUB.filter(t=>t.f===f).forEach(t=>{
+      const[a,b]=base(Xs[t.p],d), top=b-H, pf=perfil(t), seg=H/pf.length;
+      const tg=el('g',{class:'tb3'+(t.prog?' prog':'')});
+      if(soProg&&!t.prog)tg.setAttribute('opacity',.15);
+      if(metrica==='g')pf.forEach((v,i)=>tg.appendChild(el('rect',{x:a-4,y:top+i*seg,width:8,height:seg+.4,fill:corG(v)})));
+      else tg.appendChild(el('rect',{x:a-4,y:top,width:8,height:H,fill:gv(corSit[sit(t)[1]])}));
+      tg.appendChild(el('rect',{x:a-2.6,y:top,width:1.6,height:H,fill:'#ffffff',opacity:.32}));
+      tg.appendChild(el('rect',{x:a+2.2,y:top,width:1.8,height:H,fill:'#000000',opacity:.14}));
+      tg.appendChild(el('ellipse',{cx:a,cy:top,rx:4,ry:1.8,fill:'#ffffff',opacity:.55}));
+      if(t.prog&&metrica==='g')tg.appendChild(el('rect',{x:a-4.6,y:top-1,width:9.2,height:H+2,fill:'none',stroke:ink,'stroke-width':1}));
+      /* pigtail até o coletor de entrada */
+      tg.appendChild(el('path',{d:`M${a} ${top} q0 -9 7 -12`,fill:'none',stroke:ink,'stroke-width':1.1,opacity:.6}));
+      if(sel===t)tg.appendChild(el('rect',{x:a-6,y:top-3,width:12,height:H+6,rx:3,fill:'none',stroke:gv('--blue'),'stroke-width':2.5}));
+      tg.appendChild(el('title',{},`${t.id} · ${f1(t.g)}% · ${sit(t)[0]}`));
+      tg.addEventListener('click',()=>{sel=t;tudo()});g.appendChild(tg)});
+    /* coletor de entrada em cima */
+    const[i1,i2]=base(-8,d),[j1,j2]=base(Xmax+8,d);
+    g.appendChild(el('line',{x1:i1+7,y1:i2-H-12,x2:j1+7,y2:j2-H-12,stroke:ink,'stroke-width':3.2,'stroke-linecap':'round',opacity:.7}));
+    s.appendChild(g);
+    const hal={stroke:gv('--map-bg'),'stroke-width':4,'paint-order':'stroke',opacity:(filFoco<0||filFoco===f)?1:.25};
+    rot.push(el('text',{x:j1+16,y:j2-H-8,'font-size':12,'font-weight':800,...hal},`${FIL[f]}`),el('text',{x:j1+30,y:j2-H-8,'font-size':10,...hal},`eixo ${R2.eixos[f]}`))}
+  rot.forEach(r=>s.appendChild(r));
+  /* legenda das alturas */
+  const[r1,r2]=base(Xmax+30,0);
+  ['1 m','3 m','5 m','7 m','9 m','11 m'].forEach((n,i)=>s.appendChild(el('text',{x:r1,y:r2-H+i*H/6+H/12+4,'font-size':10},n)));
+  s.appendChild(el('text',{x:r1,y:r2+16,'font-size':10,'font-weight':700},'abaixo do teto'));
+  return s}
+
+function side02(){
+  if(!sel){const n=k=>TUB.filter(t=>k(t)).length;
+    const top=TUB.slice().sort((a,b)=>b.g-a.g).slice(0,10);
+    return `<div class="hs-t">Visão do forno</div><div class="hs-q">Toque num tubo para abrir a ficha. Valor do mapa = maior crescimento entre as 6 alturas medidas (2 por tubo, 3 tubos por coluna). Posição 1 = parede leste, 52 = parede oeste.</div>
+      <div class="faixas"><div><div class="n" style="color:var(--g-ok)">${n(t=>t.g<R2.lim.al)}</div><div class="l">abaixo do alerta</div></div>
+      <div><div class="n" style="color:var(--g-al)">${n(t=>t.g>=R2.lim.al&&t.g<R2.lim.rt)}</div><div class="l">em alerta</div></div>
+      <div><div class="n" style="color:var(--g-rt)">${n(t=>t.g>=R2.lim.rt)}</div><div class="l">acima da retirada</div></div></div>
+      <h3>Maiores crescimentos</h3><ul class="top">${top.map(t=>`<li data-id="${t.id}"><b>${t.id}</b><span class="zm">${sit(t)[0]}</span><b style="color:${corG(t.g)}">${f1(t.g)}%</b></li>`).join('')}</ul>
+      <h3>Dados do tubo (FAB-051)</h3>${ficha02()}`}
+  const t=sel,[sTxt,sK]=sit(t),pf=perfil(t),hs=hist(t);
+  return `<button type="button" class="hs-fechar" id="b-fechar">← Visão do forno</button>
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-top:4px">
+      <div><div class="hs-t">Tubo ${t.id}</div><div class="hs-q" style="margin:2px 0 0">Fileira ${FIL[t.f]} (eixo ${R2.eixos[t.f]}) · posição ${t.p+1} de 52 · vão ${vao(t.p)}${t.p<=2?' · parede leste':t.p>=41?' · parede oeste':''}</div></div>
+      <span class="chip" style="${st(sK==='nao'?'nao':sK)}">${sTxt}</span></div>
+    <div style="display:flex;gap:18px;margin-top:14px;align-items:flex-end;flex-wrap:wrap">
+      <div><div class="big" style="color:${corG(t.g)}">${f1(t.g)}<small> %</small></div><div class="zm">crescimento máximo em 2027</div></div>
+      <div><div class="big">${f1(143.1*(1+t.g/100),1)}<small> mm</small></div><div class="zm">DE medido (nominal 143,1)</div></div></div>
+    <h3>Perfil ao longo da coluna (6 alturas, distância abaixo do teto)</h3><div class="graf">${grafPerfil(pf)}</div>
+    <h3>Histórico por campanha</h3><div class="graf">${grafHist(hs)}</div>
+    <h3>Na parada</h3><dl class="kv"><dt>Medida</dt><dd>1.5 Substituir tubos e pigtails</dd><dt>Programado</dt><dd>${t.prog?(t.p<=2?'Sim, faixa A1 a F3 (leste)':'Sim, faixa A42 a F52 (oeste)'):'Não'}</dd>${t.rem?'<dt>Situação</dt><dd>Removido antes da parada, conforme item 1.5</dd>':''}
+      <dt>Instalado em</dt><dd>${t.inst==='2021'?'Parada de 2021 (substituição)':'Partida original'}</dd>${t.subst?`<dt>Coluna nova</dt><dd>${t.rx==='laudado'?'Diâmetro em 6 alturas e carbono medidos':'Medição de 6 alturas e carbono pendente'}</dd>`:''}</dl>
+    <h3>Dados do tubo (FAB-051)</h3>${ficha02()}`}
+function vao(p){let a=0;for(let i=0;i<5;i++){if(p<a+R2.grupos[i])return R2.colunas[i]+'–'+R2.colunas[i+1];a+=R2.grupos[i]}}
+function ficha02(){return `<dl class="kv"><dt>Tubo</dt><dd>Fundido, A-608 HP modif. (25Cr-35Ni+Nb)</dd><dt>Dimensão</dt><dd>DI 114,3 × parede 14,4 × 12.075 mm</dd>
+  <dt>Pigtail</dt><dd>1¼" SCH 160, Incoloy 800 HT (B407)</dd><dt>Projeto</dt><dd>958 °C · 27,8 kgf/cm²</dd><dt>Passo</dt><dd>254 mm entre tubos</dd><dt>Código</dt><dd>API RP 530</dd></dl>`}
+
+function grafPerfil(v){const W=320,H=176,l=104,r=40,bh=18,g=8,mx=Math.max(R2.lim.rt*1.15,...v);const sx=x=>l+(W-l-r)*x/mx;
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Crescimento por elevação">`;
+  [['al',R2.lim.al,'--g-al'],['rt',R2.lim.rt,'--g-rt']].forEach(([k,x,c])=>{s+=`<line x1="${sx(x)}" y1="4" x2="${sx(x)}" y2="${v.length*(bh+g)}" stroke="${gv(c)}" stroke-dasharray="3 3"/>`});
+  v.forEach((x,i)=>{const y=4+i*(bh+g);s+=`<text x="0" y="${y+13}" font-size="10.5">${R2.elev[i].n.split(' · ')[0]} · ${R2.elev[i].n.split(' · ')[1]}</text><rect x="${l}" y="${y}" width="${Math.max(2,sx(x)-l)}" height="${bh}" rx="4" fill="${corG(x)}"/><text x="${sx(x)+5}" y="${y+13}" font-size="10.5" font-weight="700">${f1(x)}%</text>`});
+  s+=`<text x="${sx(R2.lim.al)}" y="${H-6}" font-size="10" text-anchor="middle">alerta</text><text x="${sx(R2.lim.rt)}" y="${H-6}" font-size="10" text-anchor="middle">retirada</text></svg>`;return s}
+function grafHist(v){const W=320,H=130,l=30,r=14,t=10,b=24,mx=Math.max(R2.lim.rt*1.15,...v.filter(x=>x!=null));
+  const sx=i=>l+(W-l-r)*i/(v.length-1),sy=y=>t+(H-t-b)*(1-y/mx);
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Histórico do crescimento">`;
+  [[R2.lim.al,'--g-al'],[R2.lim.rt,'--g-rt']].forEach(([y,c])=>{s+=`<line x1="${l}" x2="${W-r}" y1="${sy(y)}" y2="${sy(y)}" stroke="${gv(c)}" stroke-dasharray="3 3"/>`});
+  s+=`<line x1="${l}" x2="${W-r}" y1="${sy(0)}" y2="${sy(0)}" stroke="${gv('--line')}"/>`;
+  const pts=v.map((y,i)=>y==null?null:[sx(i),sy(y)]).filter(Boolean);
+  s+=`<polyline points="${pts.map(p=>p.join(',')).join(' ')}" fill="none" stroke="${gv('--blue')}" stroke-width="2"/>`;
+  v.forEach((y,i)=>{s+=`<text x="${sx(i)}" y="${H-6}" font-size="10" text-anchor="middle">${R2.camp[i]}</text>`;if(y!=null)s+=`<circle cx="${sx(i)}" cy="${sy(y)}" r="${i===v.length-1?4.5:3}" fill="${corG(y)}"/><text x="${sx(i)}" y="${sy(y)-8}" font-size="10" text-anchor="middle" font-weight="700">${f1(y,1)}</text>`});
+  return s+'</svg>'}
+
+/* =========================================================
+   F-424101 · radiação helicoidal planificada + convecção
+   ========================================================= */
+const R1={setores:12,voltas:13,nom:6.55,lim:{al:5.5,rt:4.8}};
+const PT1=[],CV1=[];
+(function gerar1(){const r=rng(424101);
+  for(let v=0;v<26;v++){const s=v%2===0?1:2, volta=Math.floor(v/2)+1;
+    for(let k=0;k<12;k++){const ponto=(k%3===0);
+      let e=6.4-(volta<=2?.55:0)-.25*Math.sin(Math.PI*v/26)+(r()-.5)*.35;if(volta<=2&&k===6)e-=.7;
+      PT1.push({v,s,volta,k,ponto,e:ponto?e:null,id:`S${s}-V${String(volta).padStart(2,'0')}-${k*30}°`})}}
+  const tipos=['Reservada (expansão)','Reservada (expansão)','Aletado','Aletado','Aletado','Aletado','Aletado','Liso (choque)','Liso (choque)','Liso (choque)'];
+  for(let f=0;f<10;f++)for(let c=0;c<4;c++){const res=f<2;let e=res?null:6.3-(f>=7?.45:0)+(r()-.5)*.4;if(f===7&&c===2)e-=.9;
+    CV1.push({f,c,tipo:tipos[f],res,e,id:`C${String(10-f).padStart(2,'0')}-${c+1}`})}
+})();
+function corE(e){return e==null?gv('--g-sem'):e<=R1.lim.rt?gv('--g-rt'):e<=R1.lim.al?gv('--g-al'):gv('--g-ok')}
+
+function mapa01(){
+  const cw=46,ch=15,x0=86,y0=40,xc=x0+12*cw+70;
+  const larg=xc+4*42+60, alt=y0+26*ch+40;
+  const s=el('svg',{viewBox:`0 0 ${larg} ${alt}`,role:'img','aria-label':'Radiação planificada e convecção do F-424101'});
+  s.appendChild(el('text',{x:x0,y:16,'font-size':12,'font-weight':800},'Radiação · serpentinas abertas de 0° a 360°'));
+  for(let k=0;k<12;k++)s.appendChild(el('text',{x:x0+k*cw+cw/2,y:y0-6,'font-size':10,'text-anchor':'middle'},`${k*30}°`));
+  s.appendChild(el('rect',{x:x0-2,y:y0-2+0,width:12*cw+4,height:4*ch+4,fill:'none',stroke:gv('--s-esp'),'stroke-dasharray':'4 3',rx:4}));
+  PT1.forEach(p=>{const x=x0+p.k*cw,y=y0+p.v*ch;
+    const r=el('rect',{x:x+1,y:y+1,width:cw-2,height:ch-2,rx:3,fill:p.ponto?corE(p.e):(p.s===1?gv('--field'):gv('--field-line')),class:p.ponto?'tb'+(sel===p?' sel':''):'' ,opacity:p.ponto?1:.9});
+    if(p.ponto){r.appendChild(el('title',{},`${p.id} · ${f1(p.e)} mm`));r.addEventListener('click',()=>{sel=p;tudo()})}
+    s.appendChild(r)});
+  for(let v=0;v<26;v+=2){const volta=v/2+1;s.appendChild(el('text',{x:x0-8,y:y0+v*ch+ch-3,'font-size':9.5,'text-anchor':'end'},`V${volta} S1`));}
+  s.appendChild(el('text',{x:x0+12*cw+6,y:y0+2*ch+4,'font-size':10,fill:gv('--s-esp-tx')},'item 1.5'));
+  s.appendChild(el('text',{x:x0+12*cw+6,y:y0+2*ch+16,'font-size':10,fill:gv('--s-esp-tx')},'limpeza'));
+  s.appendChild(el('text',{x:x0,y:alt-10,'font-size':10.5},'Linhas claras: serpentina 1 · linhas escuras: serpentina 2 · célula colorida: ponto de ME'));
+  s.appendChild(el('text',{x:xc,y:16,'font-size':12,'font-weight':800},'Convecção'));
+  CV1.forEach(t=>{const x=xc+t.c*42+21,y=y0+12+t.f*34;
+    const c=el('circle',{cx:x,cy:y,r:12,fill:t.res?'none':corE(t.e),stroke:t.res?gv('--map-line'):'none','stroke-dasharray':t.res?'3 3':'',class:t.res?'':'tb'+(sel===t?' sel':'')});
+    if(!t.res){c.appendChild(el('title',{},`${t.id} · ${f1(t.e)} mm`));c.addEventListener('click',()=>{sel=t;tudo()})}s.appendChild(c)});
+  [[0,'reservadas'],[2,'aletados'],[7,'lisos']].forEach(([f,n])=>s.appendChild(el('text',{x:xc+4*42+6,y:y0+16+f*34,'font-size':10},n)));
+  return s}
+
+function side01(){
+  if(!sel){const todos=PT1.filter(p=>p.ponto).concat(CV1.filter(c=>!c.res));const n=k=>todos.filter(k).length;
+    const pior=todos.slice().sort((a,b)=>a.e-b.e).slice(0,8);
+    return `<div class="hs-t">Visão do forno</div><div class="hs-q">Toque num ponto de ME da radiação ou num tubo da convecção para abrir a ficha.</div>
+      <div class="faixas"><div><div class="n" style="color:var(--g-ok)">${n(p=>p.e>R1.lim.al)}</div><div class="l">acima do alerta</div></div>
+      <div><div class="n" style="color:var(--g-al)">${n(p=>p.e<=R1.lim.al&&p.e>R1.lim.rt)}</div><div class="l">em alerta</div></div>
+      <div><div class="n" style="color:var(--g-rt)">${n(p=>p.e<=R1.lim.rt)}</div><div class="l">no limite ou abaixo</div></div></div>
+      <h3>Menores espessuras</h3><ul class="top">${pior.map(p=>`<li data-id="${p.id}"><b style="font-size:11.5px">${p.id}</b><span class="zm">${p.volta?'radiação':'convecção · '+p.tipo.toLowerCase()}</span><b style="color:${corE(p.e)}">${f1(p.e)}</b></li>`).join('')}</ul>
+      <h3>Dados da serpentina (FAB-003, 011, 012)</h3>${ficha01()}`}
+  const p=sel,rad=!!p.volta,hs=[p.e+.42,p.e+.21,p.e];
+  return `<button type="button" class="hs-fechar" id="b-fechar">← Visão do forno</button>
+    <div class="hs-t" style="margin-top:4px">${rad?'Ponto':'Tubo'} ${p.id}</div>
+    <div class="hs-q" style="margin:2px 0 0">${rad?`Radiação · serpentina ${p.s} · volta ${p.volta} de 13 · setor ${p.k*30}°`:`Convecção · fileira ${10-p.f} de baixo para cima · tubo ${p.c+1} de 4 · ${p.tipo}`}</div>
+    <div style="display:flex;gap:18px;margin-top:14px;flex-wrap:wrap"><div><div class="big" style="color:${corE(p.e)}">${f1(p.e)}<small> mm</small></div><div class="zm">espessura medida em 2027</div></div>
+      <div><div class="big">${f1(R1.nom)}<small> mm</small></div><div class="zm">espessura nominal</div></div></div>
+    ${rad&&p.volta<=2?`<div class="aviso" style="${st('esp')}">Volta incluída no item 1.5: limpeza das duas primeiras espiras.</div>`:''}
+    <h3>Histórico por campanha</h3><dl class="kv">${['2021','2024','2027'].map((c,i)=>`<dt>${c}</dt><dd style="color:${corE(hs[i])}">${f1(hs[i])} mm</dd>`).join('')}<dt>Taxa</dt><dd>${f1((hs[0]-hs[2])/6,3)} mm/ano</dd></dl>
+    <h3>Dados da serpentina</h3>${ficha01()}`}
+function ficha01(){return `<dl class="kv"><dt>Tubo</dt><dd>DN 5" SCH 40, ASTM A-335 P22</dd><dt>Radiação</dt><dd>2 serpentinas helicoidais, Ø 4.000, 13 voltas, passo 508</dd>
+  <dt>Convecção</dt><dd>10 fileiras × 4 tubos: 3 lisas, 5 aletadas, 2 reservadas</dd><dt>Aletas</dt><dd>SAE-1010, 1,27 × 25,4, 197/m</dd></dl>`}
+
+/* =========================================================
+   F-428301A/B · tubos verticais na parede + convecção
+   ========================================================= */
+const R8={nom:14.27,lim:{al:12.5,rt:11.0},elTopo:'16.183',elBase:'3.683'};
+const D8={};
+function gera83(chave,seed){const r=rng(seed),T=[],C=[];
+  for(let s=0;s<4;s++)for(let i=0;i<10;i++){
+    let e=13.85-(i<3?.35:0)+(r()-.5)*.55;
+    if(chave==='8A'&&s===1&&(i===4||i===5))e-=2.3+r()*.4;
+    if(chave==='8B'&&s===3&&i===8)e-=1.6;
+    const ang=((270-90*s-9*(i+.5))%360+360)%360;
+    T.push({tipo:'rad',s,i,ang,id:`P${s+1}-T${String(i+1).padStart(2,'0')}`,e})}
+  const tipos=['Reservada (expansão)','Reservada (expansão)','Aletado','Aletado','Aletado','Aletado','Aletado','Aletado','Aletado','Liso (choque)','Liso (choque)','Liso (choque)'];
+  for(let f=0;f<12;f++)for(let c=0;c<4;c++){const res=f<2,me=f>=8;
+    let e=me?13.6-(f>=9?.45:0)+(r()-.5)*.5:null;if(chave==='8A'&&f===10&&c===1)e-=1.4;
+    C.push({tipo:'conv',f,c,res,me,tipoN:tipos[f],id:`C${String(12-f).padStart(2,'0')}-${c+1}`,e})}
+  D8[chave]={T,C}}
+gera83('8A',428301);gera83('8B',428302);
+let vista8='iso';
+function corE8(e){return e==null?gv('--g-sem'):e<=R8.lim.rt?gv('--g-rt'):e<=R8.lim.al?gv('--g-al'):gv('--g-ok')}
+
+function conv83(s,x0,y0,dados){
+  s.appendChild(el('text',{x:x0,y:y0-14,'font-size':12,'font-weight':800},'Convecção'));
+  dados.C.forEach(t=>{const x=x0+t.c*34+16,y=y0+8+t.f*28;
+    const c=el('circle',{cx:x,cy:y,r:10.5,fill:t.res?'none':t.me?corE8(t.e):gv('--field-line'),stroke:t.res?gv('--map-line'):'none','stroke-dasharray':t.res?'3 3':'',class:t.me?'tb'+(sel===t?' sel':''):''});
+    if(t.me){c.appendChild(el('title',{},`${t.id} · ${f1(t.e)} mm`));c.addEventListener('click',()=>{sel=t;tudo()})}s.appendChild(c)});
+  [[0,'reservadas'],[2,'aletados'],[9,'lisos']].forEach(([f,n])=>s.appendChild(el('text',{x:x0+4*34+6,y:y0+12+f*28,'font-size':10},n)))}
+
+function marcaTubo(g,t,x,y){const c=el('circle',{cx:x,cy:y,r:7,fill:corE8(t.e),stroke:sel===t?gv('--blue'):'#ffffff','stroke-width':sel===t?3:1.5,class:'tb'});
+  c.appendChild(el('title',{},`${t.id} · ${f1(t.e)} mm`));c.addEventListener('click',()=>{sel=t;tudo()});g.appendChild(c)}
+
+function mapa83(){
+  const d=D8[forno], ink=gv('--map-ink'), line=gv('--map-line'), corpo=gv('--field-line');
+  if(vista8==='plan'){
+    const P=19,GAP=30,x0=70,yT=70,H=300;const larg=x0+40*P+3*GAP+270,alt=yT+H+80;
+    const s=el('svg',{viewBox:`0 0 ${larg} ${alt}`,role:'img','aria-label':'Radiação planificada do forno vertical'});
+    s.appendChild(el('text',{x:x0,y:18,'font-size':12,'font-weight':800},'Radiação · parede aberta de 270° a 270°, vista de dentro'));
+    const X=t=>x0+(t.s*10+t.i)*P+t.s*GAP;
+    d.T.forEach(t=>{const x=X(t);
+      s.appendChild(el('rect',{x:x-4.5,y:yT,width:9,height:H,rx:2,fill:corpo}));
+      if(t.i<9){const x2=X(d.T[t.s*10+t.i+1]),emCima=t.i%2===1,yy=emCima?yT:yT+H;
+        s.appendChild(el('path',{d:`M${x} ${yy} A${(x2-x)/2} ${(x2-x)/2} 0 0 ${emCima?1:0} ${x2} ${yy}`,fill:'none',stroke:corpo,'stroke-width':9}))}
+      marcaTubo(s,t,x,yT+H/2)});
+    for(let p=0;p<4;p++){const a=X(d.T[p*10]),b=X(d.T[p*10+9]);
+      s.appendChild(el('text',{x:(a+b)/2,y:yT+H+44,'font-size':11.5,'font-weight':800,'text-anchor':'middle'},`Passe ${p+1}`));
+      s.appendChild(el('text',{x:a,y:yT-22,'font-size':9.5,'text-anchor':'middle'},'entra'));
+      s.appendChild(el('text',{x:b,y:yT-22,'font-size':9.5,'text-anchor':'middle'},'sai'))}
+    ['270°','180°','90°','0°','270°'].forEach((a,k)=>{const x=k===0?x0-14:k===4?X(d.T[39])+14:(X(d.T[k*10-1])+X(d.T[k*10]))/2;
+      s.appendChild(el('line',{x1:x,y1:yT-8,x2:x,y2:yT+H+20,stroke:line,'stroke-dasharray':'3 4'}));
+      s.appendChild(el('text',{x,y:yT+H+30,'font-size':10,'text-anchor':'middle'},a))});
+    s.appendChild(el('text',{x:x0-20,y:yT+4,'font-size':9.5,'text-anchor':'end'},`EL ${R8.elTopo}`));
+    s.appendChild(el('text',{x:x0-20,y:yT+H,'font-size':9.5,'text-anchor':'end'},`EL ${R8.elBase}`));
+    conv83(s,X(d.T[39])+70,yT,d);return s}
+  if(vista8==='pl'){
+    const cx=270,cy=262,R=190;const s=el('svg',{viewBox:`0 0 780 540`,role:'img','aria-label':'Planta da radiação do forno vertical'});
+    s.appendChild(el('circle',{cx,cy,r:R+26,fill:'none',stroke:line}));s.appendChild(el('circle',{cx,cy,r:R-24,fill:gv('--burner'),'fill-opacity':.35,stroke:line,'stroke-dasharray':'4 4'}));
+    s.appendChild(el('text',{x:cx,y:cy+4,'font-size':11,'text-anchor':'middle'},'queimadores no piso'));
+    [[0,'0°'],[90,'90°'],[180,'180°'],[270,'270°']].forEach(([a,n])=>{const r=a*Math.PI/180;
+      s.appendChild(el('line',{x1:cx+(R-30)*Math.cos(r),y1:cy+(R-30)*Math.sin(r),x2:cx+(R+34)*Math.cos(r),y2:cy+(R+34)*Math.sin(r),stroke:line,'stroke-dasharray':'3 4'}));
+      s.appendChild(el('text',{x:cx+(R+48)*Math.cos(r),y:cy+(R+48)*Math.sin(r)+4,'font-size':10.5,'text-anchor':'middle'},n))});
+    for(let p=0;p<4;p++){const a=(270-90*p-45)*Math.PI/180;s.appendChild(el('text',{x:cx+(R-58)*Math.cos(a),y:cy+(R-58)*Math.sin(a)+4,'font-size':11,'font-weight':800,'text-anchor':'middle'},`P${p+1}`))}
+    d.T.forEach(t=>{const r=t.ang*Math.PI/180;marcaTubo(s,t,cx+R*Math.cos(r),cy+R*Math.sin(r))});
+    s.appendChild(el('text',{x:10,y:530,'font-size':10.5},'Orientação conforme FAB-202, corte C1-C1'));
+    conv83(s,560,60,d);return s}
+  /* isométrica: cilindro de tubos */
+  const cx=320,cy=410,rx=230,ry=78,H=270;const s=el('svg',{viewBox:`0 0 850 520`,role:'img','aria-label':'Vista isométrica da radiação do forno vertical'});
+  s.appendChild(el('ellipse',{cx,cy,rx:rx+22,ry:ry+9,fill:gv('--burner'),'fill-opacity':.45,stroke:line}));
+  s.appendChild(el('ellipse',{cx,cy:cy-H,rx:rx+22,ry:ry+9,fill:'none',stroke:line,'stroke-dasharray':'4 4'}));
+  s.appendChild(el('line',{x1:cx-rx-22,y1:cy,x2:cx-rx-22,y2:cy-H,stroke:line,'stroke-dasharray':'4 4'}));
+  s.appendChild(el('line',{x1:cx+rx+22,y1:cy,x2:cx+rx+22,y2:cy-H,stroke:line,'stroke-dasharray':'4 4'}));
+  const pos=t=>{const r=t.ang*Math.PI/180;return[cx+rx*Math.cos(r),cy+ry*Math.sin(r)]};
+  d.T.slice().sort((a,b)=>Math.sin(a.ang*Math.PI/180)-Math.sin(b.ang*Math.PI/180)).forEach(t=>{const[x,y]=pos(t),fr=Math.sin(t.ang*Math.PI/180)>0;
+    const g=el('g',{opacity:fr?1:.55});
+    g.appendChild(el('rect',{x:x-4.5,y:y-H,width:9,height:H,fill:corpo}));
+    g.appendChild(el('rect',{x:x-3,y:y-H,width:1.6,height:H,fill:'#ffffff',opacity:.35}));
+    g.appendChild(el('ellipse',{cx:x,cy:y-H,rx:4.5,ry:1.8,fill:'#ffffff',opacity:.6}));
+    marcaTubo(g,t,x,y-H/2);s.appendChild(g)});
+  [[0,'0°',cx+rx+44,cy+4],[90,'90°',cx,cy+ry+26],[180,'180°',cx-rx-44,cy+4],[270,'270°',cx,cy-H-ry-16]].forEach(([a,n,x,y])=>s.appendChild(el('text',{x,y,'font-size':10.5,'text-anchor':'middle'},n)));
+  s.appendChild(el('text',{x:cx-rx-30,y:cy-H+4,'font-size':9.5,'text-anchor':'end'},`EL ${R8.elTopo}`));s.appendChild(el('text',{x:cx-rx-30,y:cy-16,'font-size':9.5,'text-anchor':'end'},`EL ${R8.elBase}`));
+  s.appendChild(el('text',{x:cx,y:cy+ry+44,'font-size':10.5,'text-anchor':'middle'},'Tubos do fundo esmaecidos · ponto = ME no meio do tubo'));
+  conv83(s,650,70,d);return s}
+
+function side83(){const d=D8[forno],todos=d.T.concat(d.C.filter(c=>c.me));
+  const ficha=`<dl class="kv"><dt>Serviço</dt><dd>U-4283 · HDT-3 Diesel</dd><dt>Radiação</dt><dd>4 passes × 10 tubos verticais, DN 6" SCH 120S × 12.500 mm</dd><dt>Material</dt><dd>A-312 TP347H · curvas A-403 WP347H, esp. mín. 14,9</dd>
+    <dt>Arranjo</dt><dd>Na parede, raio 2.913,5 · curvas de 180° em cima e embaixo</dd><dt>Convecção</dt><dd>12 fileiras × 4 tubos: 3 lisas, 7 aletadas, 2 reservadas</dd><dt>Aletas</dt><dd>AISI-304, 1,27 × 19,1, 197/m</dd><dt>Escopo</dt><dd>1.3 · ME em 56 pontos conforme croqui</dd></dl>`;
+  if(!sel){const n=k=>todos.filter(k).length,pior=todos.slice().sort((a,b)=>a.e-b.e).slice(0,8);
+    return `<div class="hs-t">Visão do forno</div><div class="hs-q">56 pontos de ME (40 na radiação, 16 nos tubos de choque da convecção). Distribuição de exemplo até recebermos o croqui.</div>
+      <div class="faixas"><div><div class="n" style="color:var(--g-ok)">${n(p=>p.e>R8.lim.al)}</div><div class="l">acima do alerta</div></div>
+      <div><div class="n" style="color:var(--g-al)">${n(p=>p.e<=R8.lim.al&&p.e>R8.lim.rt)}</div><div class="l">em alerta</div></div>
+      <div><div class="n" style="color:var(--g-rt)">${n(p=>p.e<=R8.lim.rt)}</div><div class="l">no limite ou abaixo</div></div></div>
+      <h3>Menores espessuras</h3><ul class="top">${pior.map(p=>`<li data-id="${p.id}"><b>${p.id}</b><span class="zm">${p.tipo==='rad'?'radiação · passe '+(p.s+1):'convecção · '+p.tipoN.toLowerCase()}</span><b style="color:${corE8(p.e)}">${f1(p.e)}</b></li>`).join('')}</ul>
+      <h3>Dados do forno (FAB-202, 210, 211)</h3>${ficha}`}
+  const p=sel,hs=[p.e+.5,p.e+.24,p.e];
+  return `<button type="button" class="hs-fechar" id="b-fechar">← Visão do forno</button>
+    <div class="hs-t" style="margin-top:4px">${p.tipo==='rad'?'Tubo':'Tubo de convecção'} ${p.id}</div>
+    <div class="hs-q" style="margin:2px 0 0">${p.tipo==='rad'?`Radiação · passe ${p.s+1} · tubo ${p.i+1} de 10 · posição ${Math.round(p.ang)}°`:`Convecção · fileira ${12-p.f} de baixo para cima · tubo ${p.c+1} de 4 · ${p.tipoN}`}</div>
+    <div style="display:flex;gap:18px;margin-top:14px;flex-wrap:wrap"><div><div class="big" style="color:${corE8(p.e)}">${f1(p.e)}<small> mm</small></div><div class="zm">espessura medida em 2027</div></div>
+      <div><div class="big">${f1(R8.nom)}<small> mm</small></div><div class="zm">nominal 6" SCH 120S</div></div></div>
+    <h3>Histórico por campanha</h3><dl class="kv">${['2021','2024','2027'].map((c,i)=>`<dt>${c}</dt><dd style="color:${corE8(hs[i])}">${f1(hs[i])} mm</dd>`).join('')}<dt>Taxa</dt><dd>${f1((hs[0]-hs[2])/6,3)} mm/ano</dd></dl>
+    <h3>Dados do forno</h3>${ficha}`}
+
+/* =========================================================
+   montagem da tela
+   ========================================================= */
+function kpis(){let h;
+  if(forno[0]==='8'){const d=D8[forno],rt=d.T.concat(d.C).filter(p=>p.e!=null&&p.e<=R8.lim.rt).length;
+    h=[[40,'','Tubos na radiação (4 passes × 10)'],[40,'','Tubos na convecção (+8 reservados)'],[56,'','Pontos de ME (item 1.3)'],[rt,'','No limite ou abaixo']]}
+  else if(forno==='02'){const prog=TUB.filter(t=>t.prog).length,sub=TUB.filter(t=>t.subst).length,rx=TUB.filter(t=>t.rx==='laudado').length,rt=TUB.filter(t=>t.g>=R2.lim.rt).length;
+    h=[[312,'','Tubos catalisadores (fileiras A a F)'],[sub+TUB.filter(t=>t.rem).length,` de ${prog}`,'Removidos ou substituídos (item 1.5, +10 a definir)'],[rx,` de ${sub}`,'Colunas novas medidas (6 alturas + carbono)'],[rt,'','Acima do limite de retirada']]}
+  else{const pts=PT1.filter(p=>p.ponto).length+CV1.filter(c=>!c.res).length,rt=PT1.concat(CV1).filter(p=>p.e!=null&&p.e<=R1.lim.rt).length;
+    h=[[26,'','Voltas na radiação (2 × 13)'],[32,'','Tubos na convecção (+8 reservados)'],[pts,'','Pontos de ME medidos'],[rt,'','No limite ou abaixo']]}
+  $('kpis').innerHTML=h.map(([n,s,l])=>`<div class="kpi"><div class="n">${n}<small>${s}</small></div><div class="l">${l}</div></div>`).join('')}
+function ctrl(){
+  if(forno[0]==='8'){$('ctrl').innerHTML=`<div class="grp"><span class="lb">Vista</span>${[['iso','Isométrica'],['plan','Planificada'],['pl','Planta']].map(([k,n])=>`<button type="button" class="uchip" data-v8="${k}" aria-pressed="${vista8===k}">${n}</button>`).join('')}</div>
+    <div class="grp"><label class="lb" for="e8-al">Alerta mm</label><input type="number" id="e8-al" step="0.1" min="0" value="${R8.lim.al}">
+      <label class="lb" for="e8-rt">Mínima mm</label><input type="number" id="e8-rt" step="0.1" min="0" value="${R8.lim.rt}"><span class="ex">valores de exemplo</span></div>`;
+    document.querySelectorAll('[data-v8]').forEach(b=>b.onclick=()=>{vista8=b.dataset.v8;tudo()});
+    $('e8-al').onchange=e=>{R8.lim.al=+e.target.value||R8.lim.al;tudo()};$('e8-rt').onchange=e=>{R8.lim.rt=+e.target.value||R8.lim.rt;tudo()};return}
+  if(forno==='02'){$('ctrl').innerHTML=`<div class="grp"><span class="lb">Vista</span><button type="button" class="uchip" id="v-iso" aria-pressed="${vista==='iso'}">Isométrica</button><button type="button" class="uchip" id="v-pl" aria-pressed="${vista==='pl'}">Planta</button></div>
+    ${vista==='iso'?`<div class="grp"><span class="lb">Fileira</span><button type="button" class="uchip" data-fil="-1" aria-pressed="${filFoco<0}">Todas</button>${[0,1,2,3,4,5].map(f=>`<button type="button" class="uchip" data-fil="${f}" aria-pressed="${filFoco===f}">${FIL[f]}</button>`).join('')}</div>`:''}
+    <div class="grp"><span class="lb">Pintar por</span>
+      <button type="button" class="uchip" id="m-g" aria-pressed="${metrica==='g'}">Crescimento diametral</button>
+      <button type="button" class="uchip" id="m-s" aria-pressed="${metrica==='s'}">Situação na parada</button></div>
+    <label class="chk"><input type="checkbox" id="c-prog" ${soProg?'checked':''}> Destacar os 84 do item 1.5</label>
+    <div class="grp"><label class="lb" for="l-al">Alerta %</label><input type="number" id="l-al" step="0.1" min="0" value="${R2.lim.al}">
+      <label class="lb" for="l-rt">Retirada %</label><input type="number" id="l-rt" step="0.1" min="0" value="${R2.lim.rt}"><span class="ex">valores de exemplo</span></div>`;
+    $('v-iso').onclick=()=>{vista='iso';tudo()};$('v-pl').onclick=()=>{vista='pl';tudo()};document.querySelectorAll('[data-fil]').forEach(b=>b.onclick=()=>{filFoco=+b.dataset.fil;tudo()});$('m-g').onclick=()=>{metrica='g';tudo()};$('m-s').onclick=()=>{metrica='s';tudo()};$('c-prog').onchange=e=>{soProg=e.target.checked;tudo()};
+    $('l-al').onchange=e=>{R2.lim.al=+e.target.value||R2.lim.al;tudo()};$('l-rt').onchange=e=>{R2.lim.rt=+e.target.value||R2.lim.rt;tudo()}}
+  else{$('ctrl').innerHTML=`<div class="grp"><span class="lb">Pintar por</span><button type="button" class="uchip" aria-pressed="true">Espessura medida (ME)</button></div>
+    <div class="grp"><label class="lb" for="e-al">Alerta mm</label><input type="number" id="e-al" step="0.1" min="0" value="${R1.lim.al}">
+      <label class="lb" for="e-rt">Mínima mm</label><input type="number" id="e-rt" step="0.1" min="0" value="${R1.lim.rt}"><span class="ex">valores de exemplo</span></div>`;
+    $('e-al').onchange=e=>{R1.lim.al=+e.target.value||R1.lim.al;tudo()};$('e-rt').onchange=e=>{R1.lim.rt=+e.target.value||R1.lim.rt;tudo()}}}
+function legenda(){
+  if(forno==='02'&&metrica==='s'){$('legenda').innerHTML=[['nao','Mantido','--g-sem'],['esp','Programado para substituir','--s-esp'],['pen','Já removido antes da parada','--s-pen'],['and','Substituído · medição pendente','--s-and'],['lib','Substituído · medição feita','--s-lib']].map(([k,n,c])=>`<span><i style="background:var(${c})"></i>${n}</span>`).join('');return}
+  if(forno[0]==='8'){$('legenda').innerHTML=[[`acima de ${f1(R8.lim.al,1)} mm`,'--g-ok'],[`${f1(R8.lim.rt,1)} a ${f1(R8.lim.al,1)} mm`,'--g-al'],[`${f1(R8.lim.rt,1)} mm ou menos`,'--g-rt'],['sem ponto de ME','--g-sem']].map(([n,c])=>`<span><i style="background:var(${c})"></i>${n}</span>`).join('');return}
+  const L=forno==='02'?[[`abaixo de ${f1(R2.lim.al,1)}%`,'--g-ok'],[`${f1(R2.lim.al,1)}% a ${f1(R2.lim.rt,1)}%`,'--g-al'],[`${f1(R2.lim.rt,1)}% ou mais`,'--g-rt']]
+    :[[`acima de ${f1(R1.lim.al,1)} mm`,'--g-ok'],[`${f1(R1.lim.rt,1)} a ${f1(R1.lim.al,1)} mm`,'--g-al'],[`${f1(R1.lim.rt,1)} mm ou menos`,'--g-rt'],['sem ponto de medição','--g-sem']];
+  $('legenda').innerHTML=L.map(([n,c])=>`<span><i style="background:var(${c})"></i>${n}</span>`).join('')+(forno==='02'?'<span class="zm">Contorno escuro: programado para substituir</span>':'')}
+function tudo(){
+  ['02','01','8A','8B'].forEach(k=>$('ab-'+k).setAttribute('aria-pressed',forno===k));
+  $('p-tit').textContent=forno==='02'?(vista==='iso'?'F-424102 · radiação em vista isométrica':'F-424102 · planta da radiação vista de cima'):'F-424101 · radiação planificada e convecção';
+  $('p-sub').textContent=forno==='02'?(vista==='iso'?'Cada coluna é pintada nas 6 alturas medidas · coletor de entrada em cima, de saída embaixo · espaçamento entre fileiras e altura fora de escala':'6 fileiras de 52 tubos entre 7 fileiras de 14 queimadores · colunas da estrutura K2 a M2 (FAB-063)'):'Cada célula é um trecho da serpentina: volta na vertical, ângulo na horizontal (FAB-003, 011, 012)';
+  if(forno[0]==='8'){const nm='F-42830'+'1'+forno[1];$('p-tit').textContent=nm+' · '+({iso:'radiação em vista isométrica',plan:'radiação planificada e convecção',pl:'planta da radiação vista de cima'})[vista8];
+    $('p-sub').textContent='4 passes de 10 tubos verticais na parede, raio 2.913,5 · convecção com 12 fileiras de 4 tubos (FAB-202, 210, 211)'}
+  kpis();ctrl();legenda();$('mapa').innerHTML='';$('mapa').appendChild(forno[0]==='8'?mapa83():forno==='02'?(vista==='iso'?mapa02iso():mapa02()):mapa01());
+  $('side').innerHTML=forno[0]==='8'?side83():forno==='02'?side02():side01();
+  const bf=$('b-fechar');if(bf)bf.onclick=()=>{sel=null;tudo()};
+  $('side').querySelectorAll('.top li').forEach(li=>li.onclick=()=>{const id=li.dataset.id;sel=(forno[0]==='8'?D8[forno].T.concat(D8[forno].C):forno==='02'?TUB:PT1.concat(CV1)).find(t=>t.id===id);tudo();
+    if(matchMedia('(max-width:1020px)').matches)$('side').scrollIntoView({block:'start'})})}
+['02','01','8A','8B'].forEach(k=>$('ab-'+k).onclick=()=>{forno=k;sel=null;tudo()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sel){sel=null;tudo()}});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',tudo);
+tudo();
+</script>
+
+</body>
+</html>
