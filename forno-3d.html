@@ -135,10 +135,12 @@ body{display:flex;flex-direction:column;overflow:hidden}
 .grupo button[aria-pressed="true"]{background:#0F4CBA;color:#fff}
 .grupo button:focus-visible{outline:2px solid #0F4CBA;outline-offset:1px}
 #rotulos{position:absolute;inset:0;pointer-events:none;z-index:2;overflow:hidden}
-.rot{position:absolute;left:0;top:0;pointer-events:auto;display:flex;align-items:center;gap:6px;transform-origin:0 0;margin:-14px 0 0 -14px;border:0;background:rgba(255,255,255,.92);border-radius:20px;padding:3px 10px 3px 3px;font:700 11.5px var(--font-ui);color:#1f2a37;cursor:pointer;box-shadow:0 4px 12px -4px rgba(0,0,0,.35);white-space:nowrap}
+.rot{position:absolute;left:0;top:0;pointer-events:auto;display:flex;align-items:center;gap:6px;transform-origin:0 0;margin:-16px 0 0 -16px;border:0;background:rgba(255,255,255,.92);border-radius:20px;padding:3px 10px 3px 3px;font:700 11.5px var(--font-ui);color:#1f2a37;cursor:pointer;box-shadow:0 4px 12px -4px rgba(0,0,0,.35);white-space:nowrap}
 .rot b{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--c,#0F4CBA);color:#fff;font:800 10.5px var(--font-d)}
-.rot.sel{outline:2px solid #2f6bff}
-@media (max-width:760px){.rot span{display:none}.rot{padding:3px}}
+.rot{padding:3px;transition:opacity .2s}.rot span{display:none}.rot b{width:26px;height:26px;font-size:11.5px;box-shadow:0 0 0 2px #fff}
+.rot:hover{z-index:2}.rot:hover span,.rot.sel span{display:inline}.rot:hover,.rot.sel{padding:3px 10px 3px 3px;z-index:3}
+.rot.sel{outline:2px solid #2f6bff;outline-offset:1px}.rot.apaga{opacity:.5}
+@media (hover:none){.rot:hover span{display:none}.rot:hover{padding:3px}.rot.sel span{display:inline}.rot.sel{padding:3px 10px 3px 3px}}
 #lado{position:absolute;right:12px;top:12px;bottom:12px;width:340px;max-width:calc(100% - 24px);overflow:auto;z-index:4;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 40px -16px rgba(0,0,0,.45);padding:18px}
 @media (max-width:760px){#lado{top:auto;left:12px;right:12px;width:auto;max-height:58%}}
 #lado .x{float:right;border:0;background:none;font-size:24px;line-height:1;color:var(--muted);cursor:pointer}
@@ -774,15 +776,20 @@ const zInfo=c=>{if(c.startsWith('P3:')){const z=FORNOS.P3.zonas[0];return {cod:'
   const z=FOR.zonas.find(x=>x.cod===c);return z?{cod:c,fo:FO,nome:z.nome,num:z.num,tag:z.tag||'',e:estZona(FO,c)}:null};
 const UI={xray:false,cor:false,op:false,rot:true,sel:null,tubo:null};
 const cache={};
-function matPara(m){const b=m.userData.base,k=m.userData.zona+'|'+m.userData.mat+'|'+(UI.xray&&CASCA.has(m.userData.zona+'|'+m.userData.mat))+'|'+UI.cor+'|'+(UI.sel===m.userData.zona);
-  if(cache[k])return cache[k];let x=b;const casca=UI.xray&&CASCA.has(m.userData.zona+'|'+m.userData.mat),zi=zInfo(m.userData.zona);
+const fantasma=m=>UI.sel&&m.userData.zona!==UI.sel&&m.userData.zona!=='CHAO';
+const GHOST=new THREE.MeshStandardMaterial({color:'#dfe6ee',roughness:1,metalness:0,transparent:true,opacity:.07,depthWrite:false});
+const SELM=new Set();
+function matPara(m){if(fantasma(m))return GHOST;const b=m.userData.base,k=m.userData.zona+'|'+m.userData.mat+'|'+(UI.xray&&CASCA.has(m.userData.zona+'|'+m.userData.mat))+'|'+UI.cor+'|'+(UI.sel===m.userData.zona);
+  if(cache[k]){if(UI.sel===m.userData.zona)SELM.add(cache[k]);return cache[k]}let x=b;const casca=UI.xray&&CASCA.has(m.userData.zona+'|'+m.userData.mat),zi=zInfo(m.userData.zona);
   if(casca||UI.cor||UI.sel===m.userData.zona){x=b.clone();
     if(UI.cor&&zi&&!['grade','amarelo','conc','brita','asf','branco'].includes(m.userData.mat)){x.color=new THREE.Color(COR[zi.e.k]);x.map=null;x.metalness=Math.min(x.metalness,.2);x.emissive=new THREE.Color(COR[zi.e.k]).multiplyScalar(.12)}
     if(casca){x.transparent=true;x.opacity=.13;x.depthWrite=false;x.side=THREE.DoubleSide}
-    if(UI.sel===m.userData.zona&&!['conc'].includes(m.userData.mat)){x.emissive=new THREE.Color('#2f6bff');x.emissiveIntensity=.38}}
+    if(UI.sel===m.userData.zona&&!['conc'].includes(m.userData.mat)){x.emissive=new THREE.Color(UI.cor?'#ffffff':'#2f6bff');x.emissiveIntensity=.3;SELM.add(x)}}
   return cache[k]=x}
-function aplica(){ZMESH.forEach(m=>{m.material=matPara(m);m.castShadow=!(UI.xray&&CASCA.has(m.userData.zona+'|'+m.userData.mat))});
-  const tsel=UI.sel==='TUBOS'&&!UI.tubo;IMtubo.material.emissive=new THREE.Color(tsel?'#2f6bff':UI.op?'#ff5a1a':'#000');IMtubo.material.emissiveIntensity=tsel?.35:UI.op?.55:0;
+const IMS=[IMtubo,IMfl,IMhaste,IMq,IMpin,...IMpo];IMS.forEach(m=>m.userData.m0=m.material);
+function aplica(){SELM.clear();ZMESH.forEach(m=>{m.material=matPara(m);m.castShadow=!(UI.xray&&CASCA.has(m.userData.zona+'|'+m.userData.mat))&&!fantasma(m)});
+  IMS.forEach(m=>{const g=fantasma(m);m.material=g?GHOST:m.userData.m0;m.castShadow=!g});
+  const tsel=UI.sel==='TUBOS'&&!UI.tubo;if(tsel)SELM.add(IMtubo.userData.m0);IMtubo.userData.m0.emissive=new THREE.Color(tsel?'#2f6bff':UI.op?'#ff5a1a':'#000');IMtubo.userData.m0.emissiveIntensity=tsel?.35:UI.op?.55:0;
   IMflame.visible=UI.op;
   /* cor dos tubos: no modo cor, pelo item 1.5 */
   TUBOS.forEach((t,i)=>{let c=t.c&&t.c.sub?'#b4b6b8':'#7d6f66';if(UI.cor){c=t.c?(t.c.med?'#16A34A':t.c.sub?'#0F4CBA':'#F59E0B'):'#8f8178'}IMtubo.setColorAt(i,new THREE.Color(c))});IMtubo.instanceColor.needsUpdate=true;
@@ -791,11 +798,27 @@ function aplica(){ZMESH.forEach(m=>{m.material=matPara(m);m.castShadow=!(UI.xray
 TUBOS.forEach((t,i)=>IMtubo.setColorAt(i,new THREE.Color('#7d6f66')));
 
 /* rótulos com o número da zona */
-const ANC={CHAM:[CHX,61.5,CHZ],VTF:[-37.4,12.4,0],VTI:[IDFX,6.2,IDFZ],APH:[-23.9,28.6,0],DUTO:[-20.5,31.8,0],CONV:[-15.9,24.6,-4],TRANS:[-10.7,8.9,6.2],RAD:[RX+.2,11.4,-3.2],QUEI:[-RX-1,22.6,0],
+const ANC={CHAM:[CHX,36,CHZ],VTF:[-37.4,12.4,0],VTI:[IDFX,6.2,IDFZ],APH:[-23.9,28.6,0],DUTO:[-20.5,31.8,0],CONV:[-15.9,24.6,-4],TRANS:[-10.7,8.9,6.2],RAD:[RX+.2,11.4,-3.2],QUEI:[-RX-1,22.6,0],
   TUBOS:[2.5,19.6,RZ+1],TUN:[RX+.3,6.2,4.4],COL:[2,EL.pentR+1.3,0],LT:[1.2,2.8,-10],EST:[RX+3.7,18.9,RZ+1.6],'P3:CALD':[-5,12.6,-12.4]};
-const rotEl={};Object.entries(ANC).forEach(([c,p])=>{const zi=zInfo(c);if(!zi)return;const b=document.createElement('button');b.type='button';b.className='rot';b.dataset.z=c;b.innerHTML=`<b>${zi.num}</b><span>${esc(zi.nome)}</span>`;b.onclick=()=>seleciona(c,true);$('rotulos').appendChild(b);rotEl[c]={el:b,p:new THREE.Vector3(...p)}});
+const rotEl={};Object.entries(ANC).forEach(([c,p])=>{const zi=zInfo(c);if(!zi)return;const b=document.createElement('button');b.type='button';b.className='rot';b.dataset.z=c;b.innerHTML=`<b>${zi.num}</b><span>${esc(zi.nome)}</span>`;b.title=zi.nome;b.setAttribute('aria-label',`Zona ${zi.num}: ${zi.nome}`);b.onclick=()=>seleciona(c,true);$('rotulos').appendChild(b);rotEl[c]={el:b,p:new THREE.Vector3(...p)}});
 function rotulos(){if(!UI.rot)return;const w=cv.clientWidth,h=cv.clientHeight;Object.entries(rotEl).forEach(([c,o])=>{V.copy(o.p).project(cam);const vis=V.z<1&&V.x>-1.1&&V.x<1.1&&V.y>-1.1&&V.y<1.1;
-  o.el.style.display=vis?'':'none';if(vis){o.el.style.transform=`translate(${(V.x*.5+.5)*w}px,${(-V.y*.5+.5)*h}px)`;const e=o.k||(o.k=zInfo(c).e.k);o.el.style.setProperty('--c',COR[e]);o.el.classList.toggle('sel',UI.sel===c)}})}
+  o.el.style.display=vis?'':'none';if(vis){o.el.style.transform=`translate(${(V.x*.5+.5)*w}px,${(-V.y*.5+.5)*h}px)`;const e=o.k||(o.k=zInfo(c).e.k);o.el.style.setProperty('--c',COR[e]);o.el.classList.toggle('sel',UI.sel===c);o.el.classList.toggle('apaga',!!UI.sel&&UI.sel!==c)}})}
+
+/* onde fica cada zona: caixa envolvente para a câmera ir até lá */
+const CX={};const add=(z,b)=>{if(!b||b.isEmpty())return;(CX[z]||(CX[z]=new THREE.Box3())).union(b)};
+ZMESH.forEach(m=>{if(!m.geometry.boundingBox)m.geometry.computeBoundingBox();add(m.userData.zona,m.geometry.boundingBox.clone().applyMatrix4(m.matrixWorld))});
+IMS.forEach(m=>{m.computeBoundingBox();if(m.boundingBox)add(m.userData.zona,m.boundingBox.clone())});
+function foca(c){const bx=CX[c];if(!bx)return;const ct=bx.getCenter(new THREE.Vector3()),sz=bx.getSize(new THREE.Vector3());
+  const r=Math.max(4,sz.length()/2),fov=cam.fov*Math.PI/180,fh=2*Math.atan(Math.tan(fov/2)*Math.min(1,cam.aspect));
+  let d=r/Math.sin(fh/2)*1.2;d=Math.max(18,Math.min(d,170));
+  const dir=cam.position.clone().sub(ctl.target);dir.y=Math.max(dir.y,dir.length()*.35);dir.normalize();
+  /* fora do painel de zonas o detalhe abre por cima: desloca para a zona ficar na parte livre da tela */
+  const w=cv.clientWidth,cel=!EMB&&w<760;if(cel)d*=1.25;
+  const p1=ct.clone().add(dir.clone().multiplyScalar(d)),t1=ct.clone();
+  if(!EMB){const fw=t1.clone().sub(p1).normalize(),rt=new THREE.Vector3().crossVectors(fw,new THREE.Vector3(0,1,0)).normalize(),up=new THREE.Vector3().crossVectors(rt,fw),hv=d*Math.tan(fov/2);
+    const off=cel?up.multiplyScalar(-.4*hv):rt.multiplyScalar(352/w*hv*cam.aspect);p1.add(off);t1.add(off)}
+  anim={t0:performance.now(),p0:cam.position.clone(),t0v:ctl.target.clone(),p1,t1};
+  document.querySelectorAll('[data-v]').forEach(b=>b.setAttribute('aria-pressed',false))}
 
 /* painel lateral */
 function painelZona(c){const zi=zInfo(c);if(!zi)return;const e=zi.e,sl=SLUG[zi.fo];
@@ -815,13 +838,13 @@ function painelTubo(t){const st=!t.c?['Tubo remanescente','Fora do item 1.5. Ent
    ${t.c?`<a class="bt" href="consulta.html#f-424102/p/1.5">Abrir o item 1.5 na consulta</a>`:`<a class="bt" href="consulta.html#f-424102/z/TUBOS">Abrir a zona dos tubos</a>`}
    <a class="bt bt-g" href="mapa-tubos.html#f-424102">Ver no mapa de tubos</a>`;
   $('lado').hidden=false;$('lx').onclick=fecha}
-function seleciona(c,usuario){UI.sel=c;UI.tubo=null;marcaTubo(-1);aplica();
+function seleciona(c,usuario){UI.sel=c;UI.tubo=null;marcaTubo(-1);aplica();foca(c);
   /* dentro do painel de zonas: quem mostra a zona é o painel */
   if(EMB&&!c.startsWith('P3:')){$('lado').hidden=true;if(usuario)parent.postMessage({f3d:'zona',cod:c},'*');return}
   painelZona(c);if(!EMB)history.replaceState(null,'','#'+(c.startsWith('P3:')?'cald':c.toLowerCase()))}
-function fecha(){UI.sel=null;UI.tubo=null;$('lado').hidden=true;marcaTubo(-1);aplica();if(EMB)parent.postMessage({f3d:'fecha'},'*');else history.replaceState(null,'',location.pathname)}
-addEventListener('message',e=>{const d=e.data||{};if(d.f3d==='sel'&&zInfo(d.cod)){UI.sel=d.cod;UI.tubo=null;marcaTubo(-1);$('lado').hidden=true;aplica()}
-  else if(d.f3d==='fecha'){UI.sel=null;UI.tubo=null;marcaTubo(-1);$('lado').hidden=true;aplica()}});
+function fecha(){const tinha=UI.sel;UI.sel=null;UI.tubo=null;$('lado').hidden=true;marcaTubo(-1);aplica();if(tinha)vai('iso');if(EMB)parent.postMessage({f3d:'fecha'},'*');else history.replaceState(null,'',location.pathname)}
+addEventListener('message',e=>{const d=e.data||{};if(d.f3d==='sel'&&zInfo(d.cod)){const ja=UI.sel===d.cod;UI.sel=d.cod;UI.tubo=null;marcaTubo(-1);$('lado').hidden=true;aplica();if(!ja)foca(d.cod)}
+  else if(d.f3d==='fecha'){const tinha=UI.sel;UI.sel=null;UI.tubo=null;marcaTubo(-1);$('lado').hidden=true;aplica();if(tinha)vai('iso')}});
 /* marcador do tubo escolhido */
 const marc=new THREE.Mesh(new THREE.CylinderGeometry(.13,.13,TUBY1-TUBY0+.4,16,1,true),new THREE.MeshBasicMaterial({color:'#2f6bff',transparent:true,opacity:.45,depthWrite:false}));marc.visible=false;scene.add(marc);
 function marcaTubo(i){if(i<0){marc.visible=false;return}const t=TUBOS[i];marc.position.set(t.x,(TUBY0+TUBY1)/2,t.z);marc.visible=true}
@@ -830,7 +853,7 @@ function marcaTubo(i){if(i<0){marc.visible=false;return}const t=TUBOS[i];marc.po
 const ray=new THREE.Raycaster(),ptr=new THREE.Vector2();let down=null;
 cv.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY]});
 cv.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>6)return;const r=cv.getBoundingClientRect();ptr.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(ptr,cam);
-  const alvos=[...ZMESH.filter(m=>!(UI.xray&&CASCA.has(m.userData.zona+'|'+m.userData.mat))),IMtubo,IMq,IMpin];
+  const alvos=[...ZMESH.filter(m=>!(UI.xray&&CASCA.has(m.userData.zona+'|'+m.userData.mat))),IMtubo,IMq,IMpin].filter(m=>!fantasma(m));
   const hs=ray.intersectObjects(alvos,false).filter(h=>h.object.visible&&h.object.userData.zona!=='CHAO');let hit=hs[0];if(!hit){fecha();return}
   /* guarda-corpo e plataforma na frente: prefere o equipamento logo atrás */
   if(hit.object.userData.zona==='EST'){const atras=hs.find(h=>h.object.userData.zona!=='EST'&&h.distance<hit.distance+3.5);if(atras)hit=atras}
@@ -857,9 +880,10 @@ const usaAO=()=>comp&&!UI.xray&&!UI.op;
 function tam(){const w=cv.clientWidth,h=cv.clientHeight;if(cv.width!==Math.round(w*R.getPixelRatio())||cv.height!==Math.round(h*R.getPixelRatio())){R.setSize(w,h,false);if(comp){comp.setPixelRatio(R.getPixelRatio());comp.setSize(w,h)}}cam.aspect=w/h;cam.updateProjectionMatrix()}
 addEventListener('resize',tam);
 const clk=new THREE.Clock();
-R.setAnimationLoop(()=>{const t=clk.getElapsedTime();
+function tick(){const t=clk.getElapsedTime();
   if(anim){const k=Math.min(1,(performance.now()-anim.t0)/1100),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;cam.position.lerpVectors(anim.p0,anim.p1,e);ctl.target.lerpVectors(anim.t0v,anim.t1,e);if(k>=1)anim=null}
-  flameMat.uniforms.t.value=t;ctl.update();if(usaAO())comp.render();else R.render(scene,cam);rotulos()});
+  flameMat.uniforms.t.value=t;if(SELM.size){const p=.22+.2*(.5+.5*Math.sin(t*3.2));SELM.forEach(x=>x.emissiveIntensity=p)}ctl.update();if(usaAO())comp.render();else R.render(scene,cam);rotulos()}
+R.setAnimationLoop(tick);
 
 /* início: vista isométrica, ou o que vier no link (#tubos, #conv, #tubo-B47) */
 if(EMB)UI.cor=true;
@@ -868,7 +892,7 @@ aplica();
 {const h=decodeURIComponent(location.hash.slice(1));if(h.startsWith('tubo-')){const i=TUBOS.findIndex(t=>t.id===h.slice(5).toUpperCase());if(i>=0){UI.xray=true;vai('radiacao',true);UI.sel='TUBOS';aplica();marcaTubo(i);painelTubo(TUBOS[i])}}
   else if(h){const c=h==='cald'?'P3:CALD':h.toUpperCase();if(zInfo(c))seleciona(c)}}
 $('carga').hidden=true;
-window.__f3d={scene,cam,ctl,R,TUBOS,vai,UI,aplica,quadro:()=>{if(usaAO())comp.render();else R.render(scene,cam);rotulos()}};
+window.__f3d={scene,cam,ctl,R,TUBOS,vai,UI,aplica,quadro:()=>{if(anim)anim.t0=-1e9;tick()}};
 
 </script>
 
