@@ -162,6 +162,8 @@ body{display:flex;flex-direction:column;overflow:hidden}
 #leg i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
 #carga{position:absolute;inset:0;display:grid;place-items:center;z-index:5;background:rgba(205,217,227,.7);font:700 14px var(--font-ui);color:#1f2a37}
 body.emb .es-header,body.emb .fonte{display:none!important}
+.cheia-b{display:inline-flex;align-items:center;gap:5px}.cheia-b svg{width:14px;height:14px}
+body.cheia .es-header,body.cheia .fonte{display:none!important}
 body.emb #lado{width:300px}
 body.emb .grupo button{padding:6px 8px;font-size:11.5px}
 .fonte{position:absolute;right:12px;bottom:10px;z-index:1;font:600 10.5px var(--font-ui);color:rgba(20,35,55,.7);text-align:right;max-width:46%}
@@ -188,7 +190,7 @@ body.emb .grupo button{padding:6px 8px;font-size:11.5px}
       <button type="button" data-v="planta">Planta</button><button type="button" data-v="radiacao">Radiação por dentro</button><button type="button" data-v="convec">Convecção</button><button type="button" data-v="chamine">Chaminé</button></div>
     <div class="grupo" role="group" aria-label="Camadas"><b>Mostrar</b>
       <button type="button" id="b-xray" aria-pressed="false">Raio X</button><button type="button" id="b-cor" aria-pressed="false">Cor por estado</button>
-      <button type="button" id="b-op" aria-pressed="false">Em operação</button><button type="button" id="b-rot" aria-pressed="true">Zonas</button></div>
+      <button type="button" id="b-op" aria-pressed="false">Em operação</button><button type="button" id="b-rot" aria-pressed="true">Zonas</button><button type="button" id="b-cheia" aria-pressed="false" class="cheia-b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Tela inteira</span></button></div>
   </div>
   <div id="leg" hidden><span><i style="background:#9CA3AF"></i>Não iniciada</span><span><i style="background:#0F4CBA"></i>Em andamento</span><span><i style="background:#F59E0B"></i>Aguarda inspeção</span><span><i style="background:#EF4444"></i>Pendência</span><span><i style="background:#16A34A"></i>Concluída</span><span><i style="background:#6E8A7C"></i>N/A</span>
     <span style="flex-basis:100%;color:#5b6675">Tubos: verde medido, azul substituído, âmbar programado no item 1.5</span></div>
@@ -813,9 +815,9 @@ function foca(c){const bx=CX[c];if(!bx)return;const ct=bx.getCenter(new THREE.Ve
   let d=r/Math.sin(fh/2)*1.2;d=Math.max(18,Math.min(d,170));
   const dir=cam.position.clone().sub(ctl.target);dir.y=Math.max(dir.y,dir.length()*.35);dir.normalize();
   /* fora do painel de zonas o detalhe abre por cima: desloca para a zona ficar na parte livre da tela */
-  const w=cv.clientWidth,cel=!EMB&&w<760;if(cel)d*=1.25;
+  const sol=!EMB||emCheia(),w=cv.clientWidth,cel=sol&&w<760;if(cel)d*=1.25;
   const p1=ct.clone().add(dir.clone().multiplyScalar(d)),t1=ct.clone();
-  if(!EMB){const fw=t1.clone().sub(p1).normalize(),rt=new THREE.Vector3().crossVectors(fw,new THREE.Vector3(0,1,0)).normalize(),up=new THREE.Vector3().crossVectors(rt,fw),hv=d*Math.tan(fov/2);
+  if(sol){const fw=t1.clone().sub(p1).normalize(),rt=new THREE.Vector3().crossVectors(fw,new THREE.Vector3(0,1,0)).normalize(),up=new THREE.Vector3().crossVectors(rt,fw),hv=d*Math.tan(fov/2);
     const off=cel?up.multiplyScalar(-.4*hv):rt.multiplyScalar(352/w*hv*cam.aspect);p1.add(off);t1.add(off)}
   anim={t0:performance.now(),p0:cam.position.clone(),t0v:ctl.target.clone(),p1,t1};
   document.querySelectorAll('[data-v]').forEach(b=>b.setAttribute('aria-pressed',false))}
@@ -839,12 +841,26 @@ function painelTubo(t){const st=!t.c?['Tubo remanescente','Fora do item 1.5. Ent
    <a class="bt bt-g" href="mapa-tubos.html#f-424102">Ver no mapa de tubos</a>`;
   $('lado').hidden=false;$('lx').onclick=fecha}
 function seleciona(c,usuario){UI.sel=c;UI.tubo=null;marcaTubo(-1);aplica();foca(c);
-  /* dentro do painel de zonas: quem mostra a zona é o painel */
-  if(EMB&&!c.startsWith('P3:')){$('lado').hidden=true;if(usuario)parent.postMessage({f3d:'zona',cod:c},'*');return}
+  /* dentro do painel de zonas: quem mostra a zona é o painel (menos em tela inteira, quando o painel some) */
+  if(EMB&&!c.startsWith('P3:')){if(usuario)parent.postMessage({f3d:'zona',cod:c},'*');if(!emCheia()){$('lado').hidden=true;return}}
   painelZona(c);if(!EMB)history.replaceState(null,'','#'+(c.startsWith('P3:')?'cald':c.toLowerCase()))}
 function fecha(){const tinha=UI.sel;UI.sel=null;UI.tubo=null;$('lado').hidden=true;marcaTubo(-1);aplica();if(tinha)vai('iso');if(EMB)parent.postMessage({f3d:'fecha'},'*');else history.replaceState(null,'',location.pathname)}
-addEventListener('message',e=>{const d=e.data||{};if(d.f3d==='sel'&&zInfo(d.cod)){const ja=UI.sel===d.cod;UI.sel=d.cod;UI.tubo=null;marcaTubo(-1);$('lado').hidden=true;aplica();if(!ja)foca(d.cod)}
+addEventListener('message',e=>{const d=e.data||{};if(d.f3d==='sel'&&zInfo(d.cod)){const ja=UI.sel===d.cod;UI.sel=d.cod;UI.tubo=null;marcaTubo(-1);if(emCheia())painelZona(d.cod);else $('lado').hidden=true;aplica();if(!ja)foca(d.cod)}
   else if(d.f3d==='fecha'){const tinha=UI.sel;UI.sel=null;UI.tubo=null;marcaTubo(-1);$('lado').hidden=true;aplica();if(tinha)vai('iso')}});
+/* tela inteira: API do navegador; no iPhone, que não tem, ocupa a janela toda */
+const DE=document.documentElement,rfs=DE.requestFullscreen||DE.webkitRequestFullscreen,xfs=document.exitFullscreen||document.webkitExitFullscreen;
+let cheiaCSS=false;
+function emCheia(){return !!(document.fullscreenElement||document.webkitFullscreenElement)||cheiaCSS}
+function cheiaJanela(on){cheiaCSS=on;document.body.classList.toggle('cheia',on);if(EMB)parent.postMessage({f3d:'cheia',on},'*');atualCheia()}
+function atualCheia(){const on=emCheia();$('b-cheia').setAttribute('aria-pressed',on);$('b-cheia').querySelector('span').textContent=on?'Sair da tela inteira':'Tela inteira';
+  if(!EMB)document.body.classList.toggle('cheia',on);setTimeout(tam,60);
+  if(EMB){if(on&&UI.sel&&!UI.tubo)painelZona(UI.sel);else if(!on&&!UI.tubo)$('lado').hidden=true}}
+$('b-cheia').onclick=()=>{if(emCheia()){if(cheiaCSS)cheiaJanela(false);else xfs&&xfs.call(document)}
+  else if(rfs){try{const r=rfs.call(DE);if(r&&r.catch)r.catch(()=>cheiaJanela(true))}catch(e){cheiaJanela(true)}}else cheiaJanela(true)};
+document.addEventListener('fullscreenchange',atualCheia);document.addEventListener('webkitfullscreenchange',atualCheia);
+addEventListener('keydown',e=>{if(e.key==='Escape'&&cheiaCSS)cheiaJanela(false)});
+if(EMB){const bs=document.createElement('base');bs.target='_top';document.head.appendChild(bs)}
+
 /* marcador do tubo escolhido */
 const marc=new THREE.Mesh(new THREE.CylinderGeometry(.13,.13,TUBY1-TUBY0+.4,16,1,true),new THREE.MeshBasicMaterial({color:'#2f6bff',transparent:true,opacity:.45,depthWrite:false}));marc.visible=false;scene.add(marc);
 function marcaTubo(i){if(i<0){marc.visible=false;return}const t=TUBOS[i];marc.position.set(t.x,(TUBY0+TUBY1)/2,t.z);marc.visible=true}
