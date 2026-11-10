@@ -123,6 +123,9 @@ select{font-family:var(--font-ui);font-size:13px;font-weight:600;color:var(--ink
 .fig{min-width:0;display:flex;flex-direction:column}
 .fig .palco{flex:1}
 .palco{position:relative}
+#f3d{display:block;width:100%;height:600px;border:0;border-radius:10px;background:#cdd9e3}
+@media(max-width:980px){#f3d{height:460px}}
+.palco.tres .vista-toda{display:none!important}
 .hm-side{border-left:1px solid var(--line);padding:16px 18px;min-width:0;max-height:760px;overflow:auto}
 @media(max-width:980px){.hm-side{border-left:0;border-top:1px solid var(--line);max-height:none}}
 .hs-t{font-family:var(--font-d);font-weight:800;font-size:14px;color:var(--ink);line-height:1.3}
@@ -228,6 +231,7 @@ select{font-family:var(--font-ui);font-size:13px;font-weight:600;color:var(--ink
             <g id="g-num"></g>
             <g id="g-ed"></g>
           </svg>
+          <iframe id="f3d" src="forno-3d.html?embed=1" title="F-424102 em 3D, zonas pintadas pelo estado" hidden></iframe>
           <button type="button" class="vista-toda" id="b-toda" hidden>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>Ver forno inteiro</button>
         </div>
@@ -508,6 +512,7 @@ function irPara(alvo){cancelAnimationFrame(anim);const ini=vb.slice(),t0=perform
 
 /* ---------- base do desenho (troca ao mudar de forno) ---------- */
 function montarBase(){const F=Fo(),g=$('g-base');g.innerHTML='';
+  {const tres=fk==='02',f=$('f3d');if(f){f.hidden=!tres;$('svg').style.display=tres?'none':'';$('b-ed').hidden=tres;$('palco').classList.toggle('tres',tres)}}
   if(F.tipo==='img'){const im=el('image',{x:24,y:168,width:1064,height:622});im.setAttribute('href',$('img-02').getAttribute('data-src'));g.appendChild(im)}
   else{g.innerHTML=desenhoCil(F);
     F.zonas.forEach(z=>{const ps=[...g.querySelectorAll(`[data-z="${z.cod}"]`)];if(!ps.length)return;
@@ -560,7 +565,7 @@ function ladoDetalhe(){const z=Z()[ativa],sl=SLUG[fk];
   $('b-voltar').onclick=fechar;$('b-fechar').onclick=fechar}
 function resumo(){const F=Fo(),n=k=>Z().filter(z=>z.estado===k).length;
   $('h-tt').textContent=F.nome;$('h-st').textContent='REPLAN · '+F.sub+' · Contrato 5900.0135110.26.2 · OS 035 · Parada março 2027';
-  $('cap').textContent=F.cap;$('b-ed').hidden=F.tipo!=='img';
+  $('cap').textContent=fk==='02'?'Modelo 3D em escala pelos desenhos de fabricação. Gire, aproxime e toque numa zona; ligue o Raio X para ver os 312 tubos e tocar em cada um.':F.cap;$('b-ed').hidden=F.tipo!=='img'||fk==='02';$('b-area').hidden=fk==='02';$('b-num').hidden=fk==='02';
   ['02','01','8A','8B'].forEach(k=>$('ab-'+k).setAttribute('aria-pressed',fk===k));
   $('r-lib').innerHTML=`${n('lib')+n('na')}<small> de ${Z().length}</small>`;$('r-esp').textContent=n('esp');$('r-pen').textContent=n('pen');
   const f=Z().reduce((a,z)=>a+z.ens.reduce((b,e)=>b+e.f,0),0),t=Z().reduce((a,z)=>a+z.ens.reduce((b,e)=>b+e.t,0),0);$('r-end').innerHTML=`${f}<small> de ${t}</small>`;
@@ -570,8 +575,10 @@ function resumo(){const F=Fo(),n=k=>Z().filter(z=>z.estado===k).length;
 
 function tudo(){desenhar();resumo();if(ativa>=0&&!modoEd)ladoDetalhe();else ladoLista()}
 function sel(i){if(modoEd){$('ed-zona').value=i;ativa=i;desenhar();return}
+  if(fk==='02'&&$('f3d'))try{$('f3d').contentWindow.postMessage({f3d:'sel',cod:Z()[i].cod},'*')}catch(e){}
   ativa=i;tudo();irPara(caixa(Z()[i]));if(matchMedia('(max-width:980px)').matches)$('side').scrollIntoView({behavior:reduz.matches?'auto':'smooth',block:'start'})}
-function fechar(){ativa=-1;tudo();irPara(Fo().vb)}
+function fechar(){ativa=-1;tudo();irPara(Fo().vb);if(fk==='02'&&$('f3d'))try{$('f3d').contentWindow.postMessage({f3d:'fecha'},'*')}catch(e){}}
+addEventListener('message',e=>{const d=e.data||{};if(fk!=='02')return;if(d.f3d==='zona'){const i=Z().findIndex(z=>z.cod===d.cod);if(i>=0)sel(i)}else if(d.f3d==='fecha'&&ativa>=0){ativa=-1;tudo()}});
 const HM={'f-424102':'02','f-424101':'01','f-428301a':'8A','f-428301b':'8B'},MH={'02':'f-424102','01':'f-424101','8A':'f-428301a','8B':'f-428301b'};
 function trocar(k){if(modoEd)$('b-ed').click();fk=k;ativa=-1;try{history.replaceState(null,'','#'+MH[k])}catch(e){};const lk=document.getElementById('lk-outro');if(lk)lk.href='mapa-tubos.html#'+MH[k];montarBase();edOpcoes();tudo()}
 $('b-toda').onclick=fechar;

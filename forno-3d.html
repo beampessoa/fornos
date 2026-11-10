@@ -159,6 +159,9 @@ body{display:flex;flex-direction:column;overflow:hidden}
 #leg{position:absolute;left:12px;bottom:12px;z-index:3;display:flex;flex-wrap:wrap;gap:6px 12px;background:rgba(255,255,255,.9);border-radius:10px;padding:8px 12px;font:600 11.5px var(--font-ui);color:#1f2a37;max-width:calc(100% - 24px)}
 #leg i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
 #carga{position:absolute;inset:0;display:grid;place-items:center;z-index:5;background:rgba(205,217,227,.7);font:700 14px var(--font-ui);color:#1f2a37}
+body.emb .es-header,body.emb .fonte{display:none!important}
+body.emb #lado{width:300px}
+body.emb .grupo button{padding:6px 8px;font-size:11.5px}
 .fonte{position:absolute;right:12px;bottom:10px;z-index:1;font:600 10.5px var(--font-ui);color:rgba(20,35,55,.7);text-align:right;max-width:46%}
 @media (max-width:760px){.fonte{display:none}}
 </style>
@@ -383,6 +386,7 @@ import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 
 const $=id=>document.getElementById(id);
 const FO='02',FOR=FORNOS[FO];
+const EMB=new URLSearchParams(location.search).has('embed');if(EMB)document.body.classList.add('emb');
 const MOBILE=matchMedia('(max-width:760px)').matches||navigator.maxTouchPoints>1&&innerWidth<1100;
 
 /* ---------- grade do arranjo geral ---------- */
@@ -789,7 +793,7 @@ TUBOS.forEach((t,i)=>IMtubo.setColorAt(i,new THREE.Color('#7d6f66')));
 /* rótulos com o número da zona */
 const ANC={CHAM:[CHX,61.5,CHZ],VTF:[-37.4,12.4,0],VTI:[IDFX,6.2,IDFZ],APH:[-23.9,28.6,0],DUTO:[-20.5,31.8,0],CONV:[-15.9,24.6,-4],TRANS:[-10.7,8.9,6.2],RAD:[RX+.2,11.4,-3.2],QUEI:[-RX-1,22.6,0],
   TUBOS:[2.5,19.6,RZ+1],TUN:[RX+.3,6.2,4.4],COL:[2,EL.pentR+1.3,0],LT:[1.2,2.8,-10],EST:[RX+3.7,18.9,RZ+1.6],'P3:CALD':[-5,12.6,-12.4]};
-const rotEl={};Object.entries(ANC).forEach(([c,p])=>{const zi=zInfo(c);if(!zi)return;const b=document.createElement('button');b.type='button';b.className='rot';b.dataset.z=c;b.innerHTML=`<b>${zi.num}</b><span>${esc(zi.nome)}</span>`;b.onclick=()=>seleciona(c);$('rotulos').appendChild(b);rotEl[c]={el:b,p:new THREE.Vector3(...p)}});
+const rotEl={};Object.entries(ANC).forEach(([c,p])=>{const zi=zInfo(c);if(!zi)return;const b=document.createElement('button');b.type='button';b.className='rot';b.dataset.z=c;b.innerHTML=`<b>${zi.num}</b><span>${esc(zi.nome)}</span>`;b.onclick=()=>seleciona(c,true);$('rotulos').appendChild(b);rotEl[c]={el:b,p:new THREE.Vector3(...p)}});
 function rotulos(){if(!UI.rot)return;const w=cv.clientWidth,h=cv.clientHeight;Object.entries(rotEl).forEach(([c,o])=>{V.copy(o.p).project(cam);const vis=V.z<1&&V.x>-1.1&&V.x<1.1&&V.y>-1.1&&V.y<1.1;
   o.el.style.display=vis?'':'none';if(vis){o.el.style.transform=`translate(${(V.x*.5+.5)*w}px,${(-V.y*.5+.5)*h}px)`;const e=o.k||(o.k=zInfo(c).e.k);o.el.style.setProperty('--c',COR[e]);o.el.classList.toggle('sel',UI.sel===c)}})}
 
@@ -811,8 +815,13 @@ function painelTubo(t){const st=!t.c?['Tubo remanescente','Fora do item 1.5. Ent
    ${t.c?`<a class="bt" href="consulta.html#f-424102/p/1.5">Abrir o item 1.5 na consulta</a>`:`<a class="bt" href="consulta.html#f-424102/z/TUBOS">Abrir a zona dos tubos</a>`}
    <a class="bt bt-g" href="mapa-tubos.html#f-424102">Ver no mapa de tubos</a>`;
   $('lado').hidden=false;$('lx').onclick=fecha}
-function seleciona(c){UI.sel=c;UI.tubo=null;aplica();painelZona(c);history.replaceState(null,'','#'+(c.startsWith('P3:')?'cald':c.toLowerCase()))}
-function fecha(){UI.sel=null;UI.tubo=null;$('lado').hidden=true;marcaTubo(-1);aplica();history.replaceState(null,'',location.pathname)}
+function seleciona(c,usuario){UI.sel=c;UI.tubo=null;marcaTubo(-1);aplica();
+  /* dentro do painel de zonas: quem mostra a zona é o painel */
+  if(EMB&&!c.startsWith('P3:')){$('lado').hidden=true;if(usuario)parent.postMessage({f3d:'zona',cod:c},'*');return}
+  painelZona(c);if(!EMB)history.replaceState(null,'','#'+(c.startsWith('P3:')?'cald':c.toLowerCase()))}
+function fecha(){UI.sel=null;UI.tubo=null;$('lado').hidden=true;marcaTubo(-1);aplica();if(EMB)parent.postMessage({f3d:'fecha'},'*');else history.replaceState(null,'',location.pathname)}
+addEventListener('message',e=>{const d=e.data||{};if(d.f3d==='sel'&&zInfo(d.cod)){UI.sel=d.cod;UI.tubo=null;marcaTubo(-1);$('lado').hidden=true;aplica()}
+  else if(d.f3d==='fecha'){UI.sel=null;UI.tubo=null;marcaTubo(-1);$('lado').hidden=true;aplica()}});
 /* marcador do tubo escolhido */
 const marc=new THREE.Mesh(new THREE.CylinderGeometry(.13,.13,TUBY1-TUBY0+.4,16,1,true),new THREE.MeshBasicMaterial({color:'#2f6bff',transparent:true,opacity:.45,depthWrite:false}));marc.visible=false;scene.add(marc);
 function marcaTubo(i){if(i<0){marc.visible=false;return}const t=TUBOS[i];marc.position.set(t.x,(TUBY0+TUBY1)/2,t.z);marc.visible=true}
@@ -825,8 +834,8 @@ cv.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down[0],e.cli
   const hs=ray.intersectObjects(alvos,false).filter(h=>h.object.visible&&h.object.userData.zona!=='CHAO');let hit=hs[0];if(!hit){fecha();return}
   /* guarda-corpo e plataforma na frente: prefere o equipamento logo atrás */
   if(hit.object.userData.zona==='EST'){const atras=hs.find(h=>h.object.userData.zona!=='EST'&&h.distance<hit.distance+3.5);if(atras)hit=atras}
-  if(hit.object===IMtubo&&hit.instanceId!=null){const t=TUBOS[hit.instanceId];UI.sel='TUBOS';UI.tubo=t;aplica();marcaTubo(hit.instanceId);painelTubo(t);history.replaceState(null,'','#tubo-'+t.id);return}
-  marcaTubo(-1);seleciona(hit.object.userData.zona)});
+  if(hit.object===IMtubo&&hit.instanceId!=null){const t=TUBOS[hit.instanceId];UI.sel='TUBOS';UI.tubo=t;aplica();marcaTubo(hit.instanceId);painelTubo(t);if(!EMB)history.replaceState(null,'','#tubo-'+t.id);return}
+  marcaTubo(-1);seleciona(hit.object.userData.zona,true)});
 
 /* vistas */
 const VISTAS={iso:[[52,46,78],[-14,16,0]],leste:[[72,16,6],[-8,13,0]],norte:[[-8,22,-82],[-12,14,0]],sul:[[-14,20,84],[-12,14,0]],planta:[[-12,125,1],[-12,0,0]],
@@ -853,6 +862,7 @@ R.setAnimationLoop(()=>{const t=clk.getElapsedTime();
   flameMat.uniforms.t.value=t;ctl.update();if(usaAO())comp.render();else R.render(scene,cam);rotulos()});
 
 /* início: vista isométrica, ou o que vier no link (#tubos, #conv, #tubo-B47) */
+if(EMB)UI.cor=true;
 tam();{const [p,t]=VISTAS.iso;const tv=new THREE.Vector3(...t);cam.position.copy(afasta(new THREE.Vector3(...p),tv));ctl.target.copy(tv)}
 aplica();
 {const h=decodeURIComponent(location.hash.slice(1));if(h.startsWith('tubo-')){const i=TUBOS.findIndex(t=>t.id===h.slice(5).toUpperCase());if(i>=0){UI.xray=true;vai('radiacao',true);UI.sel='TUBOS';aplica();marcaTubo(i);painelTubo(TUBOS[i])}}
