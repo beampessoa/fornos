@@ -476,6 +476,21 @@ function estZona(fo,zc){const ps=ITENS.filter(p=>p.forno===fo&&p.zonas.includes(
   const k=ps.some(p=>p.estado==='pen')?'pen':ps.every(p=>p.estado==='lib')?'lib':ps.some(p=>p.estado==='esp')?'esp':ps.every(p=>p.estado==='nao')?'nao':'and';
   return{k,ps,feitas:ps.filter(p=>p.estado==='lib').length}}
 
+/* ================= registros feitos na demonstração =================
+   a consulta grava cada registro assinado com PIN aqui; painel, 3D, planejamento e TV leem na abertura
+   e quando outra aba grava (evento storage). Sem banco: fica só neste navegador. */
+const REG_KEY='sigma-fornos-registros',HOJE_DEMO='2027-03-10';
+function regsSalvos(){try{return JSON.parse(localStorage.getItem(REG_KEY)||'{}')||{}}catch(e){return {}}}
+function guardaReg(id,r){const s=regsSalvos();(s[id]=s[id]||[]).push(r);try{localStorage.setItem(REG_KEY,JSON.stringify(s))}catch(e){}}
+function zeraRegs(){try{localStorage.removeItem(REG_KEY)}catch(e){};aplicaSalvos()}
+function nRegsSalvos(){return Object.values(regsSalvos()).reduce((a,l)=>a+l.length,0)}
+function aplicaSalvos(){const s=regsSalvos();
+  ITENS.forEach(p=>{if(!p._b)p._b={reg:p.reg.slice(),feitas:p.feitas,estado:p.estado,pend:p.pend};else{p.reg=p._b.reg.slice();p.feitas=p._b.feitas;p.estado=p._b.estado;if(p._b.pend)p.pend=p._b.pend;else delete p.pend}});
+  Object.entries(s).forEach(([id,l])=>{const p=ITENS.find(x=>x.id===id);if(!p||p.canc)return;const n=TIPOS[p.tipo].e.length;
+    l.forEach(r=>{if(p.feitas>=n)return;p.reg.push(Object.assign({},r,{et:p.feitas}));if(r.res!=='Não')p.feitas++;
+      p.estado=p.feitas>=n?'lib':r.res==='Não'?'pen':(TIPOS[p.tipo].e[p.feitas][1]==='Inspeção'?'esp':'and');if(p.pend&&p.feitas>=n)delete p.pend})})}
+aplicaSalvos();
+
 /* ================= Portal do Planejamento · fornos (mesmas funções do portal do Sigma Campo) ================= */
 const $=id=>document.getElementById(id);
 const ini=n=>String(n||'?').trim().charAt(0).toUpperCase();
